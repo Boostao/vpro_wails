@@ -212,7 +212,7 @@ func (s *ImportExportService) ImportVenusProject(ctx context.Context, contextID 
 	return interchange.ImportVenusProject(unwrapContextService(s.contexts), ctx, contextID, request)
 }
 
-// Dual TurboVeg 3 (.sqlite) & TurboVeg XML Importer/Exporter
+// Official Alterra Turboveg 3 (31-table .sqlite) & <Plot_package> Standard XML Importer/Exporter
 
 func (s *ImportExportService) ExportTurboVeg(ctx context.Context, contextID string, request interchange.TurboVegExportRequest) (interchange.TurboVegExportOutcome, error) {
 	if s == nil || unwrapContextService(s.contexts) == nil {

@@ -504,13 +504,13 @@
   {:else if section === 'turboveg'}
     <div class="two-col">
       <div class="hub-card">
-        <h3>Export TurboVeg 3 (.sqlite) or Universal XML</h3>
+        <h3>Export TurboVeg 3 (31-Table .sqlite) or Standard XML (&lt;Plot_package&gt;)</h3>
         <div class="form-stack">
           <label>
             <span>Target Format</span>
             <select bind:value={tvExportFormat} disabled={busy || operationHeld}>
-              <option value="sqlite">TurboVeg 3 Native SQLite (.sqlite)</option>
-              <option value="xml">Universal TurboVeg XML (.xml for TV2 / TV3 / JUICE)</option>
+              <option value="sqlite">TurboVeg 3 Official 31-Table SQLite (.sqlite)</option>
+              <option value="xml">TurboVeg Standard XML (&lt;Plot_package&gt; for TV2 / TV3 / JUICE / vegdata)</option>
             </select>
           </label>
           <label>
@@ -533,9 +533,9 @@
           </div>
         {/if}
 
-        <h4>10-Layer VPro &lt;-&gt; TurboVeg Crosswalk</h4>
+        <h4>Canonical VPro &lt;-&gt; TurboVeg Layer Crosswalk (0..10 + UDF Sublayer Tags)</h4>
         <table class="compact-table">
-          <thead><tr><th>VPro Columns</th><th>TurboVeg Stratum</th><th>Scope</th></tr></thead>
+          <thead><tr><th>VPro Columns</th><th>TurboVeg Layer</th><th>Crosswalk &amp; UDF Provenance</th></tr></thead>
           <tbody>
             {#each TURBOVEG_LAYER_CROSSWALK as cw (cw.tvGroup)}
               <tr><td class="mono">{cw.vproLayers}</td><td><strong>{cw.tvGroup}</strong></td><td>{cw.description}</td></tr>
@@ -545,7 +545,7 @@
       </div>
 
       <div class="hub-card">
-        <h3>Import TurboVeg (.sqlite or .xml) into VP08</h3>
+        <h3>Import TurboVeg (.sqlite or &lt;Plot_package&gt; .xml) into VP08</h3>
         <div class="form-stack">
           <label>
             <span>Source TurboVeg File (.sqlite or .xml)</span>
@@ -555,8 +555,8 @@
             <span>Format Override</span>
             <select bind:value={tvImportFormat} disabled={busy || operationHeld}>
               <option value="">Auto-detect from extension</option>
-              <option value="sqlite">TurboVeg 3 SQLite (.sqlite)</option>
-              <option value="xml">TurboVeg XML (.xml)</option>
+              <option value="sqlite">TurboVeg 3 31-Table SQLite (.sqlite)</option>
+              <option value="xml">TurboVeg Standard XML (&lt;Plot_package&gt; .xml)</option>
             </select>
           </label>
           <label>
@@ -578,7 +578,7 @@
 
         <details class="xml-check-box">
           <summary>Pre-validate pasted XML snippet (chunked non-blocking)</summary>
-          <textarea bind:value={tvXmlSnippet} rows={3} placeholder="<Turboveg><Plots><Plot plot_number=&quot;001&quot;>..." disabled={busy || operationHeld}></textarea>
+          <textarea bind:value={tvXmlSnippet} rows={3} placeholder="<Plot_package><Plots><Plot releve_nr=&quot;1&quot;>..." disabled={busy || operationHeld}></textarea>
           <button type="button" class="btn-secondary" disabled={busy || operationHeld} onclick={checkTurboVegXmlSnippet}>
             Validate XML Snippet
           </button>

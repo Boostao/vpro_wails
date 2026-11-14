@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<Plot_package UserName="hennekens" EmailAddress="" TurbovegVersion="2.142a (International single user version)" Dictionary="default" SpeciesList="BCPlantTaxonomy" Description="External Turboveg Plot_package Fixture" ShareWithMembersOnly="no" CreationDate="19/07/2024">
+	<Plots>
+		<Plot database="SkeenaExt" releve_nr="101" guid="{2B4CF1C0-2C0E-4B32-99DB-87874358125F}" create_user="jpojar" create_date="19/07/2024" modify_user="jpojar" modify_date="20/07/2024" ndff_qual="0">
+			<header_data>
+				<standard_record releve_nr="101" country="CA" reference="1001" table_nr="null" nr_in_tab="1" coverscale="00" project="SKE" author="JPOJ" date="20240719" syntaxon="SBSdk/01" surf_area="400.00" utm="null" altitude="785" exposition="225" inclinatio="18" cov_total="85" cov_trees="60" cov_herbs="35" cov_mosses="70" remarks="null"/>
+				<udf_record ispredefined="false" name="latitude" type="N" len="13" dec="8" value="54.45250000"/>
+				<udf_record ispredefined="false" name="longitude" type="N" len="13" dec="8" value="-126.62500000"/>
+				<udf_record ispredefined="false" name="zone" type="C" len="4" dec="0" value="SBS"/>
+				<udf_record ispredefined="false" name="subzone" type="C" len="8" dec="0" value="dk"/>
+				<udf_record ispredefined="false" name="site_series" type="C" len="5" dec="0" value="01"/>
+				<udf_record ispredefined="false" name="moisture_regime" type="C" len="3" dec="0" value="4"/>
+				<udf_record ispredefined="false" name="nutrient_regime" type="C" len="2" dec="0" value="C"/>
+				<udf_record ispredefined="false" name="location" type="C" len="80" dec="0" value="Vallée de Bulkley – Relevé 101 (Görlitz exchange)"/>
+			</header_data>
+			<species_data>
+				<species>
+					<standard_record nr="10" cover="42.5" layer="1"/>
+				</species>
+				<species>
+					<standard_record nr="20" cover="15" layer="4"/>
+				</species>
+				<species>
+					<standard_record nr="20" cover="3.5" layer="7"/>
+				</species>
+				<species>
+					<standard_record nr="30" cover="18.25" layer="6"/>
+				</species>
+				<species>
+					<standard_record nr="10" cover="+" layer="8"/>
+				</species>
+				<species>
+					<standard_record nr="40" cover="64" layer="9"/>
+				</species>
+				<species>
+					<standard_record nr="50" cover="2.5" layer="10"/>
+				</species>
+			</species_data>
+		</Plot>
+		<Plot database="SkeenaExt" releve_nr="102" guid="{AF39BB50-C706-4F43-A4C6-2D0B0A26746F}" create_user="wmackenz" create_date="21/07/2024" modify_user="" modify_date="" ndff_qual="0">
+			<header_data>
+				<standard_record releve_nr="102" country="CA" reference="1001" coverscale="01" project="SKE" author="WMAC" date="20240721" syntaxon="CWHvh2/01" surf_area="400.00" altitude="120" exposition="SW" inclinatio="12" remarks="Coastal bog margin – Braun-Blanquet scale"/>
+				<udf_record ispredefined="false" name="latitude" type="N" len="13" dec="8" value="53.25100000"/>
+				<udf_record ispredefined="false" name="longitude" type="N" len="13" dec="8" value="-132.14200000"/>
+				<udf_record ispredefined="false" name="zone" type="C" len="4" dec="0" value="CWH"/>
+				<udf_record ispredefined="false" name="subzone" type="C" len="8" dec="0" value="vh2"/>
+				<udf_record ispredefined="false" name="site_series" type="C" len="5" dec="0" value="01"/>
+			</header_data>
+			<species_data>
+				<species>
+					<standard_record nr="60" cover="2a" layer="1"/>
+				</species>
+				<species>
+					<standard_record nr="70" cover="3" layer="2"/>
+				</species>
+				<species>
+					<standard_record nr="30" cover="+" layer="7"/>
+				</species>
+				<species>
+					<standard_record nr="40" cover="r" layer="9"/>
+				</species>
+			</species_data>
+		</Plot>
+	</Plots>
+	<Lookup_tables>
+		<Coverscale_list>
+			<coverscale_record>
+				<code>00</code>
+				<description>Percentage (%)</description>
+				<data_record code="r" percentage="0.05"/>
+				<data_record code="+" percentage="0.50"/>
+				<data_record code="1" percentage="1.00"/>
+			</coverscale_record>
+			<coverscale_record>
+				<code>01</code>
+				<description>Braun-Blanquet (old/new)</description>
+				<data_record code="r" percentage="0.10"/>
+				<data_record code="+" percentage="0.50"/>
+				<data_record code="1" percentage="3.00"/>
+				<data_record code="2m" percentage="4.00"/>
+				<data_record code="2a" percentage="8.75"/>
+				<data_record code="2b" percentage="18.75"/>
+				<data_record code="3" percentage="37.50"/>
+				<data_record code="4" percentage="62.50"/>
+				<data_record code="5" percentage="87.50"/>
+			</coverscale_record>
+		</Coverscale_list>
+		<Reference_list>
+			<reference_record code="1001" author="Pojar, J.; MacKenzie, W." year="2024" title="BEC Field Synthesis – Skeena &amp; Haida Gwaii" published="B.C. Ministry of Forests"/>
+		</Reference_list>
+		<Country_list>
+			<country_record code="CA" description="Canada"/>
+		</Country_list>
+		<Author_list>
+			<author_record code="JPOJ" description="J. Pojar"/>
+			<author_record code="WMAC" description="W. MacKenzie"/>
+		</Author_list>
+		<Project_list>
+			<project_record code="SKE" description="SkeenaBEC"/>
+		</Project_list>
+		<Syntaxon_list>
+			<syntaxon_record code="SBSdk/01" description="Picea glauca x engelmannii - Pleurozium"/>
+			<syntaxon_record code="CWHvh2/01" description="Thuja plicata - Tsuga heterophylla"/>
+		</Syntaxon_list>
+		<Exposition_list>
+			<exposition_record code="SW" description="225"/>
+		</Exposition_list>
+		<Species_list>
+			<species_record nr="10" code="PSEDMEN" name="Pseudotsuga menziesii" author="(Mirbel) Franco" valid_nr="" valid_name="" valid_author="" synonym="no" nativename="Douglas-fir"/>
+			<species_record nr="20" code="VACCMEM" name="Vaccinium membranaceum" author="Dougl. ex Hook." valid_nr="" valid_name="" valid_author="" synonym="no" nativename="black huckleberry"/>
+			<species_record nr="30" code="CORNCAN" name="Cornus canadensis" author="L." valid_nr="" valid_name="" valid_author="" synonym="no" nativename="bunchberry"/>
+			<species_record nr="40" code="HYLOSPL" name="Hylocomium splendens" author="(Hedw.) Schimp." valid_nr="" valid_name="" valid_author="" synonym="no" nativename="step moss"/>
+			<species_record nr="50" code="ALECSAR" name="Alectoria sarmentosa" author="(Ach.) Ach." valid_nr="" valid_name="" valid_author="" synonym="no" nativename="common witch&apos;s-hair"/>
+			<species_record nr="60" code="PINUCON" name="Pinus contorta var. contorta" author="Dougl. ex Loud." valid_nr="" valid_name="" valid_author="" synonym="no" nativename="shore pine"/>
+			<species_record nr="70" code="CHAMNOO" name="Chamaecyparis nootkatensis" author="(D. Don) Spach" valid_nr="71" valid_name="Callitropsis nootkatensis" valid_author="(D. Don) Oersted" synonym="yes" nativename="yellow-cedar"/>
+		</Species_list>
+	</Lookup_tables>
+	<Template>
+		<Files>
+			<record file_nr="1" file_name="tvflora" file_desc="FLORA" fieldindex="0" file_edit="false" array_pos="0" progpath="false" print_it="false"/>
+			<record file_nr="2" file_name="tvhabita" file_desc="HEADER DATA" fieldindex="0" file_edit="false" array_pos="0" progpath="false" print_it="false"/>
+			<record file_nr="3" file_name="tvabund" file_desc="SPECIES DATA" fieldindex="0" file_edit="false" array_pos="0" progpath="false" print_it="false"/>
+			<record file_nr="4" file_name="remarks" file_desc="REMARKS" fieldindex="1" file_edit="false" array_pos="0" progpath="false" print_it="false"/>
+			<record file_nr="5" file_name="tvrefenc" file_desc="REFERENCES" fieldindex="1" file_edit="true" array_pos="0" progpath="true" print_it="false"/>
+			<record file_nr="6" file_name="tvscale" file_desc="COVER SCALES" fieldindex="1" file_edit="true" array_pos="1" progpath="true" print_it="true"/>
+			<record file_nr="7" file_name="country" file_desc="COUNTRIES" fieldindex="2" file_edit="true" array_pos="2" progpath="true" print_it="true"/>
+			<record file_nr="8" file_name="tvauthor" file_desc="AUTHORS" fieldindex="2" file_edit="true" array_pos="3" progpath="true" print_it="true"/>
+			<record file_nr="9" file_name="tvprojct" file_desc="PROJECTS" fieldindex="1" file_edit="true" array_pos="4" progpath="true" print_it="true"/>
+			<record file_nr="10" file_name="syntaxa" file_desc="SYNTAXA" fieldindex="1" file_edit="true" array_pos="5" progpath="true" print_it="true"/>
+			<record file_nr="11" file_name="exposit" file_desc="ASPECT" fieldindex="0" file_edit="true" array_pos="6" progpath="true" print_it="true"/>
+		</Files>
+		<Dbasedic>
+			<record file_nr="1" field_name="SPECIES_NR" field_type="N" field_len="5" field_dec="0" field_pict="@ 99999" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="Species number code" field_menu="" field_sel="0" field_list="0"/>
+			<record file_nr="1" field_name="LETTERCODE" field_type="C" field_len="7" field_dec="0" field_pict="" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="Species letter code" field_menu="" field_sel="0" field_list="0"/>
+			<record file_nr="2" field_name="RELEVE_NR" field_type="N" field_len="6" field_dec="0" field_pict="@ 999999" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="Relevé number" field_menu="Relevé number" field_sel="3" field_list="0"/>
+			<record file_nr="2" field_name="COUNTRY" field_type="C" field_len="2" field_dec="0" field_pict="@ !!" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="Country code" field_menu="Country code" field_sel="2" field_list="2"/>
+			<record file_nr="2" field_name="COVERSCALE" field_type="C" field_len="2" field_dec="0" field_pict="@ ##" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="Cover abundance scale" field_menu="Cover scale" field_sel="2" field_list="1"/>
+			<record file_nr="2" field_name="DATE" field_type="C" field_len="8" field_dec="0" field_pict="@R ####/##/##" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="Date (year/month/day)" field_menu="Date" field_sel="3" field_list="0"/>
+			<record file_nr="2" field_name="SURF_AREA" field_type="N" field_len="8" field_dec="2" field_pict="@Z 99999.99" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="Relevé area (m2)" field_menu="Relevé area" field_sel="1" field_list="0"/>
+			<record file_nr="3" field_name="RELEVE_NR" field_type="N" field_len="6" field_dec="0" field_pict="" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="" field_menu="" field_sel="0" field_list="0"/>
+			<record file_nr="3" field_name="SPECIES_NR" field_type="N" field_len="5" field_dec="0" field_pict="" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="" field_menu="" field_sel="0" field_list="0"/>
+			<record file_nr="3" field_name="COVER_CODE" field_type="C" field_len="2" field_dec="0" field_pict="" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="" field_menu="" field_sel="0" field_list="0"/>
+			<record file_nr="3" field_name="LAYER" field_type="N" field_len="1" field_dec="0" field_pict="" field_tran="" field_eval="" field_esel="" field_when="" field_carg="" field_desc="" field_menu="" field_sel="0" field_list="0"/>
+		</Dbasedic>
+	</Template>
+	<Metadata>
+		<record>External Turboveg 2/3 Plot_package fixture encoded in windows-1252 – testing trailing Lookup_tables, Braun-Blanquet scale 01, and scientific name crosswalk.</record>
+	</Metadata>
+</Plot_package>

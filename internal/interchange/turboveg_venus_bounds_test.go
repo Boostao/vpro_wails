@@ -25,24 +25,51 @@ func TestTurboVegAndVenusAuditBooleansFloat32CoverUTF16AndSoilDepthSigns(t *test
 	service, state := vprotest.ContextServiceFixture(t)
 	dir := t.TempDir()
 
-	// --- Part 1: TurboVeg Import (Audit Restore/Flag booleans, 99.999996 float32 cover, multi-row rollup cap 99.0, astral UTF-16 truncation) ---
+	// --- Part 1: TurboVeg <Plot_package> Import (Audit Restore/Flag booleans, 99.999996 float32 cover, multi-row rollup cap 99.0, astral UTF-16 truncation) ---
 	// "🌲🌲🌲🌲" is 4 runes = 8 UTF-16 units -> must truncate to <= 7 UTF-16 units ("🌲🌲🌲", 6 units) without splitting surrogate!
 	// "🌲🌲🌲🌲🌲" is 5 runes = 10 UTF-16 units -> Species must truncate to <= 8 UTF-16 units ("🌲🌲🌲🌲", 8 units)!
 	tvXMLPath := filepath.Join(dir, "tv_bounds.xml")
 	tvXML := `<?xml version="1.0" encoding="UTF-8"?>
-<Turboveg version="3.0">
+<Plot_package UserName="VPro" TurbovegVersion="3.0" Dictionary="vpro_bec_dict" SpeciesList="BCPlantTaxonomy">
   <Plots>
-    <Plot releve_nr="1" plot_number="🌲🌲🌲🌲">
-      <Header zone="CWH🌲🌲" subzone="vm1🌲🌲🌲🌲" site_series="01🌲🌲🌲"/>
-      <SpeciesData>
-        <Species code="PSEUMEN" layer="1" cover="99.999996" collected="🌲V"/>
-        <Species code="TSUGHET" layer="4" cover="60.0"/>
-        <Species code="TSUGHET" layer="4" cover="55.0"/>
-        <Species code="🌲🌲🌲🌲🌲" layer="6" cover="12.5"/>
-      </SpeciesData>
+    <Plot database="BoundsTest" releve_nr="1" guid="{11111111-2222-4333-8444-555555555555}">
+      <header_data>
+        <standard_record releve_nr="1" country="CA" coverscale="00"/>
+        <udf_record ispredefined="false" name="vpro_plot_number" type="C" len="10" dec="0" value="🌲🌲🌲🌲"/>
+        <udf_record ispredefined="false" name="zone" type="C" len="10" dec="0" value="CWH🌲🌲"/>
+        <udf_record ispredefined="false" name="subzone" type="C" len="15" dec="0" value="vm1🌲🌲🌲🌲"/>
+        <udf_record ispredefined="false" name="site_series" type="C" len="10" dec="0" value="01🌲🌲🌲"/>
+      </header_data>
+      <species_data>
+        <species>
+          <standard_record nr="1" cover="99.999996" layer="1"/>
+          <udf_record ispredefined="false" name="vpro_code" type="C" len="8" dec="0" value="PSEUMEN"/>
+          <udf_record ispredefined="false" name="collected" type="C" len="4" dec="0" value="🌲V"/>
+        </species>
+        <species>
+          <standard_record nr="2" cover="60.0" layer="4"/>
+        </species>
+        <species>
+          <standard_record nr="2" cover="55.0" layer="4"/>
+        </species>
+        <species>
+          <standard_record nr="3" cover="12.5" layer="6"/>
+          <udf_record ispredefined="false" name="vpro_code" type="C" len="16" dec="0" value="🌲🌲🌲🌲🌲"/>
+        </species>
+      </species_data>
     </Plot>
   </Plots>
-</Turboveg>`
+  <Lookup_tables>
+    <Coverscale_list>
+      <coverscale_record><code>00</code><description>Percentage (%)</description></coverscale_record>
+    </Coverscale_list>
+    <Species_list>
+      <species_record nr="1" code="PSEUMEN" name="Pseudotsuga menziesii" author="" valid_nr="1" valid_name="" valid_author="" synonym="no" nativename=""/>
+      <species_record nr="2" code="TSUGHET" name="Tsuga heterophylla" author="" valid_nr="2" valid_name="" valid_author="" synonym="no" nativename=""/>
+      <species_record nr="3" code="🌲🌲🌲" name="🌲🌲🌲🌲🌲" author="" valid_nr="3" valid_name="" valid_author="" synonym="no" nativename=""/>
+    </Species_list>
+  </Lookup_tables>
+</Plot_package>`
 	if err := os.WriteFile(tvXMLPath, []byte(tvXML), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -136,7 +163,7 @@ func TestTurboVegAndVenusAuditBooleansFloat32CoverUTF16AndSoilDepthSigns(t *test
 	// Single invalid observation Cover >= 100 in float32 (99.999999) or < 0 (-5.0) must be rejected!
 	for _, badCov := range []string{"99.999999", "-5.0"} {
 		badXMLPath := filepath.Join(dir, "tv_bad_"+badCov+".xml")
-		badXML := `<?xml version="1.0" encoding="UTF-8"?><Turboveg version="3.0"><Plots><Plot releve_nr="1" plot_number="BAD1"><SpeciesData><Species code="PSEUMEN" layer="1" cover="` + badCov + `"/></SpeciesData></Plot></Plots></Turboveg>`
+		badXML := `<?xml version="1.0" encoding="UTF-8"?><Plot_package><Plots><Plot releve_nr="1" guid="{22222222-3333-4444-8555-666666666666}"><header_data><standard_record releve_nr="1" coverscale="00"/><udf_record ispredefined="false" name="vpro_plot_number" type="C" len="7" dec="0" value="BAD1"/></header_data><species_data><species><standard_record nr="1" cover="` + badCov + `" layer="1"/></species></species_data></Plot></Plots><Lookup_tables><Species_list><species_record nr="1" code="PSEUMEN" name="Pseudotsuga menziesii" author="" valid_nr="1" valid_name="" valid_author="" synonym="no" nativename=""/></Species_list></Lookup_tables></Plot_package>`
 		if err := os.WriteFile(badXMLPath, []byte(badXML), 0o600); err != nil {
 			t.Fatal(err)
 		}
@@ -148,6 +175,20 @@ func TestTurboVegAndVenusAuditBooleansFloat32CoverUTF16AndSoilDepthSigns(t *test
 		}); err == nil {
 			t.Fatalf("expected ImportTurboVeg to reject single invalid cover %s", badCov)
 		}
+	}
+
+	// Non-standard <Turboveg> XML root must also be rejected cleanly
+	legacyXMLPath := filepath.Join(dir, "legacy_bespoke.xml")
+	if err := os.WriteFile(legacyXMLPath, []byte(`<?xml version="1.0"?><Turboveg version="3.0"><Plots><Plot releve_nr="1" plot_number="001"/></Plots></Turboveg>`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := interchange.ImportTurboVeg(service, ctx, activeCtxID, interchange.TurboVegImportRequest{
+		SourcePath:      legacyXMLPath,
+		Format:          interchange.TurboVegFormatXML,
+		TargetProject:   "BadLegacy",
+		DestinationPath: filepath.Join(dir, "BadLegacy.db"),
+	}); err == nil {
+		t.Fatal("expected non-standard <Turboveg> root XML to be rejected")
 	}
 
 	// --- Part 2: VENUS 5.0 Import (Audit booleans, 99.999996 float32 cover, astral UTF-16 bounds, LMH25 soil depth signs) ---
@@ -332,31 +373,60 @@ func TestTurboVegLongPlotIDCollisionDisambiguationAndExactDuplicateError(t *test
 	service, state := vprotest.ContextServiceFixture(t)
 	dir := t.TempDir()
 
-	// 1. TurboVeg3 SQLite with two distinct >7-UTF-16 PlotNumbers ("1234567A" and "1234567B")
-	// plus a literal 7-char "1234567" plot to ensure disambiguation never steals a literal short key!
-	tvSQLitePath := filepath.Join(dir, "tv_long_collide.db")
-	srcDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tvSQLitePath, "rwc"))
+	// Seed a real 31-table Turboveg 3 SQLite baseline via ExportTurboVeg, then replace its plots with
+	// two distinct >7-UTF-16 PlotNumbers ("1234567A" and "1234567B") plus a literal 7-char "1234567" plot
+	// to ensure disambiguation never steals a literal short key!
+	tvSQLitePath := filepath.Join(dir, "tv_long_collide.sqlite")
+	if _, err := interchange.ExportTurboVeg(service, ctx, state.ContextID, interchange.TurboVegExportRequest{
+		Format:          interchange.TurboVegFormatSQLite,
+		DestinationPath: tvSQLitePath,
+	}); err != nil {
+		t.Fatalf("seed ExportTurboVeg(sqlite): %v", err)
+	}
+	srcDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tvSQLitePath, "rw")+"&_foreign_keys=on")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if _, err := srcDB.Exec(`
-		CREATE TABLE SpeciesList (SpeciesNR INTEGER PRIMARY KEY, SpeciesCode TEXT, ScientificName TEXT, EnglishName TEXT, Lifeform INTEGER, Authority TEXT);
-		CREATE TABLE Plots (PlotID INTEGER PRIMARY KEY, PlotNumber TEXT, FieldNumber TEXT, ProjectID TEXT, Date TEXT, Latitude REAL, Longitude REAL, Elevation INTEGER, Slope REAL, Aspect INTEGER, PlotSize REAL);
-		CREATE TABLE HeaderData (PlotID INTEGER PRIMARY KEY, Zone TEXT, SubZone TEXT, SiteSeries TEXT, SiteUnit TEXT, MoistureRegime TEXT, NutrientRegime TEXT, MesoSlopePosition TEXT, SurfaceShape TEXT, SoilDrainage TEXT, HumusForm TEXT, Surveyor TEXT, Location TEXT, SiteNotes TEXT, VegNotes TEXT, SoilNotes TEXT);
-		CREATE TABLE SpeciesData (ID INTEGER PRIMARY KEY AUTOINCREMENT, PlotID INTEGER, SpeciesNR INTEGER, SpeciesCode TEXT, LayerCode TEXT, TurboVegGroup TEXT, Cover REAL, Height REAL, Collected TEXT);
+		DELETE FROM speciesobservationdata;
+		DELETE FROM speciesobservations;
+		DELETE FROM plotobservationheaderdata;
+		DELETE FROM plotobservations;
+		DELETE FROM plots;
+		DELETE FROM locations;
+		DELETE FROM covercodes;
+		DELETE FROM taxa;
 
-		INSERT INTO Plots (PlotID, PlotNumber) VALUES
-			(1, '1234567A'),
-			(2, '1234567B'),
-			(3, '1234567');
-		INSERT INTO HeaderData (PlotID, Zone, SiteUnit) VALUES
-			(1, 'CWH', 'CWHvm1/01'),
-			(2, 'IDF', 'IDFdk1/01'),
-			(3, 'ESSF', 'ESSFmw/01');
-		INSERT INTO SpeciesData (PlotID, SpeciesNR, SpeciesCode, LayerCode, TurboVegGroup, Cover) VALUES
-			(1, 1, 'PSEUMEN', '1', 'Tree', 40.0),
-			(2, 2, 'PINUPON', '1', 'Tree', 55.0),
-			(3, 3, 'ABIEAMA', '1', 'Tree', 30.0);
+		INSERT INTO covercodes (id, lookupdataid, code, percentage_mean) VALUES
+			(1, 1, '40', 40.0),
+			(2, 1, '55', 55.0),
+			(3, 1, '30', 30.0);
+		INSERT INTO taxa (id, taxonlistid, scientificname, lettercode, tv2speciesid) VALUES
+			(1, 1, 'Pseudotsuga menziesii', 'PSEUMEN', 1),
+			(2, 1, 'Pinus ponderosa', 'PINUPON', 2),
+			(3, 1, 'Abies amabilis', 'ABIEAMA', 3);
+
+		INSERT INTO plots (id, datasetid) VALUES (1, 1), (2, 1), (3, 1);
+		INSERT INTO plotobservations (id, plotid, guid, deleted) VALUES
+			(1, 1, '10000000-0000-4000-8000-000000000001', 0),
+			(2, 2, '10000000-0000-4000-8000-000000000002', 0),
+			(3, 3, '10000000-0000-4000-8000-000000000003', 0);
+
+		INSERT INTO plotobservationheaderdata (id, plotobservationid, fieldid, valuestring)
+		SELECT 1, 1, id, '1234567A' FROM fields WHERE fieldname='VPRO_PLOT'
+		UNION ALL SELECT 2, 1, id, 'CWH' FROM fields WHERE fieldname='ZONE'
+		UNION ALL SELECT 3, 1, id, 'CWHvm1/01' FROM fields WHERE fieldname='SITE_UNIT'
+		UNION ALL SELECT 4, 2, id, '1234567B' FROM fields WHERE fieldname='VPRO_PLOT'
+		UNION ALL SELECT 5, 2, id, 'IDF' FROM fields WHERE fieldname='ZONE'
+		UNION ALL SELECT 6, 2, id, 'IDFdk1/01' FROM fields WHERE fieldname='SITE_UNIT'
+		UNION ALL SELECT 7, 3, id, '1234567' FROM fields WHERE fieldname='VPRO_PLOT'
+		UNION ALL SELECT 8, 3, id, 'ESSF' FROM fields WHERE fieldname='ZONE'
+		UNION ALL SELECT 9, 3, id, 'ESSFmw/01' FROM fields WHERE fieldname='SITE_UNIT';
+
+		INSERT INTO speciesobservations (id, plotobservationid, taxonid, vegetationlayerid, covercodeid, originaltaxonconcept, deleted) VALUES
+			(1, 1, 1, 1, 1, 'Pseudotsuga menziesii', 0),
+			(2, 2, 2, 1, 2, 'Pinus ponderosa', 0),
+			(3, 3, 3, 1, 3, 'Abies amabilis', 0);
 	`); err != nil {
 		srcDB.Close()
 		t.Fatal(err)
@@ -416,15 +486,27 @@ func TestTurboVegLongPlotIDCollisionDisambiguationAndExactDuplicateError(t *test
 		t.Fatalf("expected 3 unique <=7-UTF-16 PlotNumbers preserving literal '1234567', got %v", seenImported)
 	}
 
-	// 2. Also verify XML format disambiguates "1234567A" vs "1234567B" without dropping the second plot!
+	// 2. Also verify <Plot_package> XML format disambiguates "1234567A" vs "1234567B" without dropping the second plot!
 	xmlCollidePath := filepath.Join(dir, "tv_xml_collide.xml")
 	xmlCollide := `<?xml version="1.0" encoding="UTF-8"?>
-<Turboveg version="3.0">
+<Plot_package>
   <Plots>
-    <Plot releve_nr="1" plot_number="1234567A"><SpeciesData><Species code="PSEUMEN" layer="1" cover="20"/></SpeciesData></Plot>
-    <Plot releve_nr="2" plot_number="1234567B"><SpeciesData><Species code="TSUGHET" layer="1" cover="30"/></SpeciesData></Plot>
+    <Plot releve_nr="1" guid="{10000000-0000-4000-8000-000000000011}">
+      <header_data><standard_record releve_nr="1" coverscale="00"/><udf_record ispredefined="false" name="vpro_plot_number" type="C" len="8" dec="0" value="1234567A"/></header_data>
+      <species_data><species><standard_record nr="1" cover="20" layer="1"/></species></species_data>
+    </Plot>
+    <Plot releve_nr="2" guid="{10000000-0000-4000-8000-000000000012}">
+      <header_data><standard_record releve_nr="2" coverscale="00"/><udf_record ispredefined="false" name="vpro_plot_number" type="C" len="8" dec="0" value="1234567B"/></header_data>
+      <species_data><species><standard_record nr="2" cover="30" layer="1"/></species></species_data>
+    </Plot>
   </Plots>
-</Turboveg>`
+  <Lookup_tables>
+    <Species_list>
+      <species_record nr="1" code="PSEUMEN" name="Pseudotsuga menziesii" author="" valid_nr="1" valid_name="" valid_author="" synonym="no" nativename=""/>
+      <species_record nr="2" code="TSUGHET" name="Tsuga heterophylla" author="" valid_nr="2" valid_name="" valid_author="" synonym="no" nativename=""/>
+    </Species_list>
+  </Lookup_tables>
+</Plot_package>`
 	if err := os.WriteFile(xmlCollidePath, []byte(xmlCollide), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -450,12 +532,24 @@ func TestTurboVegLongPlotIDCollisionDisambiguationAndExactDuplicateError(t *test
 	// 3. Exact duplicate source plot keys ("1234567A" and "1234567A") MUST return an explicit error, never drop silently!
 	dupXMLPath := filepath.Join(dir, "tv_exact_dup.xml")
 	dupXML := `<?xml version="1.0" encoding="UTF-8"?>
-<Turboveg version="3.0">
+<Plot_package>
   <Plots>
-    <Plot releve_nr="1" plot_number="1234567A"><SpeciesData><Species code="PSEUMEN" layer="1" cover="20"/></SpeciesData></Plot>
-    <Plot releve_nr="2" plot_number="1234567A"><SpeciesData><Species code="TSUGHET" layer="1" cover="30"/></SpeciesData></Plot>
+    <Plot releve_nr="1" guid="{10000000-0000-4000-8000-000000000021}">
+      <header_data><standard_record releve_nr="1" coverscale="00"/><udf_record ispredefined="false" name="vpro_plot_number" type="C" len="8" dec="0" value="1234567A"/></header_data>
+      <species_data><species><standard_record nr="1" cover="20" layer="1"/></species></species_data>
+    </Plot>
+    <Plot releve_nr="2" guid="{10000000-0000-4000-8000-000000000022}">
+      <header_data><standard_record releve_nr="2" coverscale="00"/><udf_record ispredefined="false" name="vpro_plot_number" type="C" len="8" dec="0" value="1234567A"/></header_data>
+      <species_data><species><standard_record nr="2" cover="30" layer="1"/></species></species_data>
+    </Plot>
   </Plots>
-</Turboveg>`
+  <Lookup_tables>
+    <Species_list>
+      <species_record nr="1" code="PSEUMEN" name="Pseudotsuga menziesii" author="" valid_nr="1" valid_name="" valid_author="" synonym="no" nativename=""/>
+      <species_record nr="2" code="TSUGHET" name="Tsuga heterophylla" author="" valid_nr="2" valid_name="" valid_author="" synonym="no" nativename=""/>
+    </Species_list>
+  </Lookup_tables>
+</Plot_package>`
 	if err := os.WriteFile(dupXMLPath, []byte(dupXML), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -466,6 +560,147 @@ func TestTurboVegLongPlotIDCollisionDisambiguationAndExactDuplicateError(t *test
 		DestinationPath: filepath.Join(dir, "TVDup.db"),
 	}); err == nil {
 		t.Fatalf("expected ImportTurboVeg to return an explicit error on exact duplicate source plot number '1234567A'")
+	}
+
+	// 4. Legacy invented 5-table SQLite file must also be rejected cleanly
+	legacySQLPath := filepath.Join(dir, "legacy_5table.sqlite")
+	legDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(legacySQLPath, "rwc"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _ = legDB.Exec(`CREATE TABLE Plots (PlotID INTEGER PRIMARY KEY, PlotNumber TEXT); INSERT INTO Plots VALUES (1, '001');`)
+	legDB.Close()
+	if _, err := interchange.ImportTurboVeg(service, ctx, state.ContextID, interchange.TurboVegImportRequest{
+		SourcePath:      legacySQLPath,
+		Format:          interchange.TurboVegFormatSQLite,
+		TargetProject:   "TVBadSQL",
+		DestinationPath: filepath.Join(dir, "TVBadSQL.db"),
+	}); err == nil {
+		t.Fatal("expected legacy 5-table SQLite file to be rejected")
+	}
+}
+
+func TestTurboVegSynonymMultiplicityAndDelphiDateTimeEdgeCases(t *testing.T) {
+	ctx := context.Background()
+	service, state := vprotest.ContextServiceFixture(t)
+	dir := t.TempDir()
+
+	// 1. Export timestamped Date ("2024-07-19 14:30:00") and verify numeric Delphi TDateTime valuefloat is written!
+	vprotest.MutateContextFixture(t, state.ProjectPath, `
+		UPDATE Sample_Env SET "Date"='2024-07-19 14:30:00' WHERE PlotNumber='108050';
+	`)
+	tvSQLPath := filepath.Join(dir, "tv_syn_date.sqlite")
+	if _, err := interchange.ExportTurboVeg(service, ctx, state.ContextID, interchange.TurboVegExportRequest{
+		Format:          interchange.TurboVegFormatSQLite,
+		DestinationPath: tvSQLPath,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	mutDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tvSQLPath, "rw")+"&_foreign_keys=on")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var dateFloat float64
+	if err := mutDB.QueryRow(`
+		SELECT poh.valuefloat
+		FROM plotobservationheaderdata poh
+		INNER JOIN fields f ON f.id = poh.fieldid
+		INNER JOIN plotobservationheaderdata pplot ON pplot.plotobservationid = poh.plotobservationid
+		INNER JOIN fields fp ON fp.id = pplot.fieldid AND fp.fieldname = 'VPRO_PLOT' AND pplot.valuestring = '108050'
+		WHERE f.fieldname = 'DATE'`).Scan(&dateFloat); err != nil || dateFloat < 45492.0 {
+		mutDB.Close()
+		t.Fatalf("expected populated Delphi TDateTime valuefloat >= 45492.0 for timestamped Date, got %v (err=%v)", dateFloat, err)
+	}
+
+	// 2. Replace with a single plot having pre-1899 negative fractional Delphi TDateTime (-1.5 -> 1899-12-29)
+	// and a synonym taxon where tv2validid=200 matches MULTIPLE rows in taxa (pro-parte + orthographic) — cover must NOT double!
+	if _, err := mutDB.Exec(`
+		DELETE FROM speciesobservationdata;
+		DELETE FROM speciesobservations;
+		DELETE FROM plotobservationheaderdata;
+		DELETE FROM plotobservations;
+		DELETE FROM plots;
+		DELETE FROM locations;
+		DELETE FROM covercodes;
+		DELETE FROM taxa;
+
+		INSERT INTO covercodes (id, lookupdataid, code, percentage_mean) VALUES (1, 1, '20', 20.0);
+		INSERT INTO taxa (id, taxonlistid, scientificname, lettercode, tv2speciesid, tv2validid, issynonym) VALUES
+			(1, 1, 'Obsolete local name', 'OBSOL01', 200, 200, -1),
+			(2, 1, 'Unmapped synonym -1', 'UNMAP01', 200, 200, -1),
+			(3, 1, 'Callitropsis nootkatensis', 'CALLNOO', 200, 200, 0);
+
+		ALTER TABLE locations ADD COLUMN wkt TEXT;
+		INSERT INTO locations (id, the_geom, wkt) VALUES (1, '   ', 'POINT(-125.5 50.25)');
+		INSERT INTO plots (id, datasetid, locationid) VALUES (1, 1, 1), (2, 1, NULL);
+		INSERT INTO plotobservations (id, plotid, guid, deleted) VALUES
+			(1, 1, '99999999-0000-4000-8000-000000000001', 0),
+			(2, 2, '99999999-0000-4000-8000-000000000002', 0);
+		INSERT INTO plotobservationheaderdata (id, plotobservationid, fieldid, valuestring, valueinteger, valuefloat)
+		SELECT 1, 1, id, 'HIST01', NULL, NULL FROM fields WHERE fieldname='VPRO_PLOT'
+		UNION ALL SELECT 2, 1, id, NULL, NULL, -1.5 FROM fields WHERE fieldname='DATE'
+		UNION ALL SELECT 3, 2, id, 'HIST02', NULL, NULL FROM fields WHERE fieldname='VPRO_PLOT'
+		UNION ALL SELECT 4, 2, id, NULL, 45492, NULL FROM fields WHERE fieldname='DATE';
+
+		INSERT INTO speciesobservations (id, plotobservationid, taxonid, vegetationlayerid, covercodeid, originaltaxonconcept, deleted)
+		VALUES (1, 1, 1, 1, 1, 'Obsolete local name', 0);
+	`); err != nil {
+		mutDB.Close()
+		t.Fatal(err)
+	}
+	mutDB.Close()
+
+	impDest := filepath.Join(dir, "TVHistSyn.db")
+	if _, err := interchange.ImportTurboVeg(service, ctx, state.ContextID, interchange.TurboVegImportRequest{
+		SourcePath:      tvSQLPath,
+		Format:          interchange.TurboVegFormatSQLite,
+		TargetProject:   "TVHistSyn",
+		DestinationPath: impDest,
+	}); err != nil {
+		t.Fatalf("ImportTurboVeg(TVHistSyn): %v", err)
+	}
+
+	roDB, err := sqlutil.OpenReadOnly(impDest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer roDB.Close()
+
+	var histDate string
+	var histLat, histLon float64
+	if err := roDB.QueryRow(`SELECT CAST("Date" AS TEXT), Latitude, Longitude FROM TVHistSyn_Env WHERE PlotNumber='HIST01'`).Scan(&histDate, &histLat, &histLon); err != nil {
+		t.Fatal(err)
+	}
+	if histDate != "1899-12-29" || math.Abs(histLat-50.25) > 1e-6 || math.Abs(histLon - -125.5) > 1e-6 {
+		t.Fatalf("expected -1.5 -> 1899-12-29 and empty the_geom fallback to wkt (-125.5, 50.25), got date=%q (%v,%v)", histDate, histLon, histLat)
+	}
+	var intDate string
+	if err := roDB.QueryRow(`SELECT CAST("Date" AS TEXT) FROM TVHistSyn_Env WHERE PlotNumber='HIST02'`).Scan(&intDate); err != nil || intDate != "2024-07-19" {
+		t.Fatalf("expected integer Delphi DATE 45492 -> 2024-07-19, got %q (err=%v)", intDate, err)
+	}
+	var callCov float64
+	if err := roDB.QueryRow(`SELECT Cover1 FROM TVHistSyn_Veg WHERE PlotNumber='HIST01' AND Species='CALLNOO'`).Scan(&callCov); err != nil {
+		t.Fatal(err)
+	}
+	if math.Abs(callCov-20.0) > 1e-4 {
+		t.Fatalf("expected non-duplicated synonym Cover1=20.0, got %v", callCov)
+	}
+
+	// 3. Reject malformed UTF-8 (CAST(X'FF' AS TEXT)) in SQLite header text
+	badUTFDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tvSQLPath, "rw"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _ = badUTFDB.Exec(`UPDATE plotobservationheaderdata SET valuestring = CAST(X'FF' AS TEXT) WHERE id = 1`)
+	badUTFDB.Close()
+	if _, err := interchange.ImportTurboVeg(service, ctx, state.ContextID, interchange.TurboVegImportRequest{
+		SourcePath:      tvSQLPath,
+		Format:          interchange.TurboVegFormatSQLite,
+		TargetProject:   "TVBadUTF8",
+		DestinationPath: filepath.Join(dir, "TVBadUTF8.db"),
+	}); err == nil {
+		t.Fatal("expected malformed UTF-8 in SQLite source to be rejected")
 	}
 }
 

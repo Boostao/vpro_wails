@@ -24,7 +24,7 @@
   <h3>Not yet a complete Access replacement</h3>
   <p>Remaining work includes full linked-form callbacks and calculations, complete combined
     and formatted Summary output, printing, hierarchy editing, project creation/import and
-    merge/compare administration. Herbarium, broader standards compliance, TurboVeg and
+    merge/compare administration. Herbarium, broader standards compliance and
     UI-free R automation also remain separate unfinished workflows.</p>
 </section>
 

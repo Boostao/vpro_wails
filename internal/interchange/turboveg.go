@@ -1,23 +1,18 @@
 package interchange
 
 import (
-	"bytes"
 	"context"
-	"crypto/sha256"
+	"crypto/rand"
 	"database/sql"
 	"encoding/hex"
-	"encoding/json"
-	"encoding/xml"
 	"errors"
 	"fmt"
-	"io"
 	"math"
-	"os"
 	"path/filepath"
-	"runtime"
 	"slices"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 	"unicode/utf16"
 	"unicode/utf8"
@@ -25,6 +20,33 @@ import (
 	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 )
+
+var tvFallbackUUIDSeq uint64
+
+func newTurboVegUUID() string {
+	var b [16]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		seq := atomic.AddUint64(&tvFallbackUUIDSeq, 1)
+		now := uint64(time.Now().UnixNano())
+		for i := 0; i < 8; i++ {
+			b[i] = byte(now >> (8 * i))
+			b[8+i] = byte(seq >> (8 * i))
+		}
+	}
+	b[6] = (b[6] & 0x0f) | 0x40
+	b[8] = (b[8] & 0x3f) | 0x80
+	var out [36]byte
+	hex.Encode(out[0:8], b[0:4])
+	out[8] = '-'
+	hex.Encode(out[9:13], b[4:6])
+	out[13] = '-'
+	hex.Encode(out[14:18], b[6:8])
+	out[18] = '-'
+	hex.Encode(out[19:23], b[8:10])
+	out[23] = '-'
+	hex.Encode(out[24:36], b[10:16])
+	return string(out[:])
+}
 
 func truncateUTF16Units(s string, maxUnits int) string {
 	if maxUnits <= 0 || s == "" {
@@ -55,6 +77,26 @@ func nullTruncatedUTF16(s string, maxUnits int) any {
 	return trimmed
 }
 
+func validateFiniteSingleFloat(v float64, label string, nonNegative bool) (float64, error) {
+	if math.IsNaN(v) || math.IsInf(v, 0) || math.Abs(v) > math.MaxFloat32 || (nonNegative && v < 0) {
+		return 0, fmt.Errorf("%s %v violates IEEE-754 SINGLE bounds", label, v)
+	}
+	return float64(float32(v)), nil
+}
+
+func validateUTF8Text(s, label string) error {
+	if !utf8.ValidString(s) || strings.ContainsRune(s, 0) {
+		return fmt.Errorf("%s contains malformed UTF-8 or NUL byte", label)
+	}
+	return nil
+}
+func nullEmpty(s string) any {
+	if strings.TrimSpace(s) == "" {
+		return nil
+	}
+	return s
+}
+
 func accumulateImportedSingleCover(covers map[string]float64, col string, obsCov float64, plotNum, species string) error {
 	if math.IsNaN(obsCov) || math.IsInf(obsCov, 0) || obsCov < 0 || math.Abs(obsCov) > math.MaxFloat32 || float32(obsCov) >= 100 {
 		return fmt.Errorf("plot %s species %s cover %v violates IEEE-754 SINGLE [0, 100) bounds", plotNum, species, obsCov)
@@ -79,96 +121,159 @@ const (
 	TurboVegFormatSQLite = "sqlite"
 )
 
+// Official Alterra Turboveg 3 fixed vegetationlayers (0..10, non-extensible per Alterra specification).
+type tvVegetationLayerDef struct {
+	ID           int
+	Name         string
+	Abbreviation string
+	Description  string
+}
+
+var canonicalTV3VegetationLayers = []tvVegetationLayerDef{
+	{0, "-", "-", "no layer defined"},
+	{1, "Tree layer 1", "t1", "Tree layer 1"},
+	{2, "Tree layer 2", "t2", "Tree layer 2"},
+	{3, "Tree layer 3", "t3", "Tree layer 3"},
+	{4, "Shrub layer 1", "s1", "Shrub layer 1"},
+	{5, "Shrub layer 2", "s2", "Shrub layer 2"},
+	{6, "Herb layer", "hl", "Herb layer"},
+	{7, "Juvenile layer", "jl", "Juvenile layer"},
+	{8, "Seedling layer", "sl", "Seedling layer"},
+	{9, "Cryptogam layer", "ml", "Cryptogam layer"},
+	{10, "Epiphytes", "ep", "Epiphytes"},
+}
+
 type turboVegLayerCrosswalk struct {
-	LayerID     int
-	LayerCode   string
-	TVGroup     string
-	VProCover   string
-	VProHeight  string
-	Description string
+	VProLayer string
+	TVLayerID int
+	IsPrimary bool
 }
 
 var turboVegCrosswalk = []turboVegLayerCrosswalk{
-	{1, "1", "Tree", "Cover1", "Height1", "Dominant tree layer (A1)"},
-	{2, "2", "Tree", "Cover2", "Height2", "Main canopy tree layer (A2)"},
-	{3, "3", "Tree", "Cover3", "Height3", "Sub-canopy tree layer (A3)"},
-	{11, "TotalA", "Tree", "TotalA", "HeightA", "Combined tree stratum (TotalA)"},
-	{4, "4", "Shrub", "Cover4", "Height4", "Tall shrub layer (B1)"},
-	{5, "5", "Shrub", "Cover5", "Height5", "Low shrub layer (B2)"},
-	{51, "5a", "Shrub", "Cover5a", "Height5a", "Extended shrub sub-layer (B2a)"},
-	{52, "5b", "Shrub", "Cover5b", "Height5b", "Extended shrub sub-layer (B2b)"},
-	{53, "5c", "Shrub", "Cover5c", "Height5c", "Extended shrub sub-layer (B2c)"},
-	{12, "TotalB", "Shrub", "TotalB", "HeightB", "Combined shrub stratum (TotalB)"},
-	{6, "6", "Herb", "Cover6", "Height6", "Herbaceous layer (C)"},
-	{7, "7", "Moss", "Cover7", "", "Terrestrial moss/bryoid layer (D/Dh)"},
-	{8, "8", "Moss", "Cover8", "", "Epixylic bryoid layer on decaying wood (Dw)"},
-	{9, "9", "Moss", "Cover9", "", "Epilithic bryoid layer on rock (Dr)"},
-	{10, "10", "Epiphyte", "Cover10", "", "Epiphyte layer on trees/shrubs (Ep)"},
+	{"A1", 1, true},
+	{"A2", 2, true},
+	{"A3", 3, true},
+	{"A", 1, false},
+	{"B1", 4, true},
+	{"B2", 5, true},
+	{"B2a", 5, false},
+	{"B2b", 5, false},
+	{"B2c", 5, false},
+	{"B", 4, false},
+	{"C", 6, true},
+	{"D", 9, true},
+	{"Dw", 9, false},
+	{"Dr", 9, false},
+	{"Ep", 10, true},
 }
 
-var vproSublayerCodeToTV = map[string]turboVegLayerCrosswalk{
-	"A1": turboVegCrosswalk[0],
-	"A2": turboVegCrosswalk[1],
-	"A3": turboVegCrosswalk[2],
-	"A":  turboVegCrosswalk[3],
-	"B1": turboVegCrosswalk[4],
-	"B2": turboVegCrosswalk[5],
-	"B2a": turboVegCrosswalk[6],
-	"B2b": turboVegCrosswalk[7],
-	"B2c": turboVegCrosswalk[8],
-	"B":  turboVegCrosswalk[9],
-	"C":  turboVegCrosswalk[10],
-	"D":  turboVegCrosswalk[11],
-	"Dw": turboVegCrosswalk[12],
-	"Dr": turboVegCrosswalk[13],
-	"Ep": turboVegCrosswalk[14],
+var vproSublayerCodeToTV = func() map[string]turboVegLayerCrosswalk {
+	m := make(map[string]turboVegLayerCrosswalk, len(turboVegCrosswalk))
+	for _, cw := range turboVegCrosswalk {
+		m[cw.VProLayer] = cw
+	}
+	return m
+}()
+
+func isWoodyVProLifeform(lf *int) bool {
+	if lf == nil {
+		return false
+	}
+	switch *lf {
+	case 1, 2, 3, 4, 12:
+		return true
+	default:
+		return false
+	}
 }
 
-func resolveIncomingTurboVegLayer(layerCode, tvGroup string) (coverCol, heightCol string) {
-	lc := strings.TrimSpace(layerCode)
-	switch strings.ToUpper(lc) {
-	case "1", "A1":
+func taxonGroupForLifeform(lf *int) int {
+	if lf == nil {
+		return 1
+	}
+	switch *lf {
+	case 9, 10:
+		return 3 // Mosses & liverworts
+	case 11:
+		return 4 // Lichens
+	case 13:
+		return 6 // Algae
+	default:
+		return 1 // Vascular plants
+	}
+}
+
+func taxonRankForSciName(sci string) int {
+	lower := strings.ToLower(sci)
+	if strings.Contains(lower, " var. ") {
+		return 4 // Variety
+	}
+	if strings.Contains(lower, " ssp. ") || strings.Contains(lower, " subsp. ") {
+		return 3 // Subspecies
+	}
+	if strings.HasSuffix(lower, " spp.") || strings.HasSuffix(lower, " sp.") || !strings.Contains(strings.TrimSpace(sci), " ") {
+		return 1 // Genus
+	}
+	return 2 // Species
+}
+
+func resolveIncomingTurboVegLayer(tvLayer, vproLayer string, isWoody bool) (coverCol, heightCol string) {
+	switch strings.ToUpper(strings.TrimSpace(vproLayer)) {
+	case "A1":
 		return "Cover1", "Height1"
-	case "2", "A2":
+	case "A2":
 		return "Cover2", "Height2"
-	case "3", "A3":
+	case "A3":
 		return "Cover3", "Height3"
-	case "TOTALA", "A":
+	case "A", "TOTALA":
 		return "TotalA", "HeightA"
-	case "4", "B1":
+	case "B1":
 		return "Cover4", "Height4"
-	case "5", "B2":
+	case "B2":
 		return "Cover5", "Height5"
-	case "5A", "B2A":
+	case "B2A", "5A":
 		return "Cover5a", "Height5a"
-	case "5B", "B2B":
+	case "B2B", "5B":
 		return "Cover5b", "Height5b"
-	case "5C", "B2C":
+	case "B2C", "5C":
 		return "Cover5c", "Height5c"
-	case "TOTALB", "B":
+	case "B", "TOTALB":
 		return "TotalB", "HeightB"
-	case "6", "C", "HERB":
+	case "C":
 		return "Cover6", "Height6"
-	case "7", "D", "DH", "MOSS", "CRYPTOGAM":
+	case "D", "DH":
 		return "Cover7", ""
-	case "8", "DW":
+	case "DW":
 		return "Cover8", ""
-	case "9", "DR":
+	case "DR":
 		return "Cover9", ""
-	case "10", "EP", "EPIPHYTE":
+	case "EP":
 		return "Cover10", ""
 	}
 
-	switch strings.ToUpper(strings.TrimSpace(tvGroup)) {
-	case "TREE":
-		return "TotalA", "HeightA"
-	case "SHRUB":
-		return "TotalB", "HeightB"
-	case "HERB":
+	switch strings.ToLower(strings.TrimSpace(tvLayer)) {
+	case "1", "t1":
+		return "Cover1", "Height1"
+	case "2", "t2":
+		return "Cover2", "Height2"
+	case "3", "t3":
+		return "Cover3", "Height3"
+	case "4", "s1":
+		return "Cover4", "Height4"
+	case "5", "s2":
+		return "Cover5", "Height5"
+	case "6", "hl":
 		return "Cover6", "Height6"
-	case "MOSS", "CRYPTOGAM":
+	case "7", "jl":
+		if isWoody {
+			return "Cover5", "Height5"
+		}
+		return "Cover6", "Height6"
+	case "8", "sl":
+		return "Cover6", "Height6"
+	case "9", "ml":
 		return "Cover7", ""
-	case "EPIPHYTE":
+	case "10", "ep":
 		return "Cover10", ""
 	default:
 		return "Cover6", "Height6"
@@ -224,6 +329,7 @@ type TurboVegImportOutcome struct {
 
 type tvPlotHeader struct {
 	PlotID            int
+	GUID              string
 	PlotNumber        string
 	FieldNumber       string
 	ProjectID         string
@@ -251,107 +357,313 @@ type tvPlotHeader struct {
 	SoilNotes         string
 }
 
-type tvSpeciesObs struct {
+type tvExportObs struct {
 	SpeciesNR   int
 	SpeciesCode string
 	SciName     string
-	LayerCode   string
-	TVGroup     string
+	TVLayerID   int
+	VProLayer   string
+	Cover       float64
+	Height      *float64
+	Collected   string
+}
+
+type tvImportObs struct {
+	SpeciesCode string
+	TVLayerRaw  string
+	VProLayer   string
+	IsWoody     bool
 	Cover       float64
 	Height      *float64
 	Collected   string
 }
 
 type tvDataset struct {
-	Layers  []turboVegLayerCrosswalk
-	Species []tvSpeciesItem
-	Plots   []tvPlotBundle
+	ProjectName string
+	Species     []tvSpeciesItem
+	Plots       []tvExportPlot
 }
 
 type tvSpeciesItem struct {
 	SpeciesNR      int
 	SpeciesCode    string
+	LetterCode     string
 	ScientificName string
 	EnglishName    string
 	Lifeform       *int
 	Authority      string
 }
 
-type tvPlotBundle struct {
+type tvExportPlot struct {
 	Header       tvPlotHeader
-	Observations []tvSpeciesObs
+	Observations []tvExportObs
 }
 
-// XML Wire Structs for TurboVeg XML (<Turboveg>)
-type xmlTurbovegDoc struct {
-	XMLName     xml.Name          `xml:"Turboveg"`
-	Version     string            `xml:"version,attr"`
-	Generator   string            `xml:"generator,attr"`
-	Layers      []xmlTVLayer      `xml:"Layers>Layer"`
-	SpeciesList []xmlTVSpeciesDef `xml:"SpeciesList>Species"`
-	Plots       []xmlTVPlot       `xml:"Plots>Plot"`
+type tvImportPlot struct {
+	Header       tvPlotHeader
+	Observations []tvImportObs
 }
 
-type xmlTVLayer struct {
-	ID          int    `xml:"id,attr"`
-	Code        string `xml:"code,attr"`
-	TVGroup     string `xml:"tv_group,attr"`
-	VProColumn  string `xml:"vpro_column,attr,omitempty"`
-	Description string `xml:"description,attr,omitempty"`
+type speciesResolvedInfo struct {
+	Code     string
+	Lifeform *int
 }
 
-type xmlTVSpeciesDef struct {
-	NR             int    `xml:"nr,attr"`
-	Code           string `xml:"code,attr"`
-	ScientificName string `xml:"name,attr,omitempty"`
-	EnglishName    string `xml:"english_name,attr,omitempty"`
-	Lifeform       *int   `xml:"lifeform,attr,omitempty"`
-	Authority      string `xml:"authority,attr,omitempty"`
+type speciesImportResolver struct {
+	byActiveCode  map[string]speciesResolvedInfo
+	bySynonymCode map[string]speciesResolvedInfo
+	byUserCode    map[string]speciesResolvedInfo
+	bySciFull     map[string]speciesResolvedInfo
+	bySciCanon    map[string]speciesResolvedInfo
 }
 
-type xmlTVPlot struct {
-	ReleveNR   int           `xml:"releve_nr,attr"`
-	PlotNumber string        `xml:"plot_number,attr"`
-	Header     xmlTVHeader   `xml:"Header"`
-	Species    []xmlTVObs    `xml:"SpeciesData>Species"`
+func normalizeScientificFull(raw string) string {
+	s := strings.ToLower(strings.TrimSpace(raw))
+	if s == "" {
+		return ""
+	}
+	s = strings.ReplaceAll(s, "×", "x")
+	s = strings.ReplaceAll(s, "subsp.", "ssp.")
+	fields := strings.Fields(s)
+	return strings.Join(fields, " ")
 }
 
-type xmlTVHeader struct {
-	FieldNumber       string   `xml:"field_number,attr,omitempty"`
-	ProjectID         string   `xml:"project_id,attr,omitempty"`
-	Date              string   `xml:"date,attr,omitempty"`
-	Latitude          *float64 `xml:"latitude,attr,omitempty"`
-	Longitude         *float64 `xml:"longitude,attr,omitempty"`
-	Elevation         *int     `xml:"elevation,attr,omitempty"`
-	Slope             *float64 `xml:"slope,attr,omitempty"`
-	Aspect            *int     `xml:"aspect,attr,omitempty"`
-	PlotSize          *float64 `xml:"plot_size,attr,omitempty"`
-	Zone              string   `xml:"zone,attr,omitempty"`
-	SubZone           string   `xml:"subzone,attr,omitempty"`
-	SiteSeries        string   `xml:"site_series,attr,omitempty"`
-	SiteUnit          string   `xml:"site_unit,attr,omitempty"`
-	MoistureRegime    string   `xml:"moisture_regime,attr,omitempty"`
-	NutrientRegime    string   `xml:"nutrient_regime,attr,omitempty"`
-	MesoSlopePosition string   `xml:"meso_slope_position,attr,omitempty"`
-	SurfaceShape      string   `xml:"surface_shape,attr,omitempty"`
-	SoilDrainage      string   `xml:"soil_drainage,attr,omitempty"`
-	HumusForm         string   `xml:"humus_form,attr,omitempty"`
-	Surveyor          string   `xml:"surveyor,attr,omitempty"`
-	Location          string   `xml:"location,attr,omitempty"`
-	SiteNotes         string   `xml:"SiteNotes,omitempty"`
-	VegNotes          string   `xml:"VegNotes,omitempty"`
-	SoilNotes         string   `xml:"SoilNotes,omitempty"`
+// canonicalScientificTaxon extracts normalized "genus species [ssp.|var.|f. epithet]"
+// stripping trailing botanical authorities or "agg." / "s.l." qualifiers when present.
+func canonicalScientificTaxon(raw string) string {
+	norm := normalizeScientificFull(raw)
+	if norm == "" {
+		return ""
+	}
+	tokens := strings.Fields(norm)
+	if len(tokens) == 1 {
+		return tokens[0]
+	}
+	if tokens[1] == "x" && len(tokens) >= 3 {
+		base := tokens[0] + " x " + tokens[2]
+		if len(tokens) >= 5 && (tokens[3] == "ssp." || tokens[3] == "var." || tokens[3] == "f.") {
+			return base + " " + tokens[3] + " " + tokens[4]
+		}
+		return base
+	}
+	if tokens[1] == "spp." || tokens[1] == "sp." {
+		return tokens[0] + " spp."
+	}
+	base := tokens[0] + " " + tokens[1]
+	for i := 2; i+1 < len(tokens); i++ {
+		if tokens[i] == "ssp." || tokens[i] == "var." || tokens[i] == "f." {
+			return base + " " + tokens[i] + " " + tokens[i+1]
+		}
+	}
+	return base
 }
 
-type xmlTVObs struct {
-	NR        int      `xml:"nr,attr"`
-	Code      string   `xml:"code,attr"`
-	Name      string   `xml:"name,attr,omitempty"`
-	Layer     string   `xml:"layer,attr"`
-	TVGroup   string   `xml:"tv_group,attr,omitempty"`
-	Cover     float64  `xml:"cover,attr"`
-	Height    *float64 `xml:"height,attr,omitempty"`
-	Collected string   `xml:"collected,attr,omitempty"`
+func loadSpeciesImportResolver(ctx context.Context, tx *sql.Tx) (*speciesImportResolver, error) {
+	r := &speciesImportResolver{
+		byActiveCode:  make(map[string]speciesResolvedInfo, 12000),
+		bySynonymCode: make(map[string]speciesResolvedInfo, 6000),
+		byUserCode:    make(map[string]speciesResolvedInfo, 256),
+		bySciFull:     make(map[string]speciesResolvedInfo, 16000),
+		bySciCanon:    make(map[string]speciesResolvedInfo, 16000),
+	}
+
+	rows, err := tx.QueryContext(ctx, `
+		SELECT COALESCE(Code,''), COALESCE(OldCode,''), COALESCE(ScientificName,''), Lifeform, COALESCE(Codetype,'')
+		FROM VLists.USysAllSpecs
+		WHERE Code IS NOT NULL AND TRIM(Code) <> ''
+		ORDER BY CASE
+			WHEN UPPER(COALESCE(Codetype,''))='U' THEN 0
+			WHEN UPPER(COALESCE(Codetype,''))<>'S' THEN 1
+			ELSE 2
+		END, rowid`)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var code, oldCode, sci, ctype string
+		var lf sql.NullInt64
+		if err := rows.Scan(&code, &oldCode, &sci, &lf, &ctype); err != nil {
+			rows.Close()
+			return nil, err
+		}
+		uCode := strings.ToUpper(strings.TrimSpace(code))
+		if uCode == "" {
+			continue
+		}
+		var lfPtr *int
+		if lf.Valid {
+			v := int(lf.Int64)
+			lfPtr = &v
+		}
+		info := speciesResolvedInfo{Code: uCode, Lifeform: lfPtr}
+		isSyn := strings.EqualFold(strings.TrimSpace(ctype), "S")
+		if !isSyn {
+			if _, exists := r.byActiveCode[uCode]; !exists {
+				r.byActiveCode[uCode] = info
+			}
+		} else {
+			uOld := strings.ToUpper(strings.TrimSpace(oldCode))
+			if uOld != "" {
+				if _, exists := r.bySynonymCode[uOld]; !exists {
+					r.bySynonymCode[uOld] = info
+				}
+			}
+		}
+		if full := normalizeScientificFull(sci); full != "" {
+			if _, exists := r.bySciFull[full]; !exists {
+				r.bySciFull[full] = info
+			}
+		}
+		if canon := canonicalScientificTaxon(sci); canon != "" {
+			if _, exists := r.bySciCanon[canon]; !exists {
+				r.bySciCanon[canon] = info
+			}
+		}
+	}
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return nil, err
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+
+	uRows, err := tx.QueryContext(ctx, `
+		SELECT COALESCE(Code,''), COALESCE(ScientificName,''), LifeForm, COALESCE(Codetype,'')
+		FROM VUser.USysUserSpp
+		WHERE Code IS NOT NULL AND TRIM(Code) <> ''`)
+	if err != nil {
+		return nil, err
+	}
+	for uRows.Next() {
+		var code, sci, ctype string
+		var lf sql.NullInt64
+		if err := uRows.Scan(&code, &sci, &lf, &ctype); err != nil {
+			uRows.Close()
+			return nil, err
+		}
+		if strings.EqualFold(strings.TrimSpace(ctype), "S") {
+			continue
+		}
+		uCode := strings.ToUpper(strings.TrimSpace(code))
+		if uCode == "" {
+			continue
+		}
+		var lfPtr *int
+		if lf.Valid {
+			v := int(lf.Int64)
+			lfPtr = &v
+		}
+		info := speciesResolvedInfo{Code: uCode, Lifeform: lfPtr}
+		if _, exists := r.byUserCode[uCode]; !exists {
+			r.byUserCode[uCode] = info
+		}
+		if full := normalizeScientificFull(sci); full != "" {
+			if _, exists := r.bySciFull[full]; !exists {
+				r.bySciFull[full] = info
+			}
+		}
+		if canon := canonicalScientificTaxon(sci); canon != "" {
+			if _, exists := r.bySciCanon[canon]; !exists {
+				r.bySciCanon[canon] = info
+			}
+		}
+	}
+	if err := uRows.Err(); err != nil {
+		uRows.Close()
+		return nil, err
+	}
+	return r, uRows.Close()
+}
+
+func (r *speciesImportResolver) resolveTaxon(explicitVProCode, sciName, validSciName, letterCode string) (code string, lifeform *int) {
+	if v := strings.ToUpper(strings.TrimSpace(explicitVProCode)); v != "" {
+		if r != nil {
+			if info, ok := r.byActiveCode[v]; ok {
+				return v, info.Lifeform
+			}
+			if info, ok := r.byUserCode[v]; ok {
+				return v, info.Lifeform
+			}
+			if info, ok := r.bySynonymCode[v]; ok {
+				return v, info.Lifeform
+			}
+		}
+		return v, nil
+	}
+
+	if r != nil {
+		for _, candidateSci := range []string{validSciName, sciName} {
+			if full := normalizeScientificFull(candidateSci); full != "" {
+				if info, ok := r.bySciFull[full]; ok {
+					return info.Code, info.Lifeform
+				}
+			}
+			if canon := canonicalScientificTaxon(candidateSci); canon != "" {
+				if info, ok := r.bySciCanon[canon]; ok {
+					return info.Code, info.Lifeform
+				}
+			}
+		}
+		if lc := strings.ToUpper(strings.TrimSpace(letterCode)); lc != "" {
+			if info, ok := r.byActiveCode[lc]; ok {
+				return info.Code, info.Lifeform
+			}
+			if info, ok := r.bySynonymCode[lc]; ok {
+				return info.Code, info.Lifeform
+			}
+			if info, ok := r.byUserCode[lc]; ok {
+				return info.Code, info.Lifeform
+			}
+		}
+	}
+
+	if lc := strings.ToUpper(strings.TrimSpace(letterCode)); lc != "" {
+		return lc, nil
+	}
+	for _, candidateSci := range []string{validSciName, sciName} {
+		if abbr := abbreviateSpeciesName(candidateSci); abbr != "" {
+			return abbr, nil
+		}
+	}
+	return "", nil
+}
+
+func enrichExportSpeciesMetaWithOldCodes(ctx context.Context, tx *sql.Tx, sppMeta map[string]speciesLookupMeta) error {
+	rows, err := tx.QueryContext(ctx, `
+		SELECT COALESCE(OldCode,''), COALESCE(ScientificName,''), COALESCE(EnglishName,''), COALESCE(Authority,''), Lifeform
+		FROM VLists.USysAllSpecs
+		WHERE OldCode IS NOT NULL AND TRIM(OldCode) <> ''`)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var oldCode, sci, eng, auth string
+		var lf sql.NullInt64
+		if err := rows.Scan(&oldCode, &sci, &eng, &auth, &lf); err != nil {
+			return err
+		}
+		uOld := strings.ToUpper(strings.TrimSpace(oldCode))
+		if uOld == "" {
+			continue
+		}
+		if _, exists := sppMeta[uOld]; exists {
+			continue
+		}
+		var lfPtr *int
+		if lf.Valid {
+			v := int(lf.Int64)
+			lfPtr = &v
+		}
+		sppMeta[uOld] = speciesLookupMeta{
+			ScientificName: strings.TrimSpace(sci),
+			EnglishName:    strings.TrimSpace(eng),
+			Authority:      strings.TrimSpace(auth),
+			Lifeform:       lfPtr,
+		}
+	}
+	return rows.Err()
 }
 
 func extractTVDatasetFromContext(ctx context.Context, tx *sql.Tx, owner *vprocore.SqliteContext, lumpMap map[string]string) (tvDataset, int, error) {
@@ -361,6 +673,9 @@ func extractTVDatasetFromContext(ctx context.Context, tx *sql.Tx, owner *vprocor
 	}
 	sppMeta, err := loadSpeciesLookupMeta(ctx, tx)
 	if err != nil {
+		return tvDataset{}, 0, err
+	}
+	if err := enrichExportSpeciesMetaWithOldCodes(ctx, tx, sppMeta); err != nil {
 		return tvDataset{}, 0, err
 	}
 	obs, err := extractLongVegObservations(ctx, tx, owner, suByPlot, sppMeta, lumpMap)
@@ -442,6 +757,7 @@ func extractTVDatasetFromContext(ctx context.Context, tx *sql.Tx, owner *vprocor
 		}
 		h.SiteUnit = suByPlot[h.PlotNumber]
 		h.PlotID = len(headers) + 1
+		h.GUID = newTurboVegUUID()
 		plotIdxByNum[h.PlotNumber] = len(headers)
 		headers = append(headers, h)
 	}
@@ -449,7 +765,6 @@ func extractTVDatasetFromContext(ctx context.Context, tx *sql.Tx, owner *vprocor
 		return tvDataset{}, 0, err
 	}
 
-	// Build SpeciesList dictionary
 	distinctCodes := map[string]struct{}{}
 	for _, o := range obs {
 		distinctCodes[o.Species] = struct{}{}
@@ -466,19 +781,24 @@ func extractTVDatasetFromContext(ctx context.Context, tx *sql.Tx, owner *vprocor
 		nr := i + 1
 		sppNRByCode[code] = nr
 		m := sppMeta[code]
+		sci := strings.TrimSpace(m.ScientificName)
+		if sci == "" {
+			sci = code
+		}
 		sppDefs[i] = tvSpeciesItem{
 			SpeciesNR:      nr,
 			SpeciesCode:    code,
-			ScientificName: m.ScientificName,
+			LetterCode:     truncateUTF16Units(code, 7),
+			ScientificName: sci,
 			EnglishName:    m.EnglishName,
 			Lifeform:       m.Lifeform,
 			Authority:      m.Authority,
 		}
 	}
 
-	bundles := make([]tvPlotBundle, len(headers))
+	bundles := make([]tvExportPlot, len(headers))
 	for i, h := range headers {
-		bundles[i] = tvPlotBundle{Header: h}
+		bundles[i] = tvExportPlot{Header: h}
 	}
 
 	totalObs := 0
@@ -488,29 +808,45 @@ func extractTVDatasetFromContext(ctx context.Context, tx *sql.Tx, owner *vprocor
 			continue
 		}
 		cw, ok := vproSublayerCodeToTV[o.Layer]
-		layerCode := o.Layer
-		tvGrp := o.TVGroup
+		tvLayerID := 6
+		vproLayer := o.Layer
 		if ok {
-			layerCode = cw.LayerCode
-			tvGrp = cw.TVGroup
+			tvLayerID = cw.TVLayerID
+			vproLayer = cw.VProLayer
 		}
-		bundles[pIdx].Observations = append(bundles[pIdx].Observations, tvSpeciesObs{
+		cov := o.Cover
+		if float32(cov) >= 100 {
+			cov = 99.99
+		}
+		sci := strings.TrimSpace(o.ScientificName)
+		if sci == "" {
+			sci = sppMeta[o.Species].ScientificName
+		}
+		if sci == "" {
+			sci = o.Species
+		}
+		bundles[pIdx].Observations = append(bundles[pIdx].Observations, tvExportObs{
 			SpeciesNR:   sppNRByCode[o.Species],
 			SpeciesCode: o.Species,
-			SciName:     o.ScientificName,
-			LayerCode:   layerCode,
-			TVGroup:     tvGrp,
-			Cover:       o.Cover,
+			SciName:     sci,
+			TVLayerID:   tvLayerID,
+			VProLayer:   vproLayer,
+			Cover:       cov,
 			Height:      o.Height,
 			Collected:   o.Collected,
 		})
 		totalObs++
 	}
 
+	projName := strings.TrimSpace(owner.Selection.Project)
+	if projName == "" {
+		projName = "VProExport"
+	}
+
 	return tvDataset{
-		Layers:  turboVegCrosswalk,
-		Species: sppDefs,
-		Plots:   bundles,
+		ProjectName: projName,
+		Species:     sppDefs,
+		Plots:       bundles,
 	}, totalObs, nil
 }
 
@@ -590,296 +926,30 @@ func ExportTurboVeg(s *vprocore.ContextService, ctx context.Context, contextID s
 	})
 }
 
-func encodeTurboVegXML(ctx context.Context, ds tvDataset) ([]byte, error) {
-	doc := xmlTurbovegDoc{
-		Version:     "3.0",
-		Generator:   "VPro 2.0 (B.C. Ministry of Forests BEC Program)",
-		Layers:      make([]xmlTVLayer, len(ds.Layers)),
-		SpeciesList: make([]xmlTVSpeciesDef, len(ds.Species)),
-		Plots:       make([]xmlTVPlot, len(ds.Plots)),
+func loadActiveContextSpeciesResolver(s *vprocore.ContextService, ctx context.Context, contextID string) (*speciesImportResolver, error) {
+	if s == nil {
+		return nil, nil
 	}
-	for i, l := range ds.Layers {
-		doc.Layers[i] = xmlTVLayer{
-			ID:          l.LayerID,
-			Code:        l.LayerCode,
-			TVGroup:     l.TVGroup,
-			VProColumn:  l.VProCover,
-			Description: l.Description,
+	return vprocore.WithContextPlotRequest(ctx, s, contextID, func(plots *vprocore.PlotService) (*speciesImportResolver, error) {
+		owner := plots.Projects.Sqlite
+		if err := sqlutil.AcquireMutexLease(ctx, &owner.Mu); err != nil {
+			return nil, err
 		}
-	}
-	for i, sp := range ds.Species {
-		doc.SpeciesList[i] = xmlTVSpeciesDef{
-			NR:             sp.SpeciesNR,
-			Code:           sp.SpeciesCode,
-			ScientificName: sp.ScientificName,
-			EnglishName:    sp.EnglishName,
-			Lifeform:       sp.Lifeform,
-			Authority:      sp.Authority,
-		}
-	}
-	for i, pb := range ds.Plots {
-		if i%128 == 0 {
-			runtime.Gosched()
-			if err := ctx.Err(); err != nil {
-				return nil, err
-			}
-		}
-		h := pb.Header
-		xp := xmlTVPlot{
-			ReleveNR:   h.PlotID,
-			PlotNumber: h.PlotNumber,
-			Header: xmlTVHeader{
-				FieldNumber:       h.FieldNumber,
-				ProjectID:         h.ProjectID,
-				Date:              h.Date,
-				Latitude:          h.Latitude,
-				Longitude:         h.Longitude,
-				Elevation:         h.Elevation,
-				Slope:             h.Slope,
-				Aspect:            h.Aspect,
-				PlotSize:          h.PlotSize,
-				Zone:              h.Zone,
-				SubZone:           h.SubZone,
-				SiteSeries:        h.SiteSeries,
-				SiteUnit:          h.SiteUnit,
-				MoistureRegime:    h.MoistureRegime,
-				NutrientRegime:    h.NutrientRegime,
-				MesoSlopePosition: h.MesoSlopePosition,
-				SurfaceShape:      h.SurfaceShape,
-				SoilDrainage:      h.SoilDrainage,
-				HumusForm:         h.HumusForm,
-				Surveyor:          h.Surveyor,
-				Location:          h.Location,
-				SiteNotes:         h.SiteNotes,
-				VegNotes:          h.VegNotes,
-				SoilNotes:         h.SoilNotes,
-			},
-			Species: make([]xmlTVObs, len(pb.Observations)),
-		}
-		for j, o := range pb.Observations {
-			xp.Species[j] = xmlTVObs{
-				NR:        o.SpeciesNR,
-				Code:      o.SpeciesCode,
-				Name:      o.SciName,
-				Layer:     o.LayerCode,
-				TVGroup:   o.TVGroup,
-				Cover:     o.Cover,
-				Height:    o.Height,
-				Collected: o.Collected,
-			}
-		}
-		doc.Plots[i] = xp
-	}
-
-	var buf bytes.Buffer
-	buf.WriteString(xml.Header)
-	enc := xml.NewEncoder(&buf)
-	enc.Indent("", "  ")
-	if err := enc.Encode(doc); err != nil {
-		return nil, err
-	}
-	buf.WriteByte('\n')
-	return buf.Bytes(), nil
-}
-
-func writeTurboVeg3SQLite(ctx context.Context, destinationPath string, ds tvDataset) (string, string, error) {
-	absDest, err := filepath.Abs(filepath.Clean(destinationPath))
-	if err != nil {
-		return "", "", err
-	}
-	if err := os.MkdirAll(filepath.Dir(absDest), 0o755); err != nil {
-		return "", "", err
-	}
-	tmpFile, err := os.CreateTemp(filepath.Dir(absDest), ".vpro-tv3-*.sqlite")
-	if err != nil {
-		return "", "", err
-	}
-	tmpPath := tmpFile.Name()
-	published := false
-	defer func() {
-		if !published {
-			_ = os.Remove(tmpPath)
-		}
-	}()
-	_ = tmpFile.Close()
-
-	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tmpPath, "rw")+"&_journal_mode=DELETE&_synchronous=FULL&_foreign_keys=on")
-	if err != nil {
-		return "", "", err
-	}
-	db.SetMaxOpenConns(1)
-
-	tx, err := db.BeginTx(ctx, nil)
-	if err != nil {
-		db.Close()
-		return "", "", err
-	}
-
-	build := func() error {
-		if _, err := tx.ExecContext(ctx, `
-			CREATE TABLE Plots (
-				PlotID INTEGER PRIMARY KEY,
-				PlotNumber TEXT NOT NULL UNIQUE,
-				FieldNumber TEXT,
-				ProjectID TEXT,
-				Date TEXT,
-				Latitude DOUBLE,
-				Longitude DOUBLE,
-				Elevation INTEGER,
-				Slope DOUBLE,
-				Aspect INTEGER,
-				PlotSize DOUBLE
-			);
-			CREATE TABLE HeaderData (
-				PlotID INTEGER PRIMARY KEY REFERENCES Plots(PlotID) ON DELETE CASCADE,
-				Zone TEXT,
-				SubZone TEXT,
-				SiteSeries TEXT,
-				SiteUnit TEXT,
-				MoistureRegime TEXT,
-				NutrientRegime TEXT,
-				MesoSlopePosition TEXT,
-				SurfaceShape TEXT,
-				SoilDrainage TEXT,
-				HumusForm TEXT,
-				Surveyor TEXT,
-				Location TEXT,
-				SiteNotes TEXT,
-				VegNotes TEXT,
-				SoilNotes TEXT,
-				ExtraJSON TEXT
-			);
-			CREATE TABLE Layers (
-				LayerID INTEGER PRIMARY KEY,
-				LayerCode TEXT NOT NULL UNIQUE,
-				TurboVegGroup TEXT NOT NULL,
-				VProColumn TEXT,
-				HeightColumn TEXT,
-				Description TEXT
-			);
-			CREATE TABLE SpeciesList (
-				SpeciesNR INTEGER PRIMARY KEY,
-				SpeciesCode TEXT NOT NULL UNIQUE,
-				ScientificName TEXT,
-				EnglishName TEXT,
-				Lifeform INTEGER,
-				Authority TEXT
-			);
-			CREATE TABLE SpeciesData (
-				ID INTEGER PRIMARY KEY AUTOINCREMENT,
-				PlotID INTEGER NOT NULL REFERENCES Plots(PlotID) ON DELETE CASCADE,
-				SpeciesNR INTEGER NOT NULL REFERENCES SpeciesList(SpeciesNR),
-				SpeciesCode TEXT NOT NULL,
-				LayerCode TEXT NOT NULL,
-				TurboVegGroup TEXT NOT NULL,
-				Cover DOUBLE NOT NULL,
-				Height DOUBLE,
-				Collected TEXT
-			);
-			CREATE INDEX idx_tv3_speciesdata_plot ON SpeciesData(PlotID);
-			CREATE INDEX idx_tv3_speciesdata_spp ON SpeciesData(SpeciesCode);
-		`); err != nil {
-			return err
-		}
-
-		lStmt, err := tx.PrepareContext(ctx, `INSERT INTO Layers (LayerID, LayerCode, TurboVegGroup, VProColumn, HeightColumn, Description) VALUES (?,?,?,?,?,?)`)
+		defer owner.Mu.Unlock()
+		tx, err := owner.BeginReadSnapshot(ctx)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		for _, l := range ds.Layers {
-			if _, err := lStmt.ExecContext(ctx, l.LayerID, l.LayerCode, l.TVGroup, l.VProCover, l.VProHeight, l.Description); err != nil {
-				lStmt.Close()
-				return err
-			}
-		}
-		lStmt.Close()
-
-		spStmt, err := tx.PrepareContext(ctx, `INSERT INTO SpeciesList (SpeciesNR, SpeciesCode, ScientificName, EnglishName, Lifeform, Authority) VALUES (?,?,?,?,?,?)`)
+		defer func() { _ = tx.Rollback() }()
+		res, err := loadSpeciesImportResolver(ctx, tx)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		for _, sp := range ds.Species {
-			var lfAny any
-			if sp.Lifeform != nil {
-				lfAny = *sp.Lifeform
-			}
-			if _, err := spStmt.ExecContext(ctx, sp.SpeciesNR, sp.SpeciesCode, sp.ScientificName, sp.EnglishName, lfAny, sp.Authority); err != nil {
-				spStmt.Close()
-				return err
-			}
+		if err := tx.Commit(); err != nil {
+			return nil, err
 		}
-		spStmt.Close()
-
-		pStmt, err := tx.PrepareContext(ctx, `INSERT INTO Plots (PlotID, PlotNumber, FieldNumber, ProjectID, Date, Latitude, Longitude, Elevation, Slope, Aspect, PlotSize) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
-		if err != nil {
-			return err
-		}
-		defer pStmt.Close()
-
-		hStmt, err := tx.PrepareContext(ctx, `INSERT INTO HeaderData (PlotID, Zone, SubZone, SiteSeries, SiteUnit, MoistureRegime, NutrientRegime, MesoSlopePosition, SurfaceShape, SoilDrainage, HumusForm, Surveyor, Location, SiteNotes, VegNotes, SoilNotes, ExtraJSON) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-		if err != nil {
-			return err
-		}
-		defer hStmt.Close()
-
-		obsStmt, err := tx.PrepareContext(ctx, `INSERT INTO SpeciesData (PlotID, SpeciesNR, SpeciesCode, LayerCode, TurboVegGroup, Cover, Height, Collected) VALUES (?,?,?,?,?,?,?,?)`)
-		if err != nil {
-			return err
-		}
-		defer obsStmt.Close()
-
-		for _, pb := range ds.Plots {
-			h := pb.Header
-			if _, err := pStmt.ExecContext(ctx, h.PlotID, h.PlotNumber, nullEmpty(h.FieldNumber), nullEmpty(h.ProjectID), nullEmpty(h.Date),
-				h.Latitude, h.Longitude, h.Elevation, h.Slope, h.Aspect, h.PlotSize); err != nil {
-				return err
-			}
-			extra, _ := json.Marshal(map[string]string{"generator": "VPro 2.0"})
-			if _, err := hStmt.ExecContext(ctx, h.PlotID, nullEmpty(h.Zone), nullEmpty(h.SubZone), nullEmpty(h.SiteSeries), nullEmpty(h.SiteUnit),
-				nullEmpty(h.MoistureRegime), nullEmpty(h.NutrientRegime), nullEmpty(h.MesoSlopePosition), nullEmpty(h.SurfaceShape),
-				nullEmpty(h.SoilDrainage), nullEmpty(h.HumusForm), nullEmpty(h.Surveyor), nullEmpty(h.Location),
-				nullEmpty(h.SiteNotes), nullEmpty(h.VegNotes), nullEmpty(h.SoilNotes), string(extra)); err != nil {
-				return err
-			}
-			for _, o := range pb.Observations {
-				if _, err := obsStmt.ExecContext(ctx, h.PlotID, o.SpeciesNR, o.SpeciesCode, o.LayerCode, o.TVGroup, o.Cover, o.Height, nullEmpty(o.Collected)); err != nil {
-					return err
-				}
-			}
-		}
-		return nil
-	}
-
-	if err := build(); err != nil {
-		_ = tx.Rollback()
-		_ = db.Close()
-		return "", "", err
-	}
-	if err := tx.Commit(); err != nil {
-		_ = db.Close()
-		return "", "", err
-	}
-	if err := db.Close(); err != nil {
-		return "", "", err
-	}
-	if err := os.Rename(tmpPath, absDest); err != nil {
-		return "", "", err
-	}
-	published = true
-
-	rawBytes, err := os.ReadFile(absDest)
-	if err != nil {
-		return "", "", err
-	}
-	sum := sha256.Sum256(rawBytes)
-	return absDest, hex.EncodeToString(sum[:]), nil
-}
-
-func nullEmpty(s string) any {
-	if strings.TrimSpace(s) == "" {
-		return nil
-	}
-	return s
+		return res, nil
+	})
 }
 
 func ImportTurboVeg(s *vprocore.ContextService, ctx context.Context, contextID string, request TurboVegImportRequest) (TurboVegImportOutcome, error) {
@@ -899,36 +969,36 @@ func ImportTurboVeg(s *vprocore.ContextService, ctx context.Context, contextID s
 			format = TurboVegFormatSQLite
 		}
 	}
+	if format != TurboVegFormatXML && format != TurboVegFormatSQLite {
+		return TurboVegImportOutcome{}, fmt.Errorf("unsupported TurboVeg import format %q", format)
+	}
 
-	var ds tvDataset
+	resolver, err := loadActiveContextSpeciesResolver(s, ctx, contextID)
+	if err != nil {
+		return TurboVegImportOutcome{}, err
+	}
+
+	var plots []tvImportPlot
 	switch format {
 	case TurboVegFormatXML:
-		ds, err = parseTurboVegXMLFile(ctx, absSrc)
+		plots, err = parseTurboVegXMLFile(ctx, absSrc, resolver)
 	case TurboVegFormatSQLite:
-		ds, err = readTurboVeg3SQLiteFile(ctx, absSrc)
-	default:
-		return TurboVegImportOutcome{}, fmt.Errorf("unsupported TurboVeg import format %q", format)
+		plots, err = readTurboVeg3SQLiteFile(ctx, absSrc, resolver)
 	}
 	if err != nil {
 		return TurboVegImportOutcome{}, err
 	}
-	if len(ds.Plots) == 0 {
+	if len(plots) == 0 {
 		return TurboVegImportOutcome{}, errors.New("TurboVeg source contains zero plots")
 	}
 
-	sppSet := map[string]struct{}{}
-	obsCount := 0
-	for _, pb := range ds.Plots {
-		for _, o := range pb.Observations {
-			sppSet[strings.ToUpper(strings.TrimSpace(o.SpeciesCode))] = struct{}{}
-			obsCount++
-		}
-	}
-
+	var persistedSppCount, persistedObsCount int
 	destPath, destSHA, activated, newState, err := stageAndPublishVP08Project(
 		s, ctx, contextID, request.TargetProject, request.DestinationPath, request.ActivateOnSuccess,
 		func(ctx context.Context, tx *sql.Tx, project string) error {
-			return populateVP08FromTVDataset(ctx, tx, project, ds)
+			var pErr error
+			persistedSppCount, persistedObsCount, pErr = populateVP08FromTVPlots(ctx, tx, project, plots)
+			return pErr
 		},
 	)
 	if err != nil {
@@ -941,133 +1011,12 @@ func ImportTurboVeg(s *vprocore.ContextService, ctx context.Context, contextID s
 		TargetProject:    strings.TrimSpace(request.TargetProject),
 		DestinationPath:  destPath,
 		DestinationSHA:   destSHA,
-		PlotCount:        len(ds.Plots),
-		SpeciesCount:     len(sppSet),
-		ObservationCount: obsCount,
+		PlotCount:        len(plots),
+		SpeciesCount:     persistedSppCount,
+		ObservationCount: persistedObsCount,
 		Activated:        activated,
 		State:            newState,
 	}, nil
-}
-
-func parseTurboVegXMLFile(ctx context.Context, path string) (tvDataset, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return tvDataset{}, err
-	}
-	defer f.Close()
-
-	dec := xml.NewDecoder(f)
-	var ds tvDataset
-	sppNameByNR := map[int]string{}
-	plotCounter := 0
-
-	for {
-		tok, err := dec.Token()
-		if errors.Is(err, io.EOF) {
-			break
-		}
-		if err != nil {
-			return tvDataset{}, fmt.Errorf("parse TurboVeg XML: %w", err)
-		}
-		se, ok := tok.(xml.StartElement)
-		if !ok {
-			continue
-		}
-		switch strings.ToLower(se.Name.Local) {
-		case "specieslist":
-			var list struct {
-				Species []xmlTVSpeciesDef `xml:"Species"`
-			}
-			if err := dec.DecodeElement(&list, &se); err != nil {
-				return tvDataset{}, err
-			}
-			for _, sp := range list.Species {
-				code := strings.ToUpper(strings.TrimSpace(sp.Code))
-				if code == "" && sp.ScientificName != "" {
-					code = abbreviateSpeciesName(sp.ScientificName)
-				}
-				sppNameByNR[sp.NR] = code
-				ds.Species = append(ds.Species, tvSpeciesItem{
-					SpeciesNR:      sp.NR,
-					SpeciesCode:    code,
-					ScientificName: sp.ScientificName,
-					EnglishName:    sp.EnglishName,
-					Lifeform:       sp.Lifeform,
-					Authority:      sp.Authority,
-				})
-			}
-		case "plot", "releve":
-			plotCounter++
-			if plotCounter%64 == 0 {
-				runtime.Gosched()
-				if err := ctx.Err(); err != nil {
-					return tvDataset{}, err
-				}
-			}
-			var xp xmlTVPlot
-			if err := dec.DecodeElement(&xp, &se); err != nil {
-				return tvDataset{}, err
-			}
-			pNum := strings.TrimSpace(xp.PlotNumber)
-			if pNum == "" && xp.ReleveNR != 0 {
-				pNum = strconv.Itoa(xp.ReleveNR)
-			}
-			pb := tvPlotBundle{
-				Header: tvPlotHeader{
-					PlotID:            plotCounter,
-					PlotNumber:        pNum,
-					FieldNumber:       xp.Header.FieldNumber,
-					ProjectID:         xp.Header.ProjectID,
-					Date:              xp.Header.Date,
-					Latitude:          xp.Header.Latitude,
-					Longitude:         xp.Header.Longitude,
-					Elevation:         xp.Header.Elevation,
-					Slope:             xp.Header.Slope,
-					Aspect:            xp.Header.Aspect,
-					PlotSize:          xp.Header.PlotSize,
-					Zone:              xp.Header.Zone,
-					SubZone:           xp.Header.SubZone,
-					SiteSeries:        xp.Header.SiteSeries,
-					SiteUnit:          xp.Header.SiteUnit,
-					MoistureRegime:    xp.Header.MoistureRegime,
-					NutrientRegime:    xp.Header.NutrientRegime,
-					MesoSlopePosition: xp.Header.MesoSlopePosition,
-					SurfaceShape:      xp.Header.SurfaceShape,
-					SoilDrainage:      xp.Header.SoilDrainage,
-					HumusForm:         xp.Header.HumusForm,
-					Surveyor:          xp.Header.Surveyor,
-					Location:          xp.Header.Location,
-					SiteNotes:         xp.Header.SiteNotes,
-					VegNotes:          xp.Header.VegNotes,
-					SoilNotes:         xp.Header.SoilNotes,
-				},
-			}
-			for _, o := range xp.Species {
-				code := strings.ToUpper(strings.TrimSpace(o.Code))
-				if code == "" {
-					code = sppNameByNR[o.NR]
-				}
-				if code == "" && o.Name != "" {
-					code = abbreviateSpeciesName(o.Name)
-				}
-				if code == "" || o.Cover == 0 {
-					continue
-				}
-				pb.Observations = append(pb.Observations, tvSpeciesObs{
-					SpeciesNR:   o.NR,
-					SpeciesCode: code,
-					SciName:     o.Name,
-					LayerCode:   o.Layer,
-					TVGroup:     o.TVGroup,
-					Cover:       o.Cover,
-					Height:      o.Height,
-					Collected:   o.Collected,
-				})
-			}
-			ds.Plots = append(ds.Plots, pb)
-		}
-	}
-	return ds, nil
 }
 
 func abbreviateSpeciesName(sci string) string {
@@ -1083,123 +1032,7 @@ func abbreviateSpeciesName(sci string) string {
 	return truncateUTF16Units(g+sp, 8)
 }
 
-func readTurboVeg3SQLiteFile(ctx context.Context, path string) (tvDataset, error) {
-	resolved, err := vprocore.ExistingDatabasePath(path)
-	if err != nil {
-		return tvDataset{}, err
-	}
-	db, err := sqlutil.OpenReadOnlyContext(ctx, resolved)
-	if err != nil {
-		return tvDataset{}, err
-	}
-	defer db.Close()
-
-	var ds tvDataset
-	spRows, err := db.QueryContext(ctx, `SELECT SpeciesNR, SpeciesCode, COALESCE(ScientificName,''), COALESCE(EnglishName,''), Lifeform, COALESCE(Authority,'') FROM SpeciesList ORDER BY SpeciesNR`)
-	if err == nil {
-		for spRows.Next() {
-			var sp tvSpeciesItem
-			var lf sql.NullInt64
-			if sErr := spRows.Scan(&sp.SpeciesNR, &sp.SpeciesCode, &sp.ScientificName, &sp.EnglishName, &lf, &sp.Authority); sErr == nil {
-				if lf.Valid {
-					v := int(lf.Int64)
-					sp.Lifeform = &v
-				}
-				ds.Species = append(ds.Species, sp)
-			}
-		}
-		spRows.Close()
-	}
-
-	pRows, err := db.QueryContext(ctx, `
-		SELECT
-			p.PlotID, p.PlotNumber, COALESCE(p.FieldNumber,''), COALESCE(p.ProjectID,''), COALESCE(p.Date,''),
-			p.Latitude, p.Longitude, p.Elevation, p.Slope, p.Aspect, p.PlotSize,
-			COALESCE(h.Zone,''), COALESCE(h.SubZone,''), COALESCE(h.SiteSeries,''), COALESCE(h.SiteUnit,''),
-			COALESCE(h.MoistureRegime,''), COALESCE(h.NutrientRegime,''), COALESCE(h.MesoSlopePosition,''),
-			COALESCE(h.SurfaceShape,''), COALESCE(h.SoilDrainage,''), COALESCE(h.HumusForm,''),
-			COALESCE(h.Surveyor,''), COALESCE(h.Location,''),
-			COALESCE(h.SiteNotes,''), COALESCE(h.VegNotes,''), COALESCE(h.SoilNotes,'')
-		FROM Plots AS p
-		LEFT JOIN HeaderData AS h ON h.PlotID = p.PlotID
-		ORDER BY p.PlotID`)
-	if err != nil {
-		return tvDataset{}, fmt.Errorf("read TurboVeg3 Plots/HeaderData: %w", err)
-	}
-	plotIdxByID := map[int]int{}
-	for pRows.Next() {
-		var h tvPlotHeader
-		var lat, lon, slope, pSize sql.NullFloat64
-		var elev, aspect sql.NullInt64
-		if err := pRows.Scan(
-			&h.PlotID, &h.PlotNumber, &h.FieldNumber, &h.ProjectID, &h.Date,
-			&lat, &lon, &elev, &slope, &aspect, &pSize,
-			&h.Zone, &h.SubZone, &h.SiteSeries, &h.SiteUnit,
-			&h.MoistureRegime, &h.NutrientRegime, &h.MesoSlopePosition,
-			&h.SurfaceShape, &h.SoilDrainage, &h.HumusForm,
-			&h.Surveyor, &h.Location, &h.SiteNotes, &h.VegNotes, &h.SoilNotes,
-		); err != nil {
-			pRows.Close()
-			return tvDataset{}, err
-		}
-		if lat.Valid {
-			v := lat.Float64
-			h.Latitude = &v
-		}
-		if lon.Valid {
-			v := lon.Float64
-			h.Longitude = &v
-		}
-		if elev.Valid {
-			v := int(elev.Int64)
-			h.Elevation = &v
-		}
-		if slope.Valid {
-			v := slope.Float64
-			h.Slope = &v
-		}
-		if aspect.Valid {
-			v := int(aspect.Int64)
-			h.Aspect = &v
-		}
-		if pSize.Valid {
-			v := pSize.Float64
-			h.PlotSize = &v
-		}
-		plotIdxByID[h.PlotID] = len(ds.Plots)
-		ds.Plots = append(ds.Plots, tvPlotBundle{Header: h})
-	}
-	if err := pRows.Close(); err != nil {
-		return tvDataset{}, err
-	}
-
-	oRows, err := db.QueryContext(ctx, `
-		SELECT PlotID, SpeciesNR, SpeciesCode, LayerCode, TurboVegGroup, Cover, Height, COALESCE(Collected,'')
-		FROM SpeciesData
-		ORDER BY PlotID, ID`)
-	if err != nil {
-		return tvDataset{}, fmt.Errorf("read TurboVeg3 SpeciesData: %w", err)
-	}
-	defer oRows.Close()
-	for oRows.Next() {
-		var plotID int
-		var o tvSpeciesObs
-		var ht sql.NullFloat64
-		if err := oRows.Scan(&plotID, &o.SpeciesNR, &o.SpeciesCode, &o.LayerCode, &o.TVGroup, &o.Cover, &ht, &o.Collected); err != nil {
-			return tvDataset{}, err
-		}
-		if ht.Valid {
-			v := ht.Float64
-			o.Height = &v
-		}
-		if idx, ok := plotIdxByID[plotID]; ok {
-			ds.Plots[idx].Observations = append(ds.Plots[idx].Observations, o)
-		}
-	}
-	return ds, oRows.Err()
-}
-
-func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, ds tvDataset) error {
+func populateVP08FromTVPlots(ctx context.Context, tx *sql.Tx, project string, plots []tvImportPlot) (int, int, error) {
 	envTbl := vprocore.QuoteHeaderIdentifier(project + "_Env")
 	adminTbl := vprocore.QuoteHeaderIdentifier(project + "_Admin")
 	vegTbl := vprocore.QuoteHeaderIdentifier(project + "_Veg")
@@ -1214,14 +1047,14 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 			"SoilDrainage","HumusForm","SiteSurveyor","Location","SiteNotes","VegNotes","SoilNotes"
 		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
 	defer envStmt.Close()
 
 	adminStmt, err := tx.PrepareContext(ctx, `
 		INSERT INTO `+adminTbl+` ("Plot","PlotType","PlotSize","UserSiteUnit") VALUES (?,?,?,?)`)
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
 	defer adminStmt.Close()
 
@@ -1241,7 +1074,7 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 	}
 	vegStmt, err := tx.PrepareContext(ctx, `INSERT INTO `+vegTbl+` (`+strings.Join(qVegCols, ", ")+`) VALUES (`+strings.Join(qMarks, ", ")+`)`)
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
 	defer vegStmt.Close()
 
@@ -1249,13 +1082,13 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 	suRows := [][2]string{}
 	seenRawPlots := map[string]bool{}
 	reservedLiteralShort := map[string]bool{}
-	for _, pb := range ds.Plots {
+	for _, pb := range plots {
 		rawPlot := strings.TrimSpace(pb.Header.PlotNumber)
 		if rawPlot == "" {
-			return fmt.Errorf("TurboVeg plot %d has an empty plot number", pb.Header.PlotID)
+			return 0, 0, fmt.Errorf("TurboVeg plot %d has an empty plot number", pb.Header.PlotID)
 		}
 		if seenRawPlots[rawPlot] {
-			return fmt.Errorf("duplicate TurboVeg source plot number %q", rawPlot)
+			return 0, 0, fmt.Errorf("duplicate TurboVeg source plot number %q", rawPlot)
 		}
 		seenRawPlots[rawPlot] = true
 		if len(utf16.Encode([]rune(rawPlot))) <= 7 {
@@ -1264,11 +1097,51 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 	}
 
 	usedTargetPlots := map[string]bool{}
+	persistedSpecies := map[string]struct{}{}
+	persistedObsCount := 0
 	nowStr := time.Now().Format("2006-01-02 15:04:05")
 
-	for _, pb := range ds.Plots {
+	for plotIdx, pb := range plots {
+		if plotIdx%128 == 0 {
+			if err := ctx.Err(); err != nil {
+				return 0, 0, err
+			}
+		}
 		h := pb.Header
 		rawPlot := strings.TrimSpace(h.PlotNumber)
+		for _, tf := range [][2]string{
+			{"PlotNumber", h.PlotNumber},
+			{"FieldNumber", h.FieldNumber},
+			{"ProjectID", h.ProjectID},
+			{"Date", h.Date},
+			{"Zone", h.Zone},
+			{"SubZone", h.SubZone},
+			{"SiteSeries", h.SiteSeries},
+			{"SiteUnit", h.SiteUnit},
+			{"MoistureRegime", h.MoistureRegime},
+			{"NutrientRegime", h.NutrientRegime},
+			{"MesoSlopePosition", h.MesoSlopePosition},
+			{"SurfaceShape", h.SurfaceShape},
+			{"SoilDrainage", h.SoilDrainage},
+			{"HumusForm", h.HumusForm},
+			{"Surveyor", h.Surveyor},
+			{"Location", h.Location},
+			{"SiteNotes", h.SiteNotes},
+			{"VegNotes", h.VegNotes},
+			{"SoilNotes", h.SoilNotes},
+		} {
+			if err := validateUTF8Text(tf[1], tf[0]); err != nil {
+				return 0, 0, err
+			}
+		}
+		var slopeSingle *float64
+		if h.Slope != nil {
+			sv, err := validateFiniteSingleFloat(*h.Slope, "SlopeGradient", true)
+			if err != nil {
+				return 0, 0, fmt.Errorf("plot %s: %w", rawPlot, err)
+			}
+			slopeSingle = &sv
+		}
 		pNum := allocateUniqueTVPlotNumber(rawPlot, usedTargetPlots, reservedLiteralShort)
 		usedTargetPlots[pNum] = true
 
@@ -1284,7 +1157,7 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 			projID,
 			nullTruncatedUTF16(h.Date, 40),
 			h.Latitude, h.Longitude,
-			h.Elevation, h.Slope, h.Aspect,
+			h.Elevation, slopeSingle, h.Aspect,
 			nullTruncatedUTF16(h.Zone, 4),
 			nullTruncatedUTF16(h.SubZone, 8),
 			nullTruncatedUTF16(h.SiteSeries, 5),
@@ -1298,16 +1171,15 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 			nullTruncatedUTF16(h.Location, 255),
 			nullEmpty(h.SiteNotes), nullEmpty(h.VegNotes), nullEmpty(h.SoilNotes),
 		); err != nil {
-			return fmt.Errorf("insert plot %s into _Env: %w", pNum, err)
+			return 0, 0, fmt.Errorf("insert plot %s into _Env: %w", pNum, err)
 		}
 		if _, err := adminStmt.ExecContext(ctx, pNum, "FS882", h.PlotSize, nullTruncatedUTF16(h.SiteUnit, 100)); err != nil {
-			return fmt.Errorf("insert plot %s into _Admin: %w", pNum, err)
+			return 0, 0, fmt.Errorf("insert plot %s into _Admin: %w", pNum, err)
 		}
 		if suUnit := truncateUTF16Units(strings.TrimSpace(h.SiteUnit), 255); suUnit != "" {
 			suRows = append(suRows, [2]string{pNum, suUnit})
 		}
 
-		// Pivot SpeciesData per species into wide VP08 _Veg rows
 		type wideRow struct {
 			spp       string
 			collected string
@@ -1317,8 +1189,14 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 		bySpp := map[string]*wideRow{}
 		var sppOrder []string
 		for _, o := range pb.Observations {
+			if err := validateUTF8Text(o.SpeciesCode, "Species"); err != nil {
+				return 0, 0, err
+			}
+			if err := validateUTF8Text(o.Collected, "Collected"); err != nil {
+				return 0, 0, err
+			}
 			code := truncateUTF16Units(strings.ToUpper(strings.TrimSpace(o.SpeciesCode)), 8)
-			if code == "" || o.Cover == 0 {
+			if code == "" {
 				continue
 			}
 			wr := bySpp[code]
@@ -1330,15 +1208,21 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 			if wr.collected == "" && strings.TrimSpace(o.Collected) != "" {
 				wr.collected = truncateUTF16Units(strings.TrimSpace(o.Collected), 1)
 			}
-			cCol, hCol := resolveIncomingTurboVegLayer(o.LayerCode, o.TVGroup)
+			cCol, hCol := resolveIncomingTurboVegLayer(o.TVLayerRaw, o.VProLayer, o.IsWoody)
 			if err := accumulateImportedSingleCover(wr.covers, cCol, o.Cover, pNum, code); err != nil {
-				return err
+				return 0, 0, err
 			}
 			if o.Height != nil && hCol != "" {
-				if *o.Height > wr.heights[hCol] {
-					wr.heights[hCol] = *o.Height
+				hv, err := validateFiniteSingleFloat(*o.Height, hCol, true)
+				if err != nil {
+					return 0, 0, fmt.Errorf("plot %s species %s: %w", pNum, code, err)
+				}
+				if hv > wr.heights[hCol] {
+					wr.heights[hCol] = hv
 				}
 			}
+			persistedSpecies[code] = struct{}{}
+			persistedObsCount++
 		}
 
 		for _, code := range sppOrder {
@@ -1364,7 +1248,7 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 				}
 			}
 			if _, err := vegStmt.ExecContext(ctx, args...); err != nil {
-				return fmt.Errorf("insert veg %s/%s: %w", pNum, wr.spp, err)
+				return 0, 0, fmt.Errorf("insert veg %s/%s: %w", pNum, wr.spp, err)
 			}
 		}
 
@@ -1372,7 +1256,7 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 			INSERT INTO `+auditTbl+` ("Project","User","PlotNumber","Table","EditField","EditWhen","Restore","Flag")
 			VALUES (?, 'VPro', ?, 'Environment', 'Imported TurboVeg record', ?, 0, 0)`,
 			project, pNum, nowStr); err != nil {
-			return fmt.Errorf("insert audit for plot %s: %w", pNum, err)
+			return 0, 0, fmt.Errorf("insert audit for plot %s: %w", pNum, err)
 		}
 	}
 
@@ -1383,11 +1267,11 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 			CREATE UNIQUE INDEX `+vprocore.QuoteHeaderIdentifier("uidx_"+project+"_SU_PlotNumber")+` ON `+suTbl+`("PlotNumber");
 			CREATE INDEX `+vprocore.QuoteHeaderIdentifier("idx_"+project+"_SU_SiteUnit")+` ON `+suTbl+`("SiteUnit");
 			INSERT INTO "_table_metadata" ("table_name", "description") VALUES (?, 'VP04');`, project+"_SU"); err != nil {
-			return err
+			return 0, 0, err
 		}
 		for _, pair := range suRows {
 			if _, err := tx.ExecContext(ctx, `INSERT INTO `+suTbl+` ("PlotNumber", "SiteUnit") VALUES (?, ?)`, pair[0], pair[1]); err != nil {
-				return err
+				return 0, 0, err
 			}
 		}
 	}
@@ -1396,7 +1280,7 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 		INSERT INTO `+metaTbl+` ("ID", "ProjectID", "ProjectTitle", "NumberOfFS882Plots", "VegCoverMethod", "Datum")
 		VALUES (1, ?, ?, ?, '1', '2')`,
 		project, project+" (TurboVeg Import)", len(usedTargetPlots))
-	return err
+	return len(persistedSpecies), persistedObsCount, err
 }
 
 func allocateUniqueTVPlotNumber(rawPlot string, usedTargetPlots, reservedLiteralShort map[string]bool) string {
