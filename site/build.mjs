@@ -799,7 +799,7 @@ export function validateBuiltAssets({ html, css, downloadsJs, portalDocsJs }) {
 export function buildSite({
   repoRoot = defaultRepoRoot,
   outDir = path.join(repoRoot, 'site', 'dist'),
-  syncDocs = true,
+  syncDocs = false,
   manifestOverride = null,
 } = {}) {
   const docsSrcDir = path.join(repoRoot, 'docs-src');
