@@ -36,7 +36,7 @@ flowchart TB
 ## 2. Automation 1: Coordinate-Driven Geodetic, Administrative & DEM Auto-Attribution
 
 * **Manual Pain Eliminated:** Legacy `V7mdlCoordTools.txt` had zero `UTM <-> Lat/Lon` projection math, truncated DMS through `Single` floats (`~1 m` error), and required users to manually look up `GIS_BGC`, `Ecosection`, `FSRegionDistrict`, `NtsMapSheet`, `Elevation`, `SlopeGradient`, and `Aspect`.
-* **Target Touchpoints in `vpro_wails`:** `coordinateservice.go`, new `SpatialService` (`spatialattribution.go`), `frontend/src/CoordinateFields.svelte`, and MapLibre `PMTiles` layers.
+* **Target Touchpoints in `vpro_wails`:** `coordinateservice.go`, `SpatialService` (`internal/spatial/`), `frontend/src/entry/CoordinateFields.svelte`, and MapLibre `PMTiles` layers.
 * **Implementation Contract:**
   1. **Bidirectional `NAD83` Projection (`EPSG:4269` $\leftrightarrow$ `EPSG:26907..26911`):** Entering `Latitude`/`Longitude` (`DD`, `DM`, or `DMS`) automatically computes `UTMZone (7..11)`, `UTMEasting`, and `UTMNorthing` (and vice versa). If both are entered from a paper card and diverge by `> max(LocationAccuracy, 50m)`, render an inline geodetic warning badge + dual pins on the MapLibre canvas.
   2. **Point-in-Polygon Administrative & BGC Stamp (`SuggestSpatialAttributes(lat, lon)`):** Query local `.pmtiles` / R-tree index (`BGC v13+`, BC Ecosections, Natural Resource Regions/Districts, BCGS 1:20k MapSheet grid) to offer one-click population of:

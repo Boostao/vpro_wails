@@ -32,16 +32,27 @@ wails3 dev
 # Regenerate TypeScript interface bindings (MUST include -i)
 wails3 generate bindings -ts -i
 
-# Default SQLite-only desktop builds
+# Default SQLite-only desktop builds (supports VERSION=2.1.0-alpha.1 / BUILD_MODE=alpha|release)
 wails3 task linux:build EXTRA_TAGS=sqliteonly
-wails3 task windows:build:sqliteonly
+wails3 task linux:build EXTRA_TAGS=sqliteonly VERSION=2.1.0-alpha.1
+wails3 task windows:build:sqliteonly VERSION=2.1.0-alpha.1
 ```
+
+## Repository Layout
+
+- `main.go`, `native_options.go`, `aliases.go`, `domainservices_*.go` — Thin Wails host registering strictly 12 cohesive domain services.
+- `internal/` — 4-layer acyclic Go domain architecture (`Layer 0` foundations/CGO `accessreader` $\rightarrow$ `Layer 1` `vprocore`/`references`/`sourceform`/`reportcore` $\rightarrow$ `Layer 2` independent domain packages).
+- `frontend/src/` — Domain-organized Svelte 5 + TypeScript application (`shell/`, `entry/`, `datasheet/`, `classification/`, `reports/`, `spatial/`, `diagnostics/`, `rsidecar/`, `interchange/`, `admin/`, `pictures/`, `help/`, `shared/`).
+- `frontend/tests/` — Single-pass Node test suite (`frontend/scripts/run-tests.mjs`) + `fixtures/` shared Go $\leftrightarrow$ Frontend wire round-trip fixtures.
+- `docs-src/` & `site/` — Single-source offline `F1` `LMH25` help compiler (`scripts/build-docs-src.mjs`) and BC Gov Design System static-manifest release portal (`site/build.mjs` $\rightarrow$ `site/dist`).
 
 ### Validation Suites
 ```bash
-# Frontend unit tests, typecheck & Vite build
+# Frontend unit tests (single-pass runner), typecheck & Vite build
 (cd frontend && npm test && npm run check && npm run build)
 
-# Backend Go tests (SQLite-only profile)
+# Backend Go tests (SQLite-only profile) & release/portal checks
 go test -tags sqliteonly ./...
+python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+node scripts/build-docs-src.mjs && node site/build.mjs && node --test scripts/tests/downloadPortal.test.cjs
 ```
