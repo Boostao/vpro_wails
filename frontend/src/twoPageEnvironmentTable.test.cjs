@@ -7,16 +7,16 @@ const ts = require('typescript');
 const { compile } = require('svelte/compiler');
 const { loadTypeScript, componentFunctions } = require('./svelteTestHelpers.cjs');
 const { transport, metadata, cell } = require('./siviParentTestHelpers.cjs');
-const targets = require('./twoPageEnvironmentTargets.json');
+const targets = require('./shared/twoPageEnvironmentTargets.json');
 const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
 const vegetation = loadTypeScript('twoPageVegetationTable.ts', {
   './siviParentTransport': transport, './projectMetadataEditor': metadata, './qualityEditor': quality,
 });
 const table = loadTypeScript('twoPageEnvironmentTable.ts', {
-  './twoPageEnvironmentTargets.json': targets, './siviParentTransport': transport,
+  './shared/twoPageEnvironmentTargets.json': targets, './siviParentTransport': transport,
   './qualityEditor': quality, './twoPageVegetationTable': vegetation,
 });
-const fixture = () => JSON.parse(readFileSync(path.join(__dirname, 'twoPageEnvironmentTableWire.json'), 'utf8'));
+const fixture = () => JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'twoPageEnvironmentTableWire.json'), 'utf8'));
 const ownerOf = value => Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath', 'plot'].map(key => [key, value[key]]));
 const owner = ownerOf(fixture().default);
 const validate = value => table.twoPageEnvironmentTableFromWire(value, ownerOf(value), value.offset, value.limit);

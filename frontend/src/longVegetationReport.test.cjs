@@ -64,11 +64,11 @@ function qualifiedFixture() {
 }
 const validate = value => report.validateLongVegetationPreview(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db');
 const validateOptions = value => report.validateLongVegetationOptions(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db');
-const scalarWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationSelectedScalarWire.json'),'utf8'));
-const selectedUnitWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationSelectedUnitsWire.json'),'utf8'));
+const scalarWire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationSelectedScalarWire.json'),'utf8'));
+const selectedUnitWire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationSelectedUnitsWire.json'),'utf8'));
 const validateSelectedUnits = value => report.validateLongVegetationPreview(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db',true);
 test('ordinary selected-list validator refuses all distinct project wire on actual reactive proxies',()=>{
-  const projectWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationProjectUnitsWire.json'),'utf8'));
+  const projectWire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationProjectUnitsWire.json'),'utf8'));
   assert.equal(projectWire.length,3);
   for(const value of projectWire) {
     assert.throws(()=>report.validateLongVegetationPreview(value,'owned','Sample','C:\\project.db','None','',true),/Whole-project/);
@@ -223,7 +223,7 @@ test('strict-Go selected scalar preview retains all four typed kinds on actual c
     assert.throws(()=>validate(value));
   }
 });
-const noneWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationNoneUnitsWire.json'),'utf8'));
+const noneWire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationNoneUnitsWire.json'),'utf8'));
 test('strict-Go None unit wire distinguishes derived joins from physical membership IDs on actual client proxies',()=>{
   assert.equal(validate(noneWire),noneWire);
   const reactive=proxy(structuredClone(noneWire));

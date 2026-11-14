@@ -153,7 +153,7 @@ func vegetationSelectedFieldRequest(t *testing.T, expected, proposed LongVegetat
 }
 
 func TestLongVegetationSelectedFieldStrictGoClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationSelectedFieldWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationSelectedFieldWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

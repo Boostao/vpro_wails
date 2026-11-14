@@ -238,7 +238,7 @@ func TestSummaryVegetationPreferencesFacadeProductionWire(t *testing.T) {
 	if err := vprocore.DecodeStrictRequiredJSON(raw, &reopened, "Summary preference wire", "review", "request", "outcome"); err != nil || !reflect.DeepEqual(wire, reopened) {
 		t.Fatal("strict actual Go round-trip differs", err)
 	}
-	expectedBytes, err := os.ReadFile("frontend/src/summaryVegetationPreferencesWire.json")
+	expectedBytes, err := os.ReadFile("frontend/tests/fixtures/summaryVegetationPreferencesWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}

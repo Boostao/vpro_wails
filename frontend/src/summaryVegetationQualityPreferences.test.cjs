@@ -25,7 +25,7 @@ const prefs = loadTypeScript(privateFile('summaryVegetationQualityPreferences.ts
   './googleEarthReview': earth, './lifeformSummary': lifeform, './qualityEditor': quality,
   './qualityMinimumReference': references, './reportTitlePreferences': shared,
 });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationQualityPreferencesWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationQualityPreferencesWire.json'), 'utf8'));
 const { values: ignoredValues, source: ignoredSource, qualityDefinitions: ignoredQuality, becDefinitions: ignoredBEC, ...scope } = wire.review;
 const reviewed = values => ({ ...structuredClone(wire.review), values });
 const ready = (values = wire.review.values) => {

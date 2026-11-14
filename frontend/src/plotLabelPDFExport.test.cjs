@@ -19,7 +19,7 @@ const pdf = loadTypeScript('plotLabelPDFExport.ts', {
   './qualityEditor': quality, './googleEarthReview': earth, './plotLabelRegional': regional,
   './publicationSession': loadTypeScript('publicationSession.ts'),
 }, { crypto: webcrypto });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'plotLabelPDFWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'plotLabelPDFWire.json'), 'utf8'));
 const scope = { contextId: wire.review.preview.contextId, project: wire.review.project,
   projectPath: wire.review.projectPath, su: wire.review.su, suPath: wire.review.suPath };
 const plain = value => JSON.parse(JSON.stringify(value));

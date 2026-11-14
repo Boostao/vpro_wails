@@ -12,7 +12,7 @@ const client = loadTypeScript('summaryVegetationEnvironmental.ts', {
   './lifeformSummary': lifeform, './summaryVegetationFieldList': fields, './summaryVegetation': vegetation,
   './summaryVegetationEnvironmentalNumeric': numeric,
 }, { setTimeout });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalLifeformPreviewWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationEnvironmentalLifeformPreviewWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, wire.vegetation[key]]));
 const plain = value => JSON.parse(JSON.stringify(value));
 const yieldNow = () => Promise.resolve();

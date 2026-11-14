@@ -27,7 +27,7 @@ const child = loadTypeScript('siviChildWriteSession.ts', {
 const session = loadTypeScript('siviSpeciesSession.ts', {
   './siviChildWriteSession': child, './siviHeightSession': heightSession, './siviSpeciesEditor': editor,
 });
-const wireReferences = require('./siviSpeciesReferenceFixture.json');
+const wireReferences = require('../tests/fixtures/siviSpeciesReferenceFixture.json');
 const owner = { contextId: 'C', project: 'Sample', plot: 'P' };
 const id = '9007199254740993';
 const clone = value => structuredClone(value);

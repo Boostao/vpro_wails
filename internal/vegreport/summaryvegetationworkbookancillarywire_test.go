@@ -81,7 +81,7 @@ func TestSummaryAncillaryDesktopClientWire(t *testing.T) {
 	if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(decoded, wire) {
 		t.Fatal("strict production ancillary review DTO round trip differs", err)
 	}
-	path := filepath.Join("frontend", "src", "summaryVegetationWorkbookAncillaryWire.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "summaryVegetationWorkbookAncillaryWire.json")
 	expected, err := os.ReadFile(path)
 	if err != nil || !bytes.Equal(expected, raw) {
 		t.Fatal("portable strict-Go ancillary workbook wire differs", err)

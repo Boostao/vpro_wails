@@ -10,7 +10,7 @@ import (
 )
 
 func TestTwoPageVegetationIdentifierFoldExhaustiveCompilerContract(t *testing.T) {
-	path := filepath.Join("frontend", "src", "twoPageVegetationIdentifierFold.json")
+	path := filepath.Join("frontend", "src", "shared", "twoPageVegetationIdentifierFold.json")
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

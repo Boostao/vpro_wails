@@ -21,7 +21,7 @@ import (
 )
 
 func TestTwoPageVegetationSingleCalibrationTypedAssignments(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageVegetationSingle.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationSingle.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

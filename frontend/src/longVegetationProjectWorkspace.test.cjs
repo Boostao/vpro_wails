@@ -69,8 +69,8 @@ const workspaceModule = compiledModule('longVegetationProjectWorkspace.svelte.ts
   './longVegetationProjectScopeSession':selection,'./longVegetationProjectUnitSession':units,
   './longVegetationProjectWorkbook.svelte':workbook,'./longVegetationReport':ordinary
 });
-const wire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationProjectWorkbookWire.json'),'utf8'));
-const scopeWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationProjectScopeWire.json'),'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationProjectWorkbookWire.json'),'utf8'));
+const scopeWire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationProjectScopeWire.json'),'utf8'));
 const physicalOwner = scope => Object.fromEntries(['contextId','project','projectPath','su','suPath'].map(key=>[key,scope[key]]));
 const capabilities = {enabled:true,workbook:true,lifeform:false,strata:false,code:false,selectedField:false};
 const deferred = () => {let resolve,reject; const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};};

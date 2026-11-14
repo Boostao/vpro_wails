@@ -9,7 +9,7 @@ import (
 )
 
 func TestTwoPageSpeciesListClientSharedActualReceipts(t *testing.T) {
-	path := filepath.Join("frontend", "src", "twoPageVegetationSpeciesListReceipts.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationSpeciesListReceipts.json")
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

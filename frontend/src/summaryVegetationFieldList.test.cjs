@@ -24,7 +24,7 @@ function load(name, dependencies = {}) {
 }
 const client = load('summaryVegetationFieldList.ts');
 const registries = load('summaryVegetationFieldListSessions.ts', { './summaryVegetationFieldList': client });
-const wire = JSON.parse(fs.readFileSync(path.join(__dirname, 'summaryVegetationFieldListWire.json'), 'utf8'));
+const wire = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationFieldListWire.json'), 'utf8'));
 const { physical, source, ...owner } = wire.review;
 const plain = value => clone(value);
 const reports = table => Array.from(table.rows, r => r.cells[4].integer);

@@ -15,9 +15,9 @@ const client = loadTypeScript('summaryVegetationEnvironmental.ts', {
   './summaryVegetationEnvironmentalNumeric': loadTypeScript('summaryVegetationEnvironmentalNumeric.ts', { './summaryVegetationFieldList': fields }),
 }, { setTimeout });
 const source = fs.readFileSync(path.join(__dirname, 'SummaryVegetationEnvironmental.svelte'), 'utf8');
-const wire = JSON.parse(fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalWire.json'), 'utf8'));
-const numericWire = JSON.parse(fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalNumericPreviewWire.json'), 'utf8'));
-const lifeformWire = JSON.parse(fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalLifeformPreviewWire.json'), 'utf8'));
+const wire = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationEnvironmentalWire.json'), 'utf8'));
+const numericWire = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationEnvironmentalNumericPreviewWire.json'), 'utf8'));
+const lifeformWire = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationEnvironmentalLifeformPreviewWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, wire.vegetation[key]]));
 const deferred = () => {
   let resolve;

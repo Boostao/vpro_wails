@@ -6,7 +6,7 @@ const { proxy } = require('svelte/internal/client');
 const { render } = require('svelte/server');
 const { serverComponent, loadTypeScript } = require('./svelteTestHelpers.cjs');
 const report = loadTypeScript('summaryVegetation.ts', { './lifeformSummary': loadTypeScript('lifeformSummary.ts') }, { setTimeout });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationGroupedModesWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationGroupedModesWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, wire[0][key]]));
 const plain = value => JSON.parse(JSON.stringify(value));
 

@@ -6,7 +6,7 @@ const { proxy } = require('svelte/internal/client');
 const { loadTypeScript } = require('./svelteTestHelpers.cjs');
 const fields = loadTypeScript('summaryVegetationFieldList.ts');
 const client = loadTypeScript('summaryVegetationEnvironmentalNumeric.ts', { './summaryVegetationFieldList': fields });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalNumericWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationEnvironmentalNumericWire.json'), 'utf8'));
 const plain = value => JSON.parse(JSON.stringify(value));
 const cell = (storage, text = null) => ({ storage, text, integer: null, real: null, blobHex: null });
 

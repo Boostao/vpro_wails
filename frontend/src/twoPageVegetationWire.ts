@@ -3,7 +3,7 @@ import { completeMetadataCellFromWire } from './siviMetadataWire';
 import { exactSigned64 } from './projectMetadataRestore';
 import { equalCell } from './projectMetadataEditor';
 import { wellFormedUTF16 } from './qualityEditor';
-import identifierFold from './twoPageVegetationIdentifierFold.json';
+import identifierFold from './shared/twoPageVegetationIdentifierFold.json';
 import type { VegetationReferences } from './twoPageVegetationReferences';
 
 export type TwoPageVegetationForm = 'SubVegAXL_BC' | 'SubVegAXL' | 'SubVegCXL' | 'SubVegDXL';

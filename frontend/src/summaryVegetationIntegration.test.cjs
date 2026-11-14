@@ -45,7 +45,7 @@ test('source labels, unsupported options and DOM-value-before-validation remain 
 test('compiled panel renders retained production result with labels and immutable NULL blanks', async () => {
   const lifeform = loadTypeScript('lifeformSummary.ts');
   const summary = loadTypeScript('summaryVegetation.ts', { './lifeformSummary': lifeform }, { setTimeout });
-  const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWire.json'), 'utf8'));
+  const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWire.json'), 'utf8'));
   const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, wire[6][key]]));
   const session = summary.summaryVegetationSession(owner);
   session.edit(1, 6);

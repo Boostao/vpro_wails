@@ -7,8 +7,8 @@ const vm = require('node:vm');
 const client = require('svelte/internal/client');
 const { loadTypeScript } = require('./svelteTestHelpers.cjs');
 const { TwoPageVegetationSession, wire, cell } = require('./twoPageVegetationTestHelpers.cjs');
-const fixtures = require('./twoPageVegetationReceipts.json');
-const outcomes = require('./twoPageVegetationOutcomes.json');
+const fixtures = require('../tests/fixtures/twoPageVegetationReceipts.json');
+const outcomes = require('../tests/fixtures/twoPageVegetationOutcomes.json');
 const sample = () => structuredClone(fixtures[3]);
 const request = sample().history.Request;
 const { contextId, project, plot, form } = request.original;
@@ -22,7 +22,7 @@ function registry(_environment = {}, overrides = {}) {
       RecoverTwoPageVegetationOutcome: overrides.RecoverTwoPageVegetationOutcome ?? overrides.RecoverOutcome ?? ((...args) => { calls.push(['outcome', ...args]); return Promise.resolve(client.proxy(structuredClone(outcomes[3]))); }),
       GetTwoPageVegetationSpeciesReferences: overrides.GetTwoPageVegetationSpeciesReferences ?? overrides.GetSpeciesReferences ?? ((...args) => {
         calls.push(['references', ...args]);
-        const wire = structuredClone(require('./twoPageVegetationReferenceWire.json'));
+        const wire = structuredClone(require('../tests/fixtures/twoPageVegetationReferenceWire.json'));
         Object.assign(wire, owner);
         return Promise.resolve(client.proxy(wire));
       }),
@@ -80,7 +80,7 @@ test('literal tuple ownership preserves case whitespace delimiters contexts and 
 test('Species list save dispatches SaveTwoPageVegetationSpeciesList and blocks until recovery', async () => {
   const api = registry({}, {
     GetSpeciesReferences: () => {
-      const refs = structuredClone(require('./twoPageVegetationSpeciesListReceipts.json')[7].history.Request.speciesList);
+      const refs = structuredClone(require('../tests/fixtures/twoPageVegetationSpeciesListReceipts.json')[7].history.Request.speciesList);
       Object.assign(refs, owner);
       return Promise.resolve(client.proxy(refs));
     },
@@ -112,7 +112,7 @@ test('Species facade uses exact retained owner and aggregate operation/remount b
   assert.equal(api.twoPageVegetationActivity(owner).busy, false);
   assert.throws(() => api.releaseTwoPageVegetationSession(owner), /operations/);
   assert.equal(api.twoPageVegetationSession({ ...owner }), retained);
-  const wire = structuredClone(require('./twoPageVegetationReferenceWire.json'));
+  const wire = structuredClone(require('../tests/fixtures/twoPageVegetationReferenceWire.json'));
   Object.assign(wire, owner);
   release(client.proxy(wire));
   assert.equal(await pending, true);

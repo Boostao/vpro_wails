@@ -85,7 +85,7 @@ func TestSubzoneMatrixDesktopWire(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = encoded
-	path := filepath.Join("frontend", "src", "subzoneMatrixWire.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "subzoneMatrixWire.json")
 	persisted, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

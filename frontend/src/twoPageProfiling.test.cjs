@@ -16,7 +16,7 @@ const api = loadTypeScript('twoPageProfiling.ts', {
   '../../resources/two-page-plot-profiling-fields.json': definition, './siviParentTransport': transport,
   './qualityEditor': quality, './twoPageVegetationTable': vegetation,
 }, { setTimeout });
-const fixture = () => JSON.parse(readFileSync(path.join(__dirname, 'twoPageProfilingWire.json'), 'utf8'));
+const fixture = () => JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'twoPageProfilingWire.json'), 'utf8'));
 const ownerOf = value => ({
   ...Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath', 'plot'].map(name => [name, value[name]])),
   profileSource: { ...value.source },

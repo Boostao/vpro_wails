@@ -15,7 +15,7 @@ const summary = loadTypeScript('summaryVegetation.ts', { './lifeformSummary': li
 const prefs = loadTypeScript('summaryVegetationPreferences.ts', {
   './googleEarthReview': earth, './reportTitlePreferences': shared, './lifeformSummary': lifeform, './summaryVegetation': summary,
 });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationPreferencesWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationPreferencesWire.json'), 'utf8'));
 const { values: unused, previewEnabled: unusedPreview, selectionAvailable: unusedSelection, ...scope } = wire.review;
 const values = (groupBy = 1, average = 1, display = 1, showClass = 1, valueLimit = 0) =>
   ({ groupBy, average, display, showClass, valueLimit });

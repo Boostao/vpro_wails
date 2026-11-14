@@ -11,7 +11,7 @@ const references = loadTypeScript('twoPageSoilReferences.ts', {
   './siviParentTransport': transport, './projectMetadataRestore': restoration,
   './qualityEditor': quality, './readRequests': requests,
 });
-const fixtures = require('./twoPageSoilReferenceWire.json');
+const fixtures = require('../tests/fixtures/twoPageSoilReferenceWire.json');
 const fresh = (index = 0) => structuredClone(fixtures[index]);
 const normalized = () => references.soilReferencesFromWire(fresh().wire, fresh().owner);
 function held() {

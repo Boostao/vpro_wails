@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const client = require('svelte/internal/client');
 const { editor, receipt, TwoPageSoilSession } = require('./twoPageSoilTestHelpers.cjs');
-const cases = require('./twoPageSoilCreationWire.json');
+const cases = require('../tests/fixtures/twoPageSoilCreationWire.json');
 const fresh = index => structuredClone(cases[index]);
 const ownerOf = request => {
   const { contextId, project, plot, form } = request.original;

@@ -24,7 +24,7 @@ func TestTwoPageSoilCreationWire(t *testing.T) {
 		Request json.RawMessage `json:"request"`
 		Receipt json.RawMessage `json:"receipt"`
 	}
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageSoilCreationWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageSoilCreationWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

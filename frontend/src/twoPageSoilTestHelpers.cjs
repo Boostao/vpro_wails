@@ -22,9 +22,9 @@ const { TwoPageSoilSession } = loadTypeScript('twoPageSoilSession.ts', {
   './readRequests': loadTypeScript('readRequests.ts', { '@wailsio/runtime': {} }),
   './projectMetadataEditor': metadata, './twoPageSoilEditor': editor, './twoPageSoilReceipt': receipt,
 });
-const fixture = require('./twoPageSoilWire.json');
-const receipts = require('./twoPageSoilReceiptWire.json');
-const outcomes = require('./twoPageSoilOutcomeWire.json');
+const fixture = require('../tests/fixtures/twoPageSoilWire.json');
+const receipts = require('../tests/fixtures/twoPageSoilReceiptWire.json');
+const outcomes = require('../tests/fixtures/twoPageSoilOutcomeWire.json');
 const original = () => structuredClone(fixture.request.original);
 const wire = (strength = 1) => structuredClone(receipts.find(entry => entry.name === String(strength)).receipt);
 function outcome(json, status = 'committed', committed = wire()) {

@@ -13,7 +13,7 @@ const shared = loadTypeScript('reportTitlePreferences.ts', { './qualityEditor': 
 const prefs = loadTypeScript('longVegetationSelectedFieldPreferences.ts', {
   './qualityEditor': quality, './reportTitlePreferences': shared, './googleEarthReview': earth,
 });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'longVegetationSelectedFieldWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'longVegetationSelectedFieldWire.json'), 'utf8'));
 const scope = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, wire.review[key]]));
 const review = (mode = 1, field = wire.review.values.selectedField) =>
   ({ ...structuredClone(wire.review), values: { mode, selectedField: field } });

@@ -29,15 +29,15 @@ const client = loadTypeScript('summaryVegetationWorkbook.ts', {
   './summaryVegetation': vegetation, './summaryVegetationEnvironmental': environmental,
   './publicationSession': publication, './environmentWorkbook': environmentWorkbook,
 });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookWire.json'), 'utf8'));
-const ancillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookAncillaryWire.json'), 'utf8'));
-const referenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookReferencesWire.json'), 'utf8'));
-const groupedWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedWire.json'), 'utf8'));
-const strataReferenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookStrataReferencesWire.json'), 'utf8'));
-const groupedAttributeWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAttributesWire.json'), 'utf8'));
-const groupedAncillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAncillaryWire.json'), 'utf8'));
-const constancyWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookConstancyWire.json'), 'utf8'));
-const unanimousWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookUnanimousCommonWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookWire.json'), 'utf8'));
+const ancillaryWire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookAncillaryWire.json'), 'utf8'));
+const referenceWire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookReferencesWire.json'), 'utf8'));
+const groupedWire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookGroupedWire.json'), 'utf8'));
+const strataReferenceWire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookStrataReferencesWire.json'), 'utf8'));
+const groupedAttributeWire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookGroupedAttributesWire.json'), 'utf8'));
+const groupedAncillaryWire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookGroupedAncillaryWire.json'), 'utf8'));
+const constancyWire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookConstancyWire.json'), 'utf8'));
+const unanimousWire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationWorkbookUnanimousCommonWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath']
   .map(key => [key, wire.vegetation.preview[key]]));
 const yieldNow = () => Promise.resolve();

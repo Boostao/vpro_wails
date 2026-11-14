@@ -78,7 +78,7 @@ func TestTwoPageEnvironmentTableProductionWire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join("frontend", "src", "twoPageEnvironmentTableWire.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "twoPageEnvironmentTableWire.json")
 	fixture, err := os.ReadFile(path)
 	if err != nil || !bytes.Equal(append(encoded, '\n'), fixture) {
 		t.Fatal(err)

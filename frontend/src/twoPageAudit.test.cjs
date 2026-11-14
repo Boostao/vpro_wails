@@ -12,7 +12,7 @@ const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScri
 const audit = loadTypeScript('twoPageAudit.ts', {
   './siviParentTransport': transport, './projectMetadataEditor': metadata, './qualityEditor': quality,
 });
-const wire = () => JSON.parse(readFileSync(path.join(__dirname, 'twoPageAuditWire.json'), 'utf8'));
+const wire = () => JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'twoPageAuditWire.json'), 'utf8'));
 const owner = { contextId: 'wire-owned', project: 'Sample', plot: '108050', form: 'FS882-8x6XL' };
 
 test('actual Go round-trip wire preserves NULL, empty text, BOOLEAN storage and physical identity', () => {

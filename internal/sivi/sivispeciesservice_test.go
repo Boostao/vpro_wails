@@ -23,7 +23,7 @@ import (
 )
 
 func TestSIVISpeciesFrontendReferenceWireFixture(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join("frontend", "src", "siviSpeciesReferenceFixture.json"))
+	data, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "siviSpeciesReferenceFixture.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

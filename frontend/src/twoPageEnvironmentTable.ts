@@ -1,4 +1,4 @@
-import targets from './twoPageEnvironmentTargets.json';
+import targets from './shared/twoPageEnvironmentTargets.json';
 import { siviMetadataTableFromWire } from './siviParentTransport';
 import { wellFormedUTF16 } from './qualityEditor';
 export { twoPageVegetationTableCellLabel as twoPageEnvironmentCellLabel } from './twoPageVegetationTable';

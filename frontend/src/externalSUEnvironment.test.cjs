@@ -30,7 +30,7 @@ class Reads {
 const external = loadTypeScript('externalSUEnvironment.ts', {
   './siteUnitEnvironment': reverse, './googleEarthReview': earth, './qualityEditor': quality, './readRequests': { ReadRequests: Reads },
 }, { crypto: webcrypto });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'externalSUEnvironmentWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'externalSUEnvironmentWire.json'), 'utf8'));
 const scope = { contextId: wire.review.review.contextId, project: wire.review.review.project,
   projectPath: wire.review.projectPath, su: wire.review.review.su, suPath: wire.review.suPath };
 const plain = value => JSON.parse(JSON.stringify(value));

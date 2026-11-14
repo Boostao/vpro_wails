@@ -10,7 +10,7 @@ import (
 )
 
 func TestExternalSUEnvironmentProductionClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "externalSUEnvironmentWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "externalSUEnvironmentWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

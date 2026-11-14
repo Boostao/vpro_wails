@@ -14,7 +14,7 @@ const prefs = loadTypeScript('longVegetationNamingPreferences.ts', {
   './qualityEditor': quality, './reportTitlePreferences': shared, './googleEarthReview': earth,
 });
 const source = file => readFileSync(path.join(__dirname, file), 'utf8');
-const wire = JSON.parse(source('longVegetationNamingWire.json'));
+const wire = JSON.parse(source('../tests/fixtures/longVegetationNamingWire.json'));
 const scope = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, wire.review[key]]));
 const available = { none: true, english: true, code: true, selectedField: false };
 const review = (mode = 1, selectedField = wire.review.values.selectedField, code = true, owner = scope) =>

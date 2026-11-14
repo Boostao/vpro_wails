@@ -16,7 +16,7 @@ const matrix = loadTypeScript('subzoneMatrixReport.ts', {
   './publicationSession': publication,
 });
 const { ReadRequests } = loadTypeScript('readRequests.ts', { '@wailsio/runtime': {} });
-const fixture = () => JSON.parse(readFileSync(path.join(__dirname, 'subzoneMatrixWire.json'), 'utf8'));
+const fixture = () => JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'subzoneMatrixWire.json'), 'utf8'));
 const owner = { contextId: 'matrix-context', hierarchy: 'Sample', hierarchyPath: 'C:\\fixture\\hierarchy.db' };
 const destination = 'C:\\fixture\\matrix.xlsx';
 

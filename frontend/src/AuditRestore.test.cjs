@@ -65,7 +65,7 @@ test('component compiles with accessible native dialog and explicit actions', ()
 });
 
 test('real Go nullable ordinary wire stays readable but explicitly unavailable to strict restoration', () => {
-  const entries = JSON.parse(readFileSync(path.join(__dirname, 'ordinaryAuditWire.json'), 'utf8'));
+  const entries = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'ordinaryAuditWire.json'), 'utf8'));
   assert.match(auditRestoreReason(entries[0], 'Sample', '108050', caps), /NULL audit actor.*unavailable/);
   assert.match(reason(row({ editWhen: null })), /NULL audit date.*unavailable/);
   assert.equal(reason(row({ user: '', editWhen: '' })), null);

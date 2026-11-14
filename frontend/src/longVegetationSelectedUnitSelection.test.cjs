@@ -24,8 +24,8 @@ const earth = loadTypeScript('googleEarthReview.ts', {'./projectMetadataRestore'
 const selection = loadTypeScript('longVegetationSelectedUnitSelection.ts', {
   './googleEarthReview':earth,'./qualityEditor':quality,'./longVegetationReport':report
 });
-const wire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationSelectedUnitsWire.json'),'utf8'));
-const selectorWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationSelectedUnitSelectionWire.json'),'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationSelectedUnitsWire.json'),'utf8'));
+const selectorWire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationSelectedUnitSelectionWire.json'),'utf8'));
 const owner={contextId:'owned',project:'Sample',projectPath:'C:\\project.db',su:'Selected',suPath:'C:\\external.db'};
 const field=(name,type='TEXT',available=true,reason='')=>({table:'Env',name,declaredType:type,available,reason});
 const review=(revision='0',fields=[],built=false)=>({...owner,revision,fields,

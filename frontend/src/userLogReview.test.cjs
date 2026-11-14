@@ -14,7 +14,7 @@ const log = loadTypeScript('userLogReview.ts', {
   './siviParentTransport': transport, './qualityEditor': quality, './twoPageVegetationTable': vegetation,
 });
 const { ReadRequests } = loadTypeScript('readRequests.ts', { '@wailsio/runtime': {} });
-const fixture = () => JSON.parse(readFileSync(path.join(__dirname, 'userLogWire.json'), 'utf8'));
+const fixture = () => JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'userLogWire.json'), 'utf8'));
 const validate = value => log.userLogFromWire(value, 'owned-context', value.mode, value.offset, value.limit);
 
 test('shared actual-Go all/current/page/end wires retain source captions, raw storage and separate duplicate rows', () => {

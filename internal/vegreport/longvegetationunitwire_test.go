@@ -20,7 +20,7 @@ func TestLongVegetationUnitPreferencesStrictSharedClientWire(t *testing.T) {
 		Request LongVegetationUnitPreferencesRequest `json:"request"`
 		Outcome LongVegetationUnitPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationUnitWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationUnitWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

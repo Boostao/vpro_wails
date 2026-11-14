@@ -14,7 +14,7 @@ import (
 )
 
 func TestTwoPageSoilReferencesStrictGoClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageSoilReferenceWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageSoilReferenceWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

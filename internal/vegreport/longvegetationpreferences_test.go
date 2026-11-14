@@ -50,7 +50,7 @@ func TestLongVegetationPreferencesStrictWireAndYAMLOnly(t *testing.T) {
 		Request LongVegetationPreferencesRequest `json:"request"`
 		Outcome LongVegetationPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationPreferenceWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationPreferenceWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}

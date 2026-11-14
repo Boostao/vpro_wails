@@ -147,7 +147,7 @@ func TestLongVegetationQualityMinimumPreferencesStrictGoClientWire(t *testing.T)
 		Request LongVegetationQualityMinimumPreferencesRequest `json:"request"`
 		Outcome LongVegetationQualityMinimumPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationQualityMinimumWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationQualityMinimumWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}

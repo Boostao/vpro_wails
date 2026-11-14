@@ -111,7 +111,7 @@ func TestLongVegetationNamingPreferencesOwnershipCleanupCancellationCollisionAnd
 	}
 }
 func TestLongVegetationNamingPreferencesStrictGoClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationNamingWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationNamingWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

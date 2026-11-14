@@ -64,7 +64,7 @@ func TestSummaryEnvironmentalClientWireFixture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join("frontend", "src", "summaryVegetationEnvironmentalWire.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "summaryVegetationEnvironmentalWire.json")
 	actual, err := os.ReadFile(path)
 	if err != nil || !bytes.Equal(actual, append(encoded, '\n')) {
 		t.Fatal("production fixture differs", err)

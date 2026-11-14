@@ -81,7 +81,7 @@ func TestLongVegetationStatisticsPreferencesSharedWireAllCombinationsAndYAMLOnly
 		Request LongVegetationStatisticsPreferencesRequest `json:"request"`
 		Outcome LongVegetationStatisticsPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationStatisticsWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationStatisticsWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -36,7 +36,7 @@ const sessions = loadTypeScript('siviCreationSession.ts', {
 const owner = { contextId: 'C', project: 'Sample', plot: 'P' };
 const token = '00000000-0000-4000-8000-000000000001';
 const copy = value => structuredClone(value);
-const references = () => copy(require('./siviSpeciesReferenceFixture.json'));
+const references = () => copy(require('../tests/fixtures/siviSpeciesReferenceFixture.json'));
 function validDraft(form = 'SubVegA-SIVI') {
   let draft = editor.stageSIVICreationSpecies(editor.beginSIVICreation(form, owner),
     form === 'SubVegD-SIVI' ? 'MOSS' : 'TREE');

@@ -110,7 +110,7 @@ test('source-bound soil presentation contains each of the12/18 editable bindings
 });
 
 test('enabled creation renders one labelled retained input and explicit action in both compiled source panels', async () => {
-  const cases = require('./twoPageSoilCreationWire.json');
+  const cases = require('../tests/fixtures/twoPageSoilCreationWire.json');
   for (const entry of [cases[0], cases[4]]) {
     const { contextId, project, plot, form } = entry.request.original;
     const owner = { contextId, project, plot, form };
@@ -200,7 +200,7 @@ test('actual client soil choices reject stale remount delivery, detach proxies a
   let release, cancelled = 0, saves = 0;
   const first = Object.assign(new Promise(resolve => { release = resolve; }), { cancel() { cancelled++; } });
   const referenceWire = () => {
-    const result = structuredClone(require('./twoPageSoilReferenceWire.json')[0].wire);
+    const result = structuredClone(require('../tests/fixtures/twoPageSoilReferenceWire.json')[0].wire);
     Object.assign(result, fixture.owner);
     const historic = structuredClone(result.fields[0].definitions.rows[0]);
     historic.rowId = '-9'; historic.cells[3] = cell('text', 'overlength');
@@ -256,7 +256,7 @@ test('actual source chooser preserves numeric TEXT parsing, NULL versus empty an
   const client = await import('svelte/internal/client');
   for (const [index, kind, column, fieldIndex] of [[0, 'Humus', 'vonPost', 3], [1, 'Mineral', 'ASP', 0]]) {
     const source = complete(kind), owner = { ...fixture.owner, form: source.form };
-    const references = structuredClone(require('./twoPageSoilReferenceWire.json')[index].wire);
+    const references = structuredClone(require('../tests/fixtures/twoPageSoilReferenceWire.json')[index].wire);
     Object.assign(references, owner);
     const textField = references.fields[kind === 'Humus' ? 0 : 1];
     source.records.rows[0].cells[source.records.columns.findIndex(field => field.name === column)] = cell('integer', '2');

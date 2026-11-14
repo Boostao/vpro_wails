@@ -102,7 +102,7 @@ test('all25 source bindings are independently mapped and all21 cover controls en
 });
 
 test('all21 numeric bindings match independently observed Access SINGLE storage and preserve raw draft text', () => {
-  const calibration = require('./twoPageVegetationSingle.json');
+  const calibration = require('../tests/fixtures/twoPageVegetationSingle.json');
   for (const form of ['SubVegAXL_BC', 'SubVegAXL', 'SubVegCXL', 'SubVegDXL']) {
     const source = variant(form);
     for (const column of editor.twoPageVegetationFields(source).filter(column => column !== 'Collected')) {
@@ -200,7 +200,7 @@ test('column identifier witnesses match strict Go folding without folding data v
     if (witness.equal) assert.throws(() => wire.twoPageVegetationOriginalFromWire(source, fixture.owner));
     else assert.doesNotThrow(() => wire.twoPageVegetationOriginalFromWire(source, fixture.owner));
   }
-  const table = require('./twoPageVegetationIdentifierFold.json');
+  const table = require('./shared/twoPageVegetationIdentifierFold.json');
   const keys = new Set();
   for (const group of table.groups) {
     const canonical = Array.from(group)[0];

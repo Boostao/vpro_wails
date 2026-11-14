@@ -15,7 +15,7 @@ import (
 )
 
 func TestTwoPageVegetationClientSharedActualReceipts(t *testing.T) {
-	path := filepath.Join("frontend", "src", "twoPageVegetationReceipts.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationReceipts.json")
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
@@ -75,7 +75,7 @@ func TestTwoPageVegetationClientSharedActualReceipts(t *testing.T) {
 }
 
 func TestTwoPageVegetationClientSharedOutcomeWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageVegetationReceipts.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationReceipts.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,7 +83,7 @@ func TestTwoPageVegetationClientSharedOutcomeWire(t *testing.T) {
 	if err := json.Unmarshal(raw, &receipts); err != nil || len(receipts) != 5 {
 		t.Fatal("shared client receipts differ", err)
 	}
-	outcomePath := filepath.Join("frontend", "src", "twoPageVegetationOutcomes.json")
+	outcomePath := filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationOutcomes.json")
 	request := receipts[3].History.Request
 	requestJSON, err := json.Marshal(request)
 	if err != nil {

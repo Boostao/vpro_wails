@@ -8,7 +8,7 @@ const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScri
 const lookup = loadTypeScript('scopedPlotLookup.ts', { './qualityEditor': quality });
 const labels = loadTypeScript('plotLabelPreview.ts', { './qualityEditor': quality, './scopedPlotLookup': lookup });
 const regional = loadTypeScript('plotLabelRegional.ts', { './qualityEditor': quality, './plotLabelPreview': labels });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'plotLabelRegionalWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'plotLabelRegionalWire.json'), 'utf8'));
 const plain = value => JSON.parse(JSON.stringify(value));
 function host(operation = () => Promise.resolve(wire)) {
   const calls = [], changes = [];

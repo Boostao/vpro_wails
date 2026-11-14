@@ -135,7 +135,7 @@ func TestSummaryVegetationGroupedClientWireFixture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fixture := filepath.Join("frontend", "src", "summaryVegetationGroupedWire.json")
+	fixture := filepath.Join("frontend", "tests", "fixtures", "summaryVegetationGroupedWire.json")
 	raw, err := os.ReadFile(fixture)
 	if err != nil || !bytes.Equal(append(encoded, '\n'), raw) {
 		t.Fatal(err)

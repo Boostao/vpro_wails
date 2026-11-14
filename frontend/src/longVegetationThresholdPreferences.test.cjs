@@ -12,7 +12,7 @@ const earth = loadTypeScript('googleEarthReview.ts', { './projectMetadataRestore
 const shared = loadTypeScript('reportTitlePreferences.ts', { './qualityEditor': quality, './googleEarthReview': earth });
 const prefs = loadTypeScript('longVegetationThresholdPreferences.ts', { './reportTitlePreferences': shared, './googleEarthReview': earth });
 const switches = loadTypeScript('longVegetationSwitchPreferences.ts', { './reportTitlePreferences': shared, './googleEarthReview': earth });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'longVegetationThresholdWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'longVegetationThresholdWire.json'), 'utf8'));
 const scope = { ...wire.review }; delete scope.values;
 const fields = ['presenceGreaterThan', 'meanCoverGreaterThan'];
 const review = (values = wire.review.values, owner = scope) => ({ ...owner, values });

@@ -17,7 +17,7 @@ import (
 )
 
 func TestTwoPageVegetationClientStrictGoSharedWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageVegetationWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

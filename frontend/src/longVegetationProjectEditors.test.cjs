@@ -7,7 +7,7 @@ const {serverComponent,componentFunctions} = require('./svelteTestHelpers.cjs');
 const source = name => readFileSync(path.join(__dirname,name),'utf8');
 const scopeFile = 'LongVegetationProjectScopeSelection.svelte';
 const unitFile = 'LongVegetationProjectUnitPreferences.svelte';
-const wire = JSON.parse(source('longVegetationProjectScopeWire.json'));
+const wire = JSON.parse(source('../tests/fixtures/longVegetationProjectScopeWire.json'));
 const component = name => serverComponent(source(name),name,{});
 const scopeView = () => ({
   scope:{sourceKind:'project-selected-fields',build:null},definitions:[

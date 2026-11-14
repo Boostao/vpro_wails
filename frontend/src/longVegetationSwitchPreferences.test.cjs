@@ -15,7 +15,7 @@ const shared = loadTypeScript('reportTitlePreferences.ts', { './qualityEditor': 
 const prefs = loadTypeScript('longVegetationSwitchPreferences.ts', { './reportTitlePreferences': shared, './googleEarthReview': earth });
 const titles = loadTypeScript('longVegetationPreferences.ts', { './reportTitlePreferences': shared });
 const statistics = loadTypeScript('longVegetationStatisticsPreferences.ts', { './reportTitlePreferences': shared, './googleEarthReview': earth });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'longVegetationSwitchWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'longVegetationSwitchWire.json'), 'utf8'));
 const scope = { ...wire.review }; delete scope.values;
 const fields = ['quickReport', 'spaceBetweenGroups', 'reportSummary', 'constantSpeciesList'];
 const review = (values = wire.review.values, owner = scope) => ({ ...owner, values });

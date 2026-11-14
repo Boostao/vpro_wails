@@ -17,7 +17,7 @@ const table = loadTypeScript('twoPageProjectMetadata.ts', {
   '../../resources/project-metadata-layout.json': definition, './siviParentTransport': transport,
   './projectMetadataPresentation': presentation, './qualityEditor': quality, './twoPageVegetationTable': vegetation,
 });
-const fixture = () => JSON.parse(readFileSync(path.join(__dirname, 'twoPageProjectMetadataWire.json'), 'utf8'));
+const fixture = () => JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'twoPageProjectMetadataWire.json'), 'utf8'));
 const ownerOf = value => Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath', 'plot'].map(name => [name, value[name]]));
 const owner = ownerOf(fixture().default);
 const validate = value => table.twoPageProjectMetadataFromWire(value, ownerOf(value), value.offset, value.limit);

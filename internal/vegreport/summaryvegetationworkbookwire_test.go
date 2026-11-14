@@ -67,7 +67,7 @@ func TestSummaryDraftWorkbookClientWire(t *testing.T) {
 	if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(decoded, wire) {
 		t.Fatal("strict production review DTO round trip differs", err)
 	}
-	path := filepath.Join("frontend", "src", "summaryVegetationWorkbookWire.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "summaryVegetationWorkbookWire.json")
 	expected, err := os.ReadFile(path)
 	if err != nil || !bytes.Equal(expected, raw) {
 		t.Fatal("portable strict-Go Summary workbook wire differs", err)

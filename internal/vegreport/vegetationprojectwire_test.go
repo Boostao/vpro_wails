@@ -16,7 +16,7 @@ import (
 )
 
 func TestProjectTransportStrictClientWireMatchesOriginalKernel(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationProjectUnitsWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationProjectUnitsWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

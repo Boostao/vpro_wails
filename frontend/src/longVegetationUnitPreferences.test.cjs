@@ -11,7 +11,7 @@ const locations = loadTypeScript('plotLocationReview.ts', {'./projectMetadataRes
 const earth = loadTypeScript('googleEarthReview.ts', {'./projectMetadataRestore':cells,'./qualityEditor':quality,'./plotLocationReview':locations});
 const shared = loadTypeScript('reportTitlePreferences.ts', {'./qualityEditor':quality,'./googleEarthReview':earth});
 const prefs = loadTypeScript('longVegetationUnitPreferences.ts', {'./reportTitlePreferences':shared,'./googleEarthReview':earth});
-const wire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationUnitWire.json'),'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationUnitWire.json'),'utf8'));
 const scope = {...wire.review}; delete scope.values; delete scope.availability;
 const review = (unitGroups=1, none=true, owner=scope) => ({
   ...owner, values:{unitGroups}, availability:{siteUnitTable:true,selectedFields:false,none}

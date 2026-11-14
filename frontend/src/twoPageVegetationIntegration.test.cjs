@@ -9,7 +9,7 @@ const client = require('svelte/internal/client');
 const { loadTypeScript, serverComponent, componentFunctions } = require('./svelteTestHelpers.cjs');
 const { TwoPageVegetationSession, wire, editor, cell, speciesList } = require('./twoPageVegetationTestHelpers.cjs');
 const { metadata } = require('./siviParentTestHelpers.cjs');
-const fixtures = require('./twoPageVegetationReceipts.json');
+const fixtures = require('../tests/fixtures/twoPageVegetationReceipts.json');
 const read = name => readFileSync(path.join(__dirname, name), 'utf8');
 const presentation = loadTypeScript('twoPageVegetationPresentation.ts', {
   './twoPageVegetationWire': wire, './twoPageVegetationEditor': editor, './projectMetadataEditor': metadata,
@@ -65,7 +65,7 @@ test('all four source presentations retain every25 field exactly once with label
 });
 
 test('enabled A/CHARS picker has one labelled control full tuple options and explicit common-cover unavailability', async () => {
-  const receipt = structuredClone(require('./twoPageVegetationSpeciesListReceipts.json')[7]);
+  const receipt = structuredClone(require('../tests/fixtures/twoPageVegetationSpeciesListReceipts.json')[7]);
   const request = receipt.history.Request;
   const session = owned(request.original, { references: () => operation(client.proxy(request.speciesList)) }, true);
   await session.load(); await session.loadReferences();
@@ -186,7 +186,7 @@ test('actual reactive owner switch retains the newer panel error when an older r
       const error = mounted.actions().error;
       assert.match(error, /definitions unavailable/);
       if (completion === 'resolve') {
-        const data = structuredClone(require('./twoPageVegetationReferenceWire.json'));
+        const data = structuredClone(require('../tests/fixtures/twoPageVegetationReferenceWire.json'));
         Object.assign(data, { contextId, project, plot, form });
         release(client.proxy(data));
       } else reject(new Error('old owner source failure'));
@@ -349,7 +349,7 @@ test('actual root native-close and context transition barriers survive unmounted
   });
   const session = owned(source(), {
     save: () => Promise.reject(new Error('unknown delivery')),
-    outcome: json => operation({ ...structuredClone(require('./twoPageVegetationOutcomes.json')[2]), requestJSON: json }),
+    outcome: json => operation({ ...structuredClone(require('../tests/fixtures/twoPageVegetationOutcomes.json')[2]), requestJSON: json }),
   });
   const stop = session.subscribe(() => {
     const state = session.closeState();

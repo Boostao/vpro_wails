@@ -17,7 +17,7 @@ const lifeform = loadTypeScript('lifeformSummary.ts');
 const file = path.relative(path.join(frontend, 'src'), path.join(__dirname, 'summaryVegetationPresentationPreferences.ts'));
 const prefs = loadTypeScript(file, { './googleEarthReview': earth, './qualityEditor': quality,
   './lifeformSummary': lifeform, './reportTitlePreferences': shared });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationPresentationPreferencesWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationPresentationPreferencesWire.json'), 'utf8'));
 const { values: ignoredValues, source: ignoredSource, ...scope } = wire.review;
 const clone = value => structuredClone(value);
 const reviewed = values => ({ ...clone(wire.review), values });

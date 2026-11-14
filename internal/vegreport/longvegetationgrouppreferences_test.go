@@ -50,7 +50,7 @@ func TestLongVegetationGroupPreferencesStrictWire(t *testing.T) {
 		Request LongVegetationGroupPreferencesRequest `json:"request"`
 		Outcome LongVegetationGroupPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationGroupWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationGroupWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}

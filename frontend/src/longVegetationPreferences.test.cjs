@@ -14,7 +14,7 @@ const earth = loadTypeScript('googleEarthReview.ts', {
 const shared = loadTypeScript('reportTitlePreferences.ts', { './qualityEditor': quality, './googleEarthReview': earth });
 const prefs = loadTypeScript('longVegetationPreferences.ts', { './reportTitlePreferences': shared });
 const environment = loadTypeScript('longEnvironmentPreferences.ts', { './reportTitlePreferences': shared });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'longVegetationPreferenceWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'longVegetationPreferenceWire.json'), 'utf8'));
 const scope = { ...wire.review }; delete scope.values;
 const review = (title, owner = scope) => ({ ...owner, values: { title } });
 const outcome = (owner = scope, committed = true, errorMessage = '') =>

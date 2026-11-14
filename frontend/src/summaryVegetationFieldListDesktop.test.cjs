@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const { createRequire } = require('node:module');
 const req = createRequire(path.join(__dirname, '..', 'package.json'));
 const ts = req('typescript'), compiler = req('svelte/compiler'), runtime = req('svelte/internal/client');
-const wire = JSON.parse(fs.readFileSync(path.join(__dirname, 'summaryVegetationFieldListWire.json'), 'utf8'));
+const wire = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'summaryVegetationFieldListWire.json'), 'utf8'));
 const { physical, source, sourcePath, ...context } = wire.review;
 const plain = value => JSON.parse(JSON.stringify(value));
 function execute(code, dependencies = {}, globals = {}) {

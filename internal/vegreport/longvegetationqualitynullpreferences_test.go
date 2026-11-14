@@ -47,7 +47,7 @@ func TestLongVegetationQualityNullPreferencesStrictWire(t *testing.T) {
 		Request LongVegetationQualityNullPreferencesRequest `json:"request"`
 		Outcome LongVegetationQualityNullPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationQualityNullWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationQualityNullWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}

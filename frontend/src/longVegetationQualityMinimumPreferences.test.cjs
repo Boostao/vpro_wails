@@ -20,7 +20,7 @@ const prefs = loadTypeScript('longVegetationQualityMinimumPreferences.ts', {
   './qualityEditor': quality, './siviParentTransport': transport, './projectMetadataRestore': cells,
   './reportTitlePreferences': shared, './googleEarthReview': earth,
 });
-const wire = JSON.parse(readFileSync(path.join(__dirname, 'longVegetationQualityMinimumWire.json'), 'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'longVegetationQualityMinimumWire.json'), 'utf8'));
 const scope = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, wire.review[key]]));
 const fields = ['siteMinimum', 'vegMinimum', 'soilMinimum'];
 const review = (values = wire.review.values, owner = scope) => ({ ...wire.review, ...owner, values });

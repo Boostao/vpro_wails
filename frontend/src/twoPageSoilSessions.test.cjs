@@ -50,7 +50,7 @@ test('two-page soil review, writing and creation are enabled by default and load
 });
 
 test('creation profile retains drafts and dispatches only its exact owner/action across remounts', async () => {
-  const entry = structuredClone(require('./twoPageSoilCreationWire.json')[0]);
+  const entry = structuredClone(require('../tests/fixtures/twoPageSoilCreationWire.json')[0]);
   const { contextId, project, plot, form } = entry.request.original;
   const creationOwner = { contextId, project, plot, form };
   const creates = [];

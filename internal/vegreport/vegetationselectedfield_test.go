@@ -19,7 +19,7 @@ import (
 )
 
 func TestLongVegetationSelectedScalarStrictGoClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationSelectedScalarWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationSelectedScalarWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

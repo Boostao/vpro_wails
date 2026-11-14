@@ -32,7 +32,7 @@ func TestUserLogSharedActualGoWire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join("frontend", "src", "userLogWire.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "userLogWire.json")
 	fixture, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

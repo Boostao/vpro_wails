@@ -6,7 +6,7 @@ const editor = loadTypeScript('pictureLifecycleEditor.ts', {
   './pictureRead': picture, './projectMetadataEditor': metadata, './qualityEditor': quality,
   './siviRequestId': loadTypeScript('siviRequestId.ts'),
 });
-const fixture = require('./pictureLifecycleWire.json');
+const fixture = require('../tests/fixtures/pictureLifecycleWire.json');
 const owner = fixture.owner;
 const requestId = fixture.deletion.request.requestId;
 function deletion() { return structuredClone(fixture.deletion); }

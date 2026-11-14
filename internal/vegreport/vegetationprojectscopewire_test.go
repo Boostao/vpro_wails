@@ -24,7 +24,7 @@ type projectScopeWireCase struct {
 }
 
 func TestProjectUnitRequestStrictClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationProjectUnitRequestWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationProjectUnitRequestWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestProjectUnitRequestStrictClientWire(t *testing.T) {
 }
 
 func TestProjectScopeStrictClientWireMatchesPhysicalProjectionAndProductionDTOs(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationProjectScopeWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationProjectScopeWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

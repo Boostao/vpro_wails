@@ -47,7 +47,7 @@ func TestLongVegetationSwitchPreferencesStrictWire(t *testing.T) {
 		Request LongVegetationSwitchPreferencesRequest `json:"request"`
 		Outcome LongVegetationSwitchPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationSwitchWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationSwitchWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}

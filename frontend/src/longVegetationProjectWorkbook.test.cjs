@@ -55,7 +55,7 @@ vm.runInNewContext(ts.transpileModule(compiled.js.code, {
   }
 });
 const projectWorkbook = moduleValue.exports;
-const wire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationProjectWorkbookWire.json'),'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationProjectWorkbookWire.json'),'utf8'));
 const fixture = (index=0) => structuredClone(wire[index]);
 const owner = scope => Object.fromEntries(['contextId','project','projectPath','su','suPath'].map(key=>[key,scope[key]]));
 const cell = text => ({storage:text===null?'null':'text',text,integer:null,real:null,blobHex:null});

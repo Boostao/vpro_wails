@@ -27,8 +27,8 @@ const project = loadTypeScript('longVegetationProjectReport.ts', {
 const scopeClient = loadTypeScript('longVegetationProjectScope.ts', {
   './longVegetationProjectReport':project,'./longVegetationSelectedUnitSelection':selection,'./qualityEditor':quality
 });
-const wire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationProjectScopeWire.json'),'utf8'));
-const previews = JSON.parse(readFileSync(path.join(__dirname,'longVegetationProjectUnitsWire.json'),'utf8'));
+const wire = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationProjectScopeWire.json'),'utf8'));
+const previews = JSON.parse(readFileSync(path.join(__dirname,'..','tests','fixtures','longVegetationProjectUnitsWire.json'),'utf8'));
 const owner = scope => Object.fromEntries(['contextId','project','projectPath','su','suPath'].map(key=>[key,scope[key]]));
 const options = (value,index) => ({scope:structuredClone(value.scope),options:{...owner(value.scope),settings:structuredClone(previews[index].settings)}});
 const preview = (value,index) => ({scope:structuredClone(value.scope),preview:structuredClone(previews[index])});

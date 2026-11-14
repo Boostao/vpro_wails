@@ -13,7 +13,7 @@ import (
 )
 
 func TestPictureLifecycleClientFixtureStrictGoRoundTrip(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join("frontend", "src", "pictureLifecycleWire.json"))
+	data, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "pictureLifecycleWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

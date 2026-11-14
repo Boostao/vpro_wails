@@ -74,7 +74,7 @@ func TestTwoPageVegetationTableProductionWire(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = encoded
-	path := filepath.Join("frontend", "src", "twoPageVegetationTableWire.json")
+	path := filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationTableWire.json")
 	fixture, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

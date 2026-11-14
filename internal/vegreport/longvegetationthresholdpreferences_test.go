@@ -48,7 +48,7 @@ func TestLongVegetationThresholdPreferencesStrictWire(t *testing.T) {
 		Request LongVegetationThresholdPreferencesRequest `json:"request"`
 		Outcome LongVegetationThresholdPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationThresholdWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationThresholdWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}

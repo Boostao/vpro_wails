@@ -68,7 +68,7 @@ func assertSummaryWorkbookClientWire(t *testing.T, name string, wire map[string]
 	if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(decoded, wire) {
 		t.Fatal("strict production workbook review DTO round trip differs", name, err)
 	}
-	file := filepath.Join("frontend", "src", name)
+	file := filepath.Join("frontend", "tests", "fixtures", name)
 	expected, err := os.ReadFile(file)
 	if err != nil || !bytes.Equal(expected, raw) {
 		t.Fatal("portable strict-Go workbook wire differs", name, err)

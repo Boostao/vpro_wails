@@ -8,7 +8,7 @@ const { compile } = require('svelte/compiler');
 const { loadTypeScript, componentFunctions } = require('./svelteTestHelpers.cjs');
 const { transport, metadata, cell } = require('./siviParentTestHelpers.cjs');
 const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
-const fixture = () => JSON.parse(readFileSync(path.join(__dirname, 'twoPageGoogleEarthWire.json'), 'utf8'));
+const fixture = () => JSON.parse(readFileSync(path.join(__dirname, '..', 'tests', 'fixtures', 'twoPageGoogleEarthWire.json'), 'utf8'));
 const owner = { contextId: 'wire-owned', project: 'Sample', projectPath: 'C:\\fixture\\Sample.db', plot: '108050', form: 'FS882-8x6XL' };
 const decode = text => text.replace(/&(amp|lt|gt|quot|apos|#x[\da-f]+|#\d+);/gi,
   (_, key) => key.startsWith('#') ? String.fromCodePoint(key.startsWith('#x') ? parseInt(key.slice(2), 16) : Number(key.slice(1))) :

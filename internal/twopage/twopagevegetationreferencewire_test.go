@@ -15,7 +15,7 @@ import (
 )
 
 func TestTwoPageVegetationReferencesStrictGoClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageVegetationReferenceWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationReferenceWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
