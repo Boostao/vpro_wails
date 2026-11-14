@@ -95,6 +95,17 @@ def release_version():
     return version(os.environ["RELEASE_VERSION"])
 
 
+def infer_build_mode(full_version):
+    normalized, _ = version(full_version)
+    core = normalized.split("+", 1)[0]
+    if "-" not in core:
+        return "release"
+    suffix = core.split("-", 1)[1].lower()
+    if suffix == "dev" or suffix.startswith("dev."):
+        return "dev"
+    return "alpha"
+
+
 def validate_source_tag(output, tag, commit):
     require(re.fullmatch(r"[0-9a-f]{40}", commit) is not None,
             "Expected the exact GitHub checkout commit")
@@ -826,7 +837,7 @@ def main():
     if args.command == "version":
         full, _ = release_version()
         with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
-            output.write(f"version={full}\ntag=v{full}\n")
+            output.write(f"version={full}\ntag=v{full}\nbuild_mode={infer_build_mode(full)}\n")
     elif args.command == "toolchain":
         print(json.dumps(windows_toolchain(args.arch), sort_keys=True))
     elif args.command == "source-tag":

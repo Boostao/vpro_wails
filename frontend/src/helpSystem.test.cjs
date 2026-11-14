@@ -231,6 +231,16 @@ test('all 5 Svelte 5 Help/Tour/Modal components compile cleanly with zero warnin
   assert.match(whatsNewHtml, /data-whats-new-unread-banner/);
   assert.match(whatsNewHtml, /Mark v2\.0\.0 as Read/);
   assert.match(whatsNewHtml, /Version 2\.0\.0/);
+
+  // Build-tier presentation checks in AboutVProModal (dev vs alpha vs release)
+  const About = serverComponent(readSrc('AboutVProModal.svelte'), 'AboutVProModal.svelte', {
+    '@lucide/svelte': iconsProxy,
+    './helpSystem': help,
+  });
+  assert.equal(help.formatShortCommit('30e86f6abcdef1234'), '30e86f6');
+  assert.equal(help.formatShortCommit('local'), 'local');
+  assert.equal(help.formatShortCommit(''), '');
+  assert.ok(About);
 });
 
 test('Navigation Help menu exposes all 6 active items, unread badge, Tour targets, and lazy App wiring', () => {

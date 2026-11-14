@@ -5,12 +5,18 @@ import (
 	"path/filepath"
 	"strconv"
 
+	lifecyclepkg "github.com/boostao/vpro-wails/internal/lifecycle"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 func nativeWindowsOptions(debugPort, dataDir, configDir string) (application.WindowsOptions, error) {
+	return nativeWindowsOptionsForMode(lifecyclepkg.CurrentBuildInfo().BuildMode, debugPort, dataDir, configDir)
+}
+
+func nativeWindowsOptionsForMode(buildMode, debugPort, dataDir, configDir string) (application.WindowsOptions, error) {
 	options := application.WindowsOptions{}
-	if debugPort == "" {
+	// Remote WebView inspection is strictly restricted to developer builds.
+	if debugPort == "" || buildMode != lifecyclepkg.BuildModeDev {
 		if dataDir != "" {
 			options.WebviewUserDataPath = filepath.Join(dataDir, "webview")
 		}

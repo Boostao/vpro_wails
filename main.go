@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	lifecyclepkg "github.com/boostao/vpro-wails/internal/lifecycle"
 	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/resources"
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -301,7 +302,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	windows, err := nativeWindowsOptions(os.Getenv("VPRO_WEBVIEW_DEBUG_PORT"), dataDir, configDir)
+	rawDebugPort := os.Getenv("VPRO_WEBVIEW_DEBUG_PORT")
+	if rawDebugPort != "" && lifecyclepkg.CurrentBuildInfo().BuildMode != lifecyclepkg.BuildModeDev {
+		log.Printf("Ignoring VPRO_WEBVIEW_DEBUG_PORT in non-dev build (%s)", lifecyclepkg.CurrentBuildInfo().BuildMode)
+	}
+	windows, err := nativeWindowsOptions(rawDebugPort, dataDir, configDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -694,6 +699,7 @@ func main() {
 			return abort(err)
 		}
 		builtHelp.setContext(contextService)
+		builtHelp.setDataDir(dataDir)
 
 		lifecycleService.userLog = userLog
 		*plotEntryService = PlotEntryService{

@@ -343,7 +343,15 @@
   let plotFindQuery = $state('');
   let plotFindResult = $state<Awaited<ReturnType<typeof ContextService.LookupScopedPlot>> | null>(null);
   let plotFindError = $state('');
+  let startupInfo = $state<StartupState | null>(null);
   let startupFailure = $state<StartupState | null>(null);
+  const buildMode = $derived(startupInfo?.buildMode ?? '');
+  const appVersion = $derived(startupInfo?.appVersion ?? '');
+  const shortBuildCommit = $derived.by(() => {
+    const raw = (startupInfo?.gitCommit ?? '').trim();
+    return /^[0-9a-f]{8,40}$/i.test(raw) ? raw.slice(0, 7) : raw;
+  });
+  const releaseChannel = $derived(startupInfo?.releaseChannel ?? 'stable');
   let recoveryWorking = $state(false);
   let recoveryError = $state('');
   let startupBackupNotice = $state('');
@@ -731,6 +739,7 @@
     try {
       const startup = await stateReads.track(LifecycleService.GetStartupState());
       if (current !== stateRequest) return;
+      startupInfo = startup;
       if (!startup.ready) {
         startupFailure = startup;
         recoveryProjectPath = startup.projectPath ?? '';
@@ -1368,7 +1377,40 @@
 
 <div class="app-shell">
   <header class="topbar">
-    <div class="brand"><span class="brand-symbol" aria-hidden="true">V</span><span>VPro</span></div>
+    <div class="brand">
+      <span class="brand-symbol" aria-hidden="true">V</span><span>VPro</span>
+      {#if buildMode === 'dev'}
+        <button
+          type="button"
+          data-build-tier-badge="dev"
+          title="Local developer build — open About VPro & diagnostics"
+          class="ml-1.5 rounded border border-[#FCBA19] bg-[#003366] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-tight text-[#FCBA19] hover:bg-[#002244]"
+          onclick={() => { if (!startupFailure) aboutModalOpen = true; }}
+        >
+          DEV BUILD · v{appVersion || '2.0.1-dev'}{shortBuildCommit ? ` · ${shortBuildCommit}` : ''}
+        </button>
+      {:else if buildMode === 'alpha'}
+        <button
+          type="button"
+          data-build-tier-badge="alpha"
+          title="Alpha preview build — open About VPro & verification details"
+          class="ml-1.5 rounded border border-[#003366] bg-[#FCBA19] px-2 py-0.5 font-mono text-[11px] font-bold tracking-tight text-[#003366] hover:brightness-95"
+          onclick={() => { if (!startupFailure) aboutModalOpen = true; }}
+        >
+          ALPHA PREVIEW (v{appVersion})
+        </button>
+      {:else if buildMode === 'release' && releaseChannel === 'experimental'}
+        <button
+          type="button"
+          data-build-tier-badge="experimental"
+          title="Experimental release channel enabled in config.yml"
+          class="ml-1.5 rounded border border-white/40 bg-white/10 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-tight text-white hover:bg-white/20"
+          onclick={() => { if (!startupFailure) aboutModalOpen = true; }}
+        >
+          EXPERIMENTAL CHANNEL
+        </button>
+      {/if}
+    </div>
     <button class="context-toggle" type="button" disabled={startupFailure !== null} aria-expanded={contextExpanded} aria-controls="project-context" onclick={() => contextExpanded = !contextExpanded}>Projects &amp; context</button>
     {#if !startupFailure}<Navigation {view} onnavigate={navigate}
       siviAvailable={siviStandaloneEnabled && !!selected && !!$projectState?.contextId}

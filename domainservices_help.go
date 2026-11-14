@@ -26,6 +26,12 @@ func (s *HelpService) setContext(contexts *ContextService) {
 	}
 }
 
+func (s *HelpService) setDataDir(dataDir string) {
+	if s != nil && s.core != nil {
+		s.core.SetDataDir(dataDir)
+	}
+}
+
 func (s *HelpService) GetLibraryStamps(ctx context.Context) (LibraryStamps, error) {
 	if s == nil || s.core == nil {
 		return LibraryStamps{}, errors.New("help service is unavailable")

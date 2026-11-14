@@ -1,10 +1,10 @@
 {
 	"fixed": {
-		"file_version": "0.1.0"
+		"file_version": "2.0.1"
 	},
 	"info": {
 		"0000": {
-			"ProductVersion": "0.1.0",
+			"ProductVersion": "2.0.1",
 			"CompanyName": "B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program",
 			"FileDescription": "VPro — VENUS (Vegetation and Environment NexUS) Professional",
 			"LegalCopyright": "© 2026 Province of British Columbia",

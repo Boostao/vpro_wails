@@ -214,10 +214,17 @@ APP=${APP_NAME:-$(basename "$(pwd)")}
 mkdir -p bin
 
 EXT=""
-LDFLAGS="-s -w"
+VER_LDFLAGS="-X github.com/boostao/vpro-wails/internal/lifecycle.appVersion=${RELEASE_VERSION:-2.0.1}"
+if [ -n "$RELEASE_BUILD_MODE" ]; then
+    VER_LDFLAGS="${VER_LDFLAGS} -X github.com/boostao/vpro-wails/internal/lifecycle.buildMode=${RELEASE_BUILD_MODE}"
+fi
+if [ -n "$GITHUB_SHA" ]; then
+    VER_LDFLAGS="${VER_LDFLAGS} -X github.com/boostao/vpro-wails/internal/lifecycle.gitCommit=${GITHUB_SHA}"
+fi
+LDFLAGS="-s -w ${VER_LDFLAGS}"
 if [ "$GOOS" = "windows" ]; then
     EXT=".exe"
-    LDFLAGS="-s -w -H windowsgui -extldflags=-static"
+    LDFLAGS="-s -w ${VER_LDFLAGS} -H windowsgui -extldflags=-static"
 fi
 
 TAGS="production,sqliteonly"

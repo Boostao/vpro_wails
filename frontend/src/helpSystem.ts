@@ -117,14 +117,32 @@ export interface HelpLibraryStamps {
   artifacts: StandardsArtifactStamp[];
 }
 
+export type BuildMode = 'dev' | 'alpha' | 'release' | string;
+
 export interface AboutInfo {
   productName: string;
   fullName: string;
   organization: string;
   appVersion: string;
+  buildMode: BuildMode;
+  gitCommit: string;
+  buildDate: string;
+  isPrerelease: boolean;
+  unsignedNotice: boolean;
   schemaVersion: string;
   releaseChannel: string;
+  configPath: string;
+  dataDir: string;
   libraryStamps: HelpLibraryStamps;
+}
+
+export function formatShortCommit(sha?: string | null): string {
+  const trimmed = (sha ?? '').trim();
+  if (!trimmed) return '';
+  if (/^[0-9a-f]{8,40}$/i.test(trimmed)) {
+    return trimmed.slice(0, 7);
+  }
+  return trimmed;
 }
 
 export interface HelpBundle {

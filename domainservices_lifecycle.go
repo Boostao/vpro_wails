@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"errors"
+
+	lifecyclepkg "github.com/boostao/vpro-wails/internal/lifecycle"
 )
 
 type LifecycleService struct {
@@ -21,7 +23,7 @@ func NewLifecycleService(startup *StartupService, closeSvc *CloseService, userLo
 
 func (s *LifecycleService) GetStartupState() StartupState {
 	if s == nil || s.startup == nil {
-		return StartupState{ReleaseChannel: ReleaseChannelStable}
+		return lifecyclepkg.WithBuildMetadata(StartupState{ReleaseChannel: ReleaseChannelStable})
 	}
 	return s.startup.GetState()
 }

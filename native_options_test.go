@@ -26,8 +26,21 @@ func TestNativeWindowsOptions(t *testing.T) {
 		t.Fatalf("isolated loopback inspection: %#v", options)
 	}
 	for _, port := range []string{"bad", "0", "-1", "1023", "65536", "9337 --other-flag"} {
-		if _, err := nativeWindowsOptions(port, data, config); err == nil {
+		if _, err := nativeWindowsOptionsForMode("dev", port, data, config); err == nil {
 			t.Errorf("invalid port %q accepted", port)
+		}
+	}
+
+	// Non-dev tiers (alpha and release) strictly ignore VPRO_WEBVIEW_DEBUG_PORT and never inject remote debugging flags.
+	for _, mode := range []string{"alpha", "release"} {
+		for _, port := range []string{"9337", "bad", "9222 --other-flag"} {
+			gatedOpts, err := nativeWindowsOptionsForMode(mode, port, data, config)
+			if err != nil {
+				t.Fatalf("mode %q should ignore debugPort %q without failing startup, got %v", mode, port, err)
+			}
+			if len(gatedOpts.AdditionalBrowserArgs) != 0 || gatedOpts.WebviewUserDataPath != filepath.Join(data, "webview") {
+				t.Fatalf("mode %q leaked remote debugging options for %q: %#v", mode, port, gatedOpts)
+			}
 		}
 	}
 }

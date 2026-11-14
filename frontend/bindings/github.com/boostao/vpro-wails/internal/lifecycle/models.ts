@@ -10,8 +10,15 @@ export interface AboutInfo {
     "fullName": string;
     "organization": string;
     "appVersion": string;
+    "buildMode": string;
+    "gitCommit": string;
+    "buildDate": string;
+    "isPrerelease": boolean;
+    "unsignedNotice": boolean;
     "schemaVersion": string;
     "releaseChannel": string;
+    "configPath": string;
+    "dataDir": string;
     "libraryStamps": LibraryStamps;
 }
 
@@ -178,6 +185,12 @@ export interface StartupState {
     "message": string;
     "configPath": string;
     "releaseChannel": string;
+    "appVersion": string;
+    "buildMode": string;
+    "gitCommit": string;
+    "buildDate": string;
+    "isPrerelease": boolean;
+    "unsignedNotice": boolean;
     "backupPath": string;
     "configuredProject": string;
     "projectPath": string;

@@ -1,7 +1,13 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { CheckCircle2, Copy, FileCheck2, ShieldCheck, X } from '@lucide/svelte';
-  import { defaultHelpPort, type AboutInfo, type HelpBackendPort, type HelpDataUseAgreement } from './helpSystem';
+  import {
+    defaultHelpPort,
+    formatShortCommit,
+    type AboutInfo,
+    type HelpBackendPort,
+    type HelpDataUseAgreement,
+  } from './helpSystem';
 
   let {
     open = false,
@@ -114,19 +120,84 @@
           <section class="rounded border border-slate-300 border-l-[4px] border-l-[#003366] bg-[#F2F2F2] p-3.5">
             <div class="flex flex-wrap items-baseline justify-between gap-2">
               <h3 class="text-base font-bold text-[#003366]">{about.productName}</h3>
-              <div class="flex items-center gap-2 font-mono text-[11px]">
+              <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
                 <span class="rounded bg-[#003366] px-2 py-0.5 font-semibold text-white">v{about.appVersion}</span>
+                {#if about.buildMode === 'dev'}
+                  <span
+                    data-about-build-tier="dev"
+                    class="rounded border border-[#FCBA19] bg-[#003366] px-2 py-0.5 font-semibold uppercase text-[#FCBA19]"
+                  >
+                    DEV BUILD{about.gitCommit ? ` · ${formatShortCommit(about.gitCommit)}` : ''}
+                  </span>
+                {:else if about.buildMode === 'alpha'}
+                  <span
+                    data-about-build-tier="alpha"
+                    class="rounded border border-[#003366] bg-[#FCBA19] px-2 py-0.5 font-semibold uppercase text-[#003366]"
+                  >
+                    ALPHA PREVIEW
+                  </span>
+                {/if}
                 <span class="rounded border border-slate-300 bg-white px-2 py-0.5 font-semibold text-[#003366]">
                   Schema {about.schemaVersion}
                 </span>
-                <span class="rounded border border-slate-300 bg-white px-2 py-0.5 uppercase text-slate-700">
-                  Channel: {about.releaseChannel}
-                </span>
+                {#if about.buildMode === 'dev' || about.releaseChannel === 'experimental'}
+                  <span class="rounded border border-slate-300 bg-white px-2 py-0.5 uppercase text-slate-700">
+                    Channel: {about.releaseChannel}
+                  </span>
+                {/if}
               </div>
             </div>
             <div class="mt-1 text-xs font-semibold text-[#313132]">{about.fullName}</div>
             <div class="mt-0.5 text-xs text-slate-700">{about.organization}</div>
           </section>
+
+          {#if about.buildMode === 'alpha'}
+            <section
+              data-about-alpha-callout
+              class="space-y-1.5 rounded border border-[#003366] border-l-[4px] border-l-[#FCBA19] bg-amber-50/60 p-3 text-xs text-[#313132]"
+            >
+              <div class="font-bold text-[#003366]">Alpha Preview — Client Evaluation Build (v{about.appVersion})</div>
+              <p class="leading-relaxed">
+                This preview build is provided for B.C. Ministry of Forests BEC Program evaluation and domain verification.
+                Keep backup copies of archival project files before running bulk imports or merges, and report classification or
+                workflow issues via
+                <a
+                  href="https://github.com/Boostao/vpro_wails/issues"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="font-semibold text-[#003366] underline"
+                >github.com/Boostao/vpro_wails/issues</a>.
+              </p>
+            </section>
+          {/if}
+
+          {#if about.unsignedNotice && about.buildMode !== 'dev'}
+            <section
+              data-about-unsigned-notice
+              class="rounded border border-slate-300 bg-[#F2F2F2] p-3 text-[11px] leading-relaxed text-[#313132]"
+            >
+              <strong class="font-semibold text-[#003366]">Phase 1 Package Integrity (SHA-256 Verified):</strong>
+              Phase 1 desktop installers and portable archives are distributed unsigned prior to enterprise OV/EV code-signing
+              enrollment. Verify downloaded artifacts against the published <code class="font-mono text-[#003366]">SHA256SUMS.txt</code>
+              and <code class="font-mono text-[#003366]">release-manifest.json</code> digests on the release portal.
+            </section>
+          {/if}
+
+          {#if about.buildMode === 'dev'}
+            <section
+              data-about-dev-diagnostics
+              aria-label="Developer Build Diagnostics"
+              class="space-y-1 rounded border border-slate-300 bg-slate-50 p-3 font-mono text-[11px] text-slate-700"
+            >
+              <div class="font-sans text-xs font-bold uppercase tracking-wide text-[#003366]">
+                Developer Diagnostics (Local Dev Build Only)
+              </div>
+              <div>Build Mode: {about.buildMode} · Commit: {about.gitCommit || 'local'}{about.buildDate ? ` · Built: ${about.buildDate}` : ''}</div>
+              <div>Runtime Channel: {about.releaseChannel}</div>
+              {#if about.configPath}<div class="break-all">Config YAML: {about.configPath}</div>{/if}
+              {#if about.dataDir}<div class="break-all">SQLite Data Dir: {about.dataDir}</div>{/if}
+            </section>
+          {/if}
 
           <section class="space-y-2.5" aria-label="2026 Provincial Standards SHA-256 Stamps">
             <h4 class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-[#003366]">

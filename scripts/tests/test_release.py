@@ -294,7 +294,35 @@ class ReleaseTests(unittest.TestCase):
         with patch.dict(os.environ, {"GITHUB_OUTPUT": str(output)}), \
                 patch("sys.argv", ["release.py", "version"]):
             release.main()
-        self.assertEqual(output.read_text(), "version=2.3.4\ntag=v2.3.4\n")
+        self.assertEqual(output.read_text(), "version=2.3.4\ntag=v2.3.4\nbuild_mode=release\n")
+
+        alpha_output = self.root / "alpha-outputs"
+        with patch.dict(os.environ, {"GITHUB_OUTPUT": str(alpha_output), "RELEASE_VERSION": "v2.1.0-alpha.1"}), \
+                patch("sys.argv", ["release.py", "version"]):
+            release.main()
+        self.assertEqual(
+            alpha_output.read_text(),
+            "version=2.1.0-alpha.1\ntag=v2.1.0-alpha.1\nbuild_mode=alpha\n",
+        )
+        self.assertEqual(release.infer_build_mode("2.0.1-dev"), "dev")
+        self.assertEqual(release.infer_build_mode("2.1.0-rc.2+build.1"), "alpha")
+        self.assertEqual(release.infer_build_mode("2.1.0"), "release")
+
+    def test_taskfiles_inject_build_identity_ldflags_across_platforms(self):
+        for rel in (
+            "build/windows/Taskfile.yml",
+            "build/linux/Taskfile.yml",
+            "build/darwin/Taskfile.yml",
+            "build/Taskfile.yml",
+        ):
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            with self.subTest(taskfile=rel):
+                self.assertIn("-X github.com/boostao/vpro-wails/internal/lifecycle.appVersion=", text)
+                self.assertIn("-X github.com/boostao/vpro-wails/internal/lifecycle.buildMode=", text)
+                self.assertIn("-X github.com/boostao/vpro-wails/internal/lifecycle.gitCommit=", text)
+        cfg = (ROOT / "build/config.yml").read_text(encoding="utf-8")
+        self.assertIn('version: "2.0.1"', cfg)
+        self.assertNotIn("My Other Data", cfg)
 
     def test_cpu_witnesses_and_wrong_architectures(self):
         for arch in ("amd64", "arm64"):

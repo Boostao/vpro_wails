@@ -6,7 +6,7 @@ on:
       version:
         description: 'SemVer, optionally prefixed with v (numeric components <= 65535)'
         required: true
-        default: 'v2.0.0'
+        default: 'v2.1.0-alpha.1'
       prerelease:
         description: 'Publish as Pre-release'
         type: boolean
@@ -29,6 +29,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       tag: ${{ steps.version.outputs.tag }}
+      build_mode: ${{ steps.version.outputs.build_mode }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -49,6 +50,7 @@ jobs:
         arch: [amd64, arm64]
     env:
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      RELEASE_BUILD_MODE: ${{ needs.validate.outputs.build_mode }}
       RELEASE_ARCH: ${{ matrix.arch }}
       CGO_ENABLED: '1'
     steps:
@@ -96,7 +98,7 @@ jobs:
           GOARCH: ${{ matrix.arch }}
         shell: pwsh
         run: |
-          task windows:create:nsis:installer "ARCH=$env:RELEASE_ARCH" CGO_ENABLED=1 EXTRA_TAGS=sqliteonly INSTALL_SCOPE=user
+          task windows:create:nsis:installer "ARCH=$env:RELEASE_ARCH" CGO_ENABLED=1 EXTRA_TAGS=sqliteonly INSTALL_SCOPE=user "VERSION=$env:RELEASE_VERSION" "BUILD_MODE=$env:RELEASE_BUILD_MODE"
           if ($LASTEXITCODE -ne 0) { throw "Windows build/NSIS packaging failed" }
           python scripts/release.py package windows
           if ($LASTEXITCODE -ne 0) { throw "Windows artifact validation failed" }
@@ -111,6 +113,7 @@ jobs:
     runs-on: macos-15-intel
     env:
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      RELEASE_BUILD_MODE: ${{ needs.validate.outputs.build_mode }}
       CGO_ENABLED: '1'
     steps:
       - uses: actions/checkout@v4
@@ -142,7 +145,7 @@ jobs:
       - name: Build universal app and DMG without host rebuild
         run: |
           set -euo pipefail
-          task darwin:package:universal EXTRA_TAGS=sqliteonly
+          task darwin:package:universal EXTRA_TAGS=sqliteonly "VERSION=$RELEASE_VERSION" "BUILD_MODE=$RELEASE_BUILD_MODE"
           python scripts/release.py cpu bin/VPro.app/Contents/MacOS/VPro --format macho --arch universal
           task darwin:create:dmg
           python scripts/release.py package macos
@@ -165,6 +168,7 @@ jobs:
             runner: ubuntu-24.04-arm
     env:
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      RELEASE_BUILD_MODE: ${{ needs.validate.outputs.build_mode }}
       RELEASE_ARCH: ${{ matrix.arch }}
       GOARCH: ${{ matrix.arch }}
       CGO_ENABLED: '1'
@@ -209,7 +213,7 @@ jobs:
       - name: Build native AppImage and deb
         run: |
           set -euo pipefail
-          task linux:create:appimage linux:create:deb "ARCH=$RELEASE_ARCH" EXTRA_TAGS=sqliteonly
+          task linux:create:appimage linux:create:deb "ARCH=$RELEASE_ARCH" EXTRA_TAGS=sqliteonly "VERSION=$RELEASE_VERSION" "BUILD_MODE=$RELEASE_BUILD_MODE"
           python scripts/release.py package linux
       - uses: actions/upload-artifact@v4
         with:
