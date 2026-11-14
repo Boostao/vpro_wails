@@ -85,6 +85,16 @@ func TestResolveBuildInfoTiers(t *testing.T) {
 			wantCommit:     "",
 			wantPrerelease: false,
 		},
+		{
+			name:           "production binary refuses dev mode and downgrades to alpha without debug hooks",
+			rawVersion:     "2.1.0-dev",
+			rawMode:        "dev",
+			productionTag:  true,
+			wantVersion:    "2.1.0-dev",
+			wantMode:       BuildModeAlpha,
+			wantCommit:     "",
+			wantPrerelease: true,
+		},
 	}
 
 	for _, tc := range cases {
@@ -122,7 +132,7 @@ func TestHelpAndStartupExposeBuildTierAndHideDevPathsOutsideDev(t *testing.T) {
 	svc.SetDataDir(dataDir)
 	ctx := context.Background()
 
-	// 1. Dev mode exposes configPath and dataDir diagnostics.
+	// 1. Dev mode exposes configPath and dataDir diagnostics ONLY when not compiled with -tags production.
 	appVersion = "2.0.1-dev"
 	buildMode = "dev"
 	gitCommit = "abc1234"
@@ -130,7 +140,11 @@ func TestHelpAndStartupExposeBuildTierAndHideDevPathsOutsideDev(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if devAbout.BuildMode != BuildModeDev || devAbout.AppVersion != "2.0.1-dev" || devAbout.GitCommit != "abc1234" ||
+	if compiledProductionTag {
+		if devAbout.BuildMode != BuildModeAlpha || devAbout.ConfigPath != "" || devAbout.DataDir != "" {
+			t.Fatalf("expected -tags production binary to downgrade dev mode and omit local paths, got %+v", devAbout)
+		}
+	} else if devAbout.BuildMode != BuildModeDev || devAbout.AppVersion != "2.0.1-dev" || devAbout.GitCommit != "abc1234" ||
 		devAbout.ConfigPath == "" || devAbout.DataDir != dataDir {
 		t.Fatalf("expected dev AboutInfo to expose dev diagnostics, got %+v", devAbout)
 	}

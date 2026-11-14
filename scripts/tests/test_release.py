@@ -304,8 +304,18 @@ class ReleaseTests(unittest.TestCase):
             alpha_output.read_text(),
             "version=2.1.0-alpha.1\ntag=v2.1.0-alpha.1\nbuild_mode=alpha\n",
         )
-        self.assertEqual(release.infer_build_mode("2.0.1-dev"), "dev")
+        prerelease_flag_output = self.root / "pre-flag-outputs"
+        with patch.dict(os.environ, {"GITHUB_OUTPUT": str(prerelease_flag_output), "RELEASE_VERSION": "v2.1.0", "RELEASE_PRERELEASE": "true"}), \
+                patch("sys.argv", ["release.py", "version"]):
+            release.main()
+        self.assertEqual(
+            prerelease_flag_output.read_text(),
+            "version=2.1.0\ntag=v2.1.0\nbuild_mode=alpha\n",
+        )
+        # Release script never emits 'dev' build_mode for CI release artifacts.
+        self.assertEqual(release.infer_build_mode("2.0.1-dev"), "alpha")
         self.assertEqual(release.infer_build_mode("2.1.0-rc.2+build.1"), "alpha")
+        self.assertEqual(release.infer_build_mode("2.1.0", prerelease=True), "alpha")
         self.assertEqual(release.infer_build_mode("2.1.0"), "release")
 
     def test_taskfiles_inject_build_identity_ldflags_across_platforms(self):
@@ -320,6 +330,10 @@ class ReleaseTests(unittest.TestCase):
                 self.assertIn("-X github.com/boostao/vpro-wails/internal/lifecycle.appVersion=", text)
                 self.assertIn("-X github.com/boostao/vpro-wails/internal/lifecycle.buildMode=", text)
                 self.assertIn("-X github.com/boostao/vpro-wails/internal/lifecycle.gitCommit=", text)
+                if rel != "build/Taskfile.yml":
+                    self.assertIn('-e RELEASE_VERSION="{{.EFFECTIVE_VERSION}}"', text)
+                    self.assertIn('-e RELEASE_BUILD_MODE="{{.EFFECTIVE_BUILD_MODE}}"', text)
+                    self.assertIn('-e GITHUB_SHA="{{.EFFECTIVE_COMMIT}}"', text)
         cfg = (ROOT / "build/config.yml").read_text(encoding="utf-8")
         self.assertIn('version: "2.0.1"', cfg)
         self.assertNotIn("My Other Data", cfg)

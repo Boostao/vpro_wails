@@ -42,27 +42,33 @@ func ResolveBuildInfo(rawVersion, rawMode, rawCommit, rawDate string, production
 		prereleaseSuffix = strings.ToLower(core[idx+1:])
 	}
 	isDevSuffix := prereleaseSuffix == "dev" || strings.HasPrefix(prereleaseSuffix, "dev.")
-	hasClientPrerelease := prereleaseSuffix != "" && !isDevSuffix
+	hasPrereleaseSuffix := prereleaseSuffix != ""
 
 	var mode string
-	switch explicitMode {
-	case BuildModeDev:
-		mode = BuildModeDev
-	case BuildModeAlpha, "preview", "prerelease", "rc", "beta":
-		mode = BuildModeAlpha
-	case BuildModeRelease, "prod", "production", "stable":
-		if hasClientPrerelease {
+	if productionTag {
+		// Production-tagged binaries NEVER resolve to BuildModeDev (remote WebView debugging stays hard-disabled).
+		switch explicitMode {
+		case BuildModeAlpha, "preview", "prerelease", "rc", "beta", BuildModeDev:
 			mode = BuildModeAlpha
-		} else {
-			mode = BuildModeRelease
+		default:
+			if hasPrereleaseSuffix {
+				mode = BuildModeAlpha
+			} else {
+				mode = BuildModeRelease
+			}
 		}
-	default:
-		if !productionTag || isDevSuffix {
-			mode = BuildModeDev
-		} else if hasClientPrerelease {
+	} else {
+		switch explicitMode {
+		case BuildModeAlpha, "preview", "prerelease", "rc", "beta":
 			mode = BuildModeAlpha
-		} else {
-			mode = BuildModeRelease
+		case BuildModeRelease, "prod", "production", "stable":
+			if hasPrereleaseSuffix && !isDevSuffix {
+				mode = BuildModeAlpha
+			} else {
+				mode = BuildModeRelease
+			}
+		default:
+			mode = BuildModeDev
 		}
 	}
 
@@ -84,7 +90,7 @@ func ResolveBuildInfo(rawVersion, rawMode, rawCommit, rawDate string, production
 		BuildMode:      mode,
 		GitCommit:      commit,
 		BuildDate:      strings.TrimSpace(rawDate),
-		IsPrerelease:   mode == BuildModeAlpha || hasClientPrerelease,
+		IsPrerelease:   mode == BuildModeAlpha || (hasPrereleaseSuffix && mode != BuildModeDev),
 		UnsignedNotice: true,
 	}
 }

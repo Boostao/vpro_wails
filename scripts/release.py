@@ -95,15 +95,12 @@ def release_version():
     return version(os.environ["RELEASE_VERSION"])
 
 
-def infer_build_mode(full_version):
+def infer_build_mode(full_version, *, prerelease=False):
     normalized, _ = version(full_version)
     core = normalized.split("+", 1)[0]
-    if "-" not in core:
-        return "release"
-    suffix = core.split("-", 1)[1].lower()
-    if suffix == "dev" or suffix.startswith("dev."):
-        return "dev"
-    return "alpha"
+    if prerelease or "-" in core:
+        return "alpha"
+    return "release"
 
 
 def validate_source_tag(output, tag, commit):
@@ -836,8 +833,10 @@ def main():
     args = parser.parse_args()
     if args.command == "version":
         full, _ = release_version()
+        env_prerelease = os.environ.get("RELEASE_PRERELEASE", "").strip().lower() == "true"
+        mode = infer_build_mode(full, prerelease=env_prerelease)
         with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
-            output.write(f"version={full}\ntag=v{full}\nbuild_mode={infer_build_mode(full)}\n")
+            output.write(f"version={full}\ntag=v{full}\nbuild_mode={mode}\n")
     elif args.command == "toolchain":
         print(json.dumps(windows_toolchain(args.arch), sort_keys=True))
     elif args.command == "source-tag":

@@ -39,6 +39,7 @@ jobs:
         id: version
         env:
           RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_PRERELEASE: ${{ inputs.prerelease }}
         run: python scripts/release.py version
 
   build-windows:
