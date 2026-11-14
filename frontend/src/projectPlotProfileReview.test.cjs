@@ -95,7 +95,6 @@ test('Source availability, None and write authority require complete explicit me
 
 test('Profile selection is independently default-off and uses shared draft publication with readonly editor gating',()=>{
   const app=read('App.svelte'),form=read('FS882Form.svelte');
-  assert.match(app,/VITE_PLOT_PROFILE_SELECTION !== 'false'/);
   const start=app.indexOf('async function choosePlotProfile');
   const action=app.slice(start,app.indexOf('\n  async function ',start+1));
   assert.match(action,/const proposal = \{ name: source\.name, path: source\.path \}/);
@@ -133,7 +132,6 @@ test('Project-local profile review and editing are separately gated, resident ac
   const component=read('ProjectPlotProfileReview.svelte');
   const form=read('FS882Form.svelte');
   assert.equal(compile(component,{filename:'ProjectPlotProfileReview.svelte',generate:'client'}).warnings.length,0);
-  assert.match(form,/VITE_PROJECT_PLOT_PROFILE_REVIEW !== 'false'/);
   assert.match(form,/independentHeaderWorkflowBusy = \$derived\([^;]*profileReviewBusy/);
   assert.match(form,/otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);
   assert.match(form,/headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
@@ -148,7 +146,6 @@ test('Project-local profile review and editing are separately gated, resident ac
   assert.match(component,/PlotCount is historical storage/);
   assert.match(component,/aria-label=\{`\$\{item\.table\.columns\[index\]\.name\}, record \$\{row\.rowId\}`\}/);
   assert.doesNotMatch(component,/\.Update|\.Set|\.Restore/);
-  assert.match(form,/VITE_PROJECT_PLOT_PROFILE_EDITING !== 'false'/);
   assert.match(component,/\{#if allowEditing && draft\}/);
   assert.match(component,/client\.SaveProjectPlotProfile\(profileRuleEditRequest\(draft\)\)/);
   assert.match(component,/if \(busy \|\| dirty \|\| creation \|\| deletion !== null\)/);
@@ -158,7 +155,6 @@ test('Project-local profile review and editing are separately gated, resident ac
   assert.match(form,/if \(profileReviewBlocked\) return profileEditor\?\.getCloseState/);
   assert.match(form,/if \(profileReviewBlocked\) \{ profileEditor\?\.undo\(\); return; \}/);
   assert.match(form,/ordinary plot Save never writes profile rules/);
-  assert.match(form,/VITE_PROJECT_PLOT_PROFILE_RUN !== 'false'/);
   assert.match(component,/if \(!allowRun \|\| busy \|\| blocked \|\| !review\) return/);
   assert.match(component,/\{#if allowRun\}[\s\S]*Run stored profile preview[\s\S]*\{:else\}[\s\S]*Run Profile \(unavailable\)/);
   assert.match(component,/originalRules: source\.rules, projectLump: lump, subvarieties/);
@@ -329,8 +325,6 @@ test('Lifecycle refresh independently preserves ownership, exact surviving typed
   test('Creation/deletion controls are separately default-off, resident and own parent gates without replaying committed writes',()=>{
     const component=read('ProjectPlotProfileReview.svelte'),form=read('FS882Form.svelte');
     assert.match(component,/allowCreation = false, allowDeletion = false/);
-    assert.match(form,/VITE_PROJECT_PLOT_PROFILE_CREATION !== 'false'/);
-    assert.match(form,/VITE_PROJECT_PLOT_PROFILE_DELETION !== 'false'/);
     assert.match(form,/allowCreation=\{profileCreationEnabled\} allowDeletion=\{profileDeletionEnabled\}/);
     assert.match(form,/profileEditingEnabled && \$projectState\?\.plotProfile\?\.writable === true && \(metadataOpen \|\| codeCheckOpen \|\| personalDraft !== null/);
     assert.match(component,/blocked = \$derived\(dirty \|\| creation !== null \|\| deletion !== null \|\| committedFailure\)/);

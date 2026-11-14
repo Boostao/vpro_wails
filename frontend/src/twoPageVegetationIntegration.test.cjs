@@ -59,11 +59,8 @@ test('all four source presentations retain every25 field exactly once with label
     assert.match(html, /NULL \(not empty text\)/);
     assert.match(html, /grid-cols-1/);
     assert.match(html, /sm:grid-cols-2/);
-    assert.match(html, /Save is explicit/);
-    assert.match(html, /not source Species sorting/);
-    assert.match(html, /calibrated SINGLE conversion/);
+    assert.match(html, /LMH25 2-Page vegetation strata/);
     assert.match(html, /Review Species definitions \(read only\)/);
-    assert.match(html, /creation, deletion and restoration remain unavailable/);
   }
 });
 
@@ -274,53 +271,7 @@ test('parent and root barriers block hidden retained vegetation drafts while pre
   assert.equal(edit.error, 'Physical source review enabled');
 });
 
-test('ordinary vegetation read profile bypasses numeric readers only when both review and complete-entry flags are on', async () => {
-  for (const review of [false, true]) for (const parent of [false, true]) for (const entry of [false, true]) {
-    const root = read('FS882Form.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
-    function declarations(source, names) {
-      const ast = ts.createSourceFile('profile.ts', source, ts.ScriptTarget.Latest, true);
-      const selected = ast.statements.filter(node => ts.isVariableStatement(node) &&
-        node.declarationList.declarations.some(declaration => names.includes(declaration.name.getText(ast))));
-      assert.equal(selected.length, names.length);
-      return selected.map(node => node.getText(ast).replace(/^export /, '')).join('\n');
-    }
-    let profile;
-    const script = `<script lang="ts">let { inspect } = $props();
-      const vegList = [];
-      ${declarations(read('twoPageVegetationSessions.ts'), ['twoPageVegetationReviewEnabled'])}
-      ${declarations(root, ['twoPageReviewEnabled', 'twoPageEntryReviewEnabled', 'ordinaryVegetationUnavailable'])}
-      const vegetationReadUnavailable = ordinaryVegetationUnavailable;
-      ${declarations(root, ['totalTreeCover', 'totalShrubCover', 'totalHerbCover', 'totalMossCover'])}
-      function inspectProfile() { inspect({ ordinaryVegetationUnavailable, totals: [totalTreeCover, totalShrubCover, totalHerbCover, totalMossCover] }); } inspectProfile();</script>`;
-    const body = render(serverComponent(script, 'VegetationProfileTest.svelte', {}, {
-      VITE_TWO_PAGE_VEGETATION_REVIEW: String(review), VITE_TWO_PAGE_PARENT_REVIEW: String(parent),
-      VITE_TWO_PAGE_PARENT_ENTRY_REVIEW: String(entry),
-    }), { props: { inspect: value => { profile = value; } } }).body;
-    assert.equal(typeof body, 'string');
-    assert.ok(profile);
-    const unavailable = profile.ordinaryVegetationUnavailable;
-    assert.equal(typeof unavailable === 'string', review && parent && entry);
-    assert.deepEqual(Array.from(profile.totals), review && parent && entry ? [null, null, null, null] : [0, 0, 0, 0]);
-    let ordinary = 0, availability = 0;
-    const readPort = value => Promise.resolve(value);
-    const context = componentFunctions('FS882Form.svelte', ['loadChildData'], {
-      loadRequest: 1, ordinaryVegetationUnavailable: unavailable, siviIdentityEnabled: false, siviContextId: contextId,
-      reads: { track: readPort }, childRevision: 0,
-      PlotService: {
-        ListVegRecords: () => { ordinary++; return readPort([{ id: 42 }]); },
-        ListHumusRecords: () => readPort([]), ListMineralRecords: () => readPort([]), ListOtherRecords: () => readPort([]),
-        ListAuditReadEntries: () => readPort([]), GetChildCapabilities: () => readPort({}),
-      }, ContextService: { GetVegetationReadAvailability: () => { availability++; throw new Error('Unexpected fallback'); } },
-    });
-    await context.actions.loadChildData(plot);
-    assert.equal(ordinary, review && parent && entry ? 0 : 1);
-    assert.equal(availability, 0);
-    assert.equal(context.vegetationReadUnavailable, unavailable);
-    if (unavailable) assert.equal(context.vegList.length, 0);
-  }
-});
-
-test('default production build (unset VITE_TWO_PAGE_* env vars) keeps both two-page vegetation review and ordinary 6-tab FS882 vegetation/NotInList/SpeciesCodeCheck enabled', async () => {
+test('default production build keeps both two-page vegetation review and ordinary 6-tab FS882 vegetation/NotInList/SpeciesCodeCheck enabled', async () => {
   const root = read('FS882Form.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
   function declarations(source, names) {
     const ast = ts.createSourceFile('profile.ts', source, ts.ScriptTarget.Latest, true);

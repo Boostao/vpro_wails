@@ -75,10 +75,9 @@ test('attribute transport rejects incoherent source identities and counts withou
   }
 });
 
-test('attribute read uses the shared cancellable busy boundary and independent default-off gate', () => {
+test('attribute read uses the shared cancellable busy boundary', () => {
   const source = readFileSync(path.join(__dirname, 'LifeformSummary.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'LifeformSummary.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_SPECIES_ATTRIBUTE_SUMMARY !== 'false'/);
   assert.match(source, /!attributesEnabled \|\| busy/);
   assert.match(source, /VegetationReportService\.PreviewSpeciesAttributeSummary\(contextId\)/);
   assert.match(source, /validateSpeciesAttributeSummary\(value, owner\)/);
@@ -90,16 +89,13 @@ test('attribute read uses the shared cancellable busy boundary and independent d
 
 test('attribute preview renders six source families, nullable counts and visible detail headers without editors', () => {
   const source = readFileSync(path.join(__dirname, 'LifeformSummary.svelte'), 'utf8')
-    .replace("import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false'", 'true')
-    .replace("import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY !== 'false'", 'true')
-    .replace("import.meta.env.VITE_LIFEFORM_WORKBOOK !== 'false'", 'false')
     .replace('let attributePreview = $state<SpeciesAttributeSummaryPreview | null>(null);',
       `let attributePreview = $state<SpeciesAttributeSummaryPreview | null>(${JSON.stringify(fixture())});`)
     .replace("let previewKey = $state('');",
       `let previewKey = $state(${JSON.stringify(JSON.stringify([owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath]))});`);
   const component = serverComponent(source, 'LifeformSummary.svelte', {
     '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
-    './LifeformWorkbookPanel.svelte': { default() { assert.fail('Disabled workbook panel must not mount'); } },
+    './LifeformWorkbookPanel.svelte': { default() {} },
     './lifeformSummary': lifeform, './speciesAttributeSummary': summary,
   });
   const html = render(component, { props: { ...owner, onBusyChange() {} } }).body.replace(/\sclass="[^"]*"/g, '');

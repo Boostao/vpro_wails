@@ -38,7 +38,6 @@ test('Project-file SU review preserves complete destination descriptions and rej
 
 test('Project-file SU insertion is separately gated, immutable-destination reviewed and shared-transition owned',()=>{
   const app=read('App.svelte');
-  assert.match(app,/VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT !== 'false'/);
   assert.match(app,/aria-label="Reviewed project-file SU creation"/);
   assert.match(app,/<label for="profile-su-project-name"/);
   const start=app.indexOf('async function saveProfileSUProject');
@@ -87,7 +86,6 @@ test('Incomplete, foreign, repaired and overlength SU responses fail rather than
 
 test('SU publication is default-off, snapshot-captured and guarded independently by shared Save/Discard/Cancel',()=>{
   const app=read('App.svelte'),form=read('FS882Form.svelte'),panel=read('ProjectPlotProfileReview.svelte');
-  assert.match(form,/VITE_PROJECT_PLOT_PROFILE_SAVE_SU !== 'false'/);
   assert.match(panel,/allowSaveSU = false/);
   assert.match(panel,/onsureview\(structuredClone\(\$state\.snapshot/);
   assert.match(app,/onProfileSUReview=\{reviewProfileSU\}/);

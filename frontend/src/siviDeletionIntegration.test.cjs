@@ -40,8 +40,6 @@ test('actual main preflights both independent deletion flags before data work an
   assert.match(main, /NewSIVIDeletionService\(contextService, os.LookupEnv\)/);
   assert.match(main, /siviDeletion:\s*siviDeletion/);
   assert.match(main, /application\.NewService\(plotEntryService\)/);
-  assert.match(root, /VITE_SIVI_DELETION_WRITING !== 'false'/);
-  assert.match(root, /VITE_SIVI_DELETION_RESTORING !== 'false'/);
   assert.match(root, /ownedSIVIDeletionSession\(\{ contextId: siviContextId, project: \$projectState.activeProject, plot: original.plotNumber \}\)/);
   assert.match(root, /ownedSIVIRestorationSession\(\{ contextId: siviContextId, project: \$projectState.activeProject, plot: original.plotNumber \}\)/);
 });

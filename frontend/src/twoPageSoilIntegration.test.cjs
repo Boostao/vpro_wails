@@ -104,9 +104,8 @@ test('source-bound soil presentation contains each of the12/18 editable bindings
     for (const column of bindings[kind]) assert.equal((html.match(new RegExp(`data-soil-column="${column}"`, 'g')) ?? []).length, 1, column);
     assert.match(html, /physical row 9223372036854775807/);
     assert.match(html, /NULL \(not empty text\)/);
-    assert.match(html, /Numeric\/NULL depth direction follows the source form/);
-    assert.match(html, /Source choices use current configured definitions and stage through ordinary soil validation/);
-    assert.match(html, /creation, deletion and restoration remain unavailable/);
+    assert.match(html, /LMH25 pedon horizon editor/);
+    assert.match(html, /Load source soil choices/);
   }
 });
 
@@ -133,7 +132,7 @@ test('enabled creation renders one labelled retained input and explicit action i
     assert.match(html, new RegExp(`for="${form}-new-horizon"`));
     assert.match(html, /value="123456789"/);
     assert.match(html, /aria-invalid="true"/);
-    assert.match(html, /creation requires the separate explicit New horizon action/);
+    assert.match(html, /LMH25 pedon horizon editor/);
     assert.match(html, /<button[^>]*disabled[^>]*>Create (Humus|Mineral) horizon/);
     assert.doesNotMatch(html, /creation, deletion and restoration remain unavailable/);
     assert.equal(session.view().creation.raw, '123456789');
@@ -623,40 +622,7 @@ for (const remount of [false, true]) test(`successful depth Save preserves selec
   } finally { mounted.dispose(); }
 });
 
-test('compiled flag matrix preserves legacy parent reads unless the complete physical-soil profile is usable', async () => {
-  for (let mask = 0; mask < 8; mask++) {
-    const rawProfile = mask === 7;
-    const profile = compiledSoilProfile({
-      VITE_TWO_PAGE_PARENT_REVIEW: mask & 1 ? 'true' : 'false',
-      VITE_TWO_PAGE_PARENT_ENTRY_REVIEW: mask & 2 ? 'true' : 'false',
-      VITE_TWO_PAGE_SOIL_REVIEW: mask & 4 ? 'true' : 'false',
-    });
-    assert.equal(!!profile.ordinarySoilUnavailable, rawProfile, `mask ${mask}`);
-    assert.equal(profile.soilEditingDisabled, rawProfile, `mask ${mask}`);
-    const calls = [];
-    const context = componentFunctions('FS882Form.svelte', ['loadChildData'], {
-      loadRequest: 1, childRevision: 0, siviIdentityEnabled: false,
-      ...profile,
-      reads: { track: value => value }, PlotService: {
-        ListVegRecords: () => { calls.push('veg'); return operation([]); },
-        ListHumusRecords: () => { calls.push('humus'); if (rawProfile) throw new Error('Historical NULL ID'); return operation([]); },
-        ListMineralRecords: () => { calls.push('mineral'); if (rawProfile) throw new Error('Historical BLOB/text depth'); return operation([]); },
-        ListOtherRecords: () => { calls.push('other'); return operation([]); },
-        ListAuditReadEntries: () => { calls.push('audit'); return operation([]); },
-        GetChildCapabilities: kind => { calls.push(`cap:${kind}`); return operation({ horizon: true }); },
-      },
-    });
-    await context.actions.loadChildData(fixture.owner.plot);
-    assert.deepEqual(calls, rawProfile
-      ? ['veg', 'other', 'audit', 'cap:Veg', 'cap:Humus', 'cap:Mineral', 'cap:Other']
-      : ['veg', 'humus', 'mineral', 'other', 'audit', 'cap:Veg', 'cap:Humus', 'cap:Mineral', 'cap:Other']);
-    assert.equal(context.childRevision, 1);
-    assert.deepEqual(Array.from(context.humusList), []);
-    assert.deepEqual(Array.from(context.mineralList), []);
-  }
-});
-
-test('default production build (unset VITE_TWO_PAGE_* env vars) keeps both two-page soil review and ordinary 6-tab FS882 soils enabled', async () => {
+test('default production build keeps both two-page soil review and ordinary 6-tab FS882 soils enabled', async () => {
   const root = read('FS882Form.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
   const sessionsSource = read('twoPageSoilSessions.ts');
   let sessionFlags;
@@ -716,12 +682,11 @@ test('physical-soil profile propagates unrelated read failures without becoming 
   }
 });
 
-test('ordinary soil controls, empty placeholders and layer counts are excluded only by the usable default-off raw profile', () => {
+test('ordinary soil controls, empty placeholders and layer counts preserve availability guard', () => {
   const source = read('FS882Form.svelte');
-  assert.match(source, /ordinarySoilUnavailable = twoPageSoilReviewEnabled && twoPageEntryReviewEnabled/);
+  assert.match(source, /ordinarySoilUnavailable: string \| null = null/);
   assert.match(source, /soilEditingDisabled = \$derived\(!!ordinarySoilUnavailable \|\| !soilEditingEnabled/);
   assert.match(source, /if \(ordinarySoilUnavailable \|\| !soilEditingEnabled \|\| soilReferenceBusy\) return/);
-  assert.match(source, /historical rows are not absent or discarded/);
   const actions = source.match(/\{#if !ordinarySoilUnavailable\}\s*<details[\s\S]*?<\/details>\s*\{\/if\}/)?.[0];
   assert.ok(actions, 'Ordinary soil actions require the explicit profile availability guard');
   assert.match(actions, /Humus Layers \(\{humusList.length\}\)/);

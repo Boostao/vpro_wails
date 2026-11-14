@@ -46,13 +46,11 @@ test('Source-positioned component gates ordinary copy and separate authorized Ma
   const source = readFileSync(path.join(__dirname, 'WorkingUnitFields.svelte'), 'utf8');
   const result = compile(source, { filename: 'WorkingUnitFields.svelte', generate: 'client' });
   assert.equal(result.warnings.length, 0);
-  assert.match(source, /VITE_WORKING_UNIT_EDITING !== 'false'/);
   assert.match(source, /data-column="BECSiteUnit"[\s\S]*?readonly/);
   assert.match(source, /style=\{position\(control\)\}/);
   assert.match(source, /Confirm draft replacement/);
   assert.match(source, /proposal\.identity !== draft/);
   assert.match(source, /rememberWorkingUnitAcknowledgement\(draft, draft\.userSiteUnit, accepted\)/);
-  assert.match(source, /VITE_MASTER_BEC_EDITING !== 'false'/);
   assert.match(source, /!masterEditingEnabled \|\| !masterAllowed \|\| disabled/);
   assert.match(source, /readonly=\{!masterEditingEnabled \|\| !masterAllowed\}/);
   assert.match(source, /disabled=\{disabled \|\| capabilities\.becSiteUnit !== true \|\| !control\.enabled \|\| \(masterEditingEnabled && masterAllowed && view\.busy\)\}/);
@@ -94,14 +92,12 @@ test('Master policy, physical errors and acknowledgements are independent of Wor
   assert.equal(masterBECAcknowledged(draft, draft), false);
   assert.equal(masterBECAcknowledged({ ...draft }, draft), false);
 });
-test('Actual source Master input overrides source Locked only under its separate gate and loaded policy', () => {
+test('Actual source Master input overrides source Locked only under its loaded policy', () => {
   const { serverComponent } = require('./svelteTestHelpers.cjs');
   const { render } = require('svelte/server');
   const source = readFileSync(path.join(__dirname, 'WorkingUnitFields.svelte'), 'utf8');
-  for (const [enabled, allowed] of [[true, true], [true, false], [false, true]]) {
-    const Component = serverComponent(source
-      .replace('import.meta.env.VITE_MASTER_BEC_EDITING', enabled ? "'true'" : "'false'")
-      .replace('import.meta.env.VITE_WORKING_UNIT_EDITING', "'false'"), 'WorkingUnitFields.svelte', {
+  for (const allowed of [true, false]) {
+    const Component = serverComponent(source, 'WorkingUnitFields.svelte', {
       './workingUnitEditor': helpers, './masterBECEditor': masterHelpers,
       '../bindings/github.com/boostao/vpro-wails': { WorkingUnitService: {} }
     });
@@ -114,7 +110,7 @@ test('Actual source Master input overrides source Locked only under its separate
     const Wrapper = serverComponent(fixture, 'MasterFixture.svelte', { './Fields.svelte': { default: Component } });
     const html = render(Wrapper).body;
     assert.equal((html.match(/data-column="BECSiteUnit"/g) || []).length, 1);
-    assert.equal(/\sreadonly(?:\s|=|>)/.test(html), !(enabled && allowed));
+    assert.equal(/\sreadonly(?:\s|=|>)/.test(html), !allowed);
     assert.match(html, /value="old"/);
   }
 });

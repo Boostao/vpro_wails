@@ -24,7 +24,6 @@ const values = (value = null) => Object.fromEntries(substrateKeys.map(key => [ke
 test('Native-verified substrate component compiles, stages lexical input and retains explicit opt-out', () => {
   const source = readFileSync(path.join(__dirname, 'SubstrateFields.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'SubstrateFields.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_SUBSTRATE_EDITING !== 'false'/);
   assert.match(source, /style=\{position\(control\)\}/);
   assert.match(source, /type="text" inputmode="decimal"/);
   assert.match(source, /staged\[key\]\?\.raw \?\?/);

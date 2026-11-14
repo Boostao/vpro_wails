@@ -119,29 +119,28 @@ test('source labels and percent suffixes preserve one live field with retained s
   assert.match(source('LongVegetationThresholdPreferences.svelte'), /const raw = event.currentTarget.value; edit\(field.key, raw\)/);
   assert.doesNotMatch(source('LongVegetationThresholdPreferences.svelte'), /reads\.track\(VegetationReportService\.Save/);
 });
-test('actual parent/child composition keeps threshold gate independent and propagates retained barriers', () => {
-  for (const enabled of [false, true]) {
-    const owner = { ...scope, contextId: `threshold-composition-${enabled}` };
-    const session = prefs.longVegetationThresholdPreferencesSession(owner); session.apply(review(undefined, owner));
-    session.editThreshold('presenceGreaterThan', '');
-    const component = serverComponent(source('LongVegetationReport.svelte')
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
-      .replace('const thresholdsEnabled = false;', `const thresholdsEnabled = ${enabled};`), 'LongVegetationReport.svelte', {
-        '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {}, './longVegetationStatisticsPreferences': {},
-        './longVegetationSwitchPreferences': {}, './LongVegetationSwitchPreferences.svelte': { default() {} },
-        './longVegetationThresholdPreferences': prefs, './LongVegetationThresholdPreferences.svelte': { default: child() },
-        './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
-        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
-        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
-        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
-      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
-      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
-      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-        './longEnvironmentReport': {}, './longVegetationReport': {},
-        './vegetationWorkbook': { VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } } },
-      });
-    const barriers = []; const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
-    assert.equal(barriers.at(-1), enabled);
-    if (enabled) assert.match(body, /data-long-vegetation-thresholds/); else assert.doesNotMatch(body, /data-long-vegetation-thresholds/);
-  }
+test('actual parent/child composition renders thresholds and propagates retained barriers', () => {
+  const owner = { ...scope, contextId: 'threshold-composition-true' };
+  const session = prefs.longVegetationThresholdPreferencesSession(owner); session.apply(review(undefined, owner));
+  session.editThreshold('presenceGreaterThan', '');
+  const component = serverComponent(source('LongVegetationReport.svelte'), 'LongVegetationReport.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {}, './longVegetationStatisticsPreferences': {},
+    './longVegetationSwitchPreferences': {}, './LongVegetationSwitchPreferences.svelte': { default() {} },
+    './longVegetationThresholdPreferences': prefs, './LongVegetationThresholdPreferences.svelte': { default: child() },
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+    './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    './longEnvironmentReport': {}, './longVegetationReport': {},
+    './vegetationWorkbook': {
+      vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+      VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+    },
+  });
+  const barriers = []; const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
+  assert.equal(barriers.at(-1), true);
+  assert.match(body, /data-long-vegetation-thresholds/);
 });

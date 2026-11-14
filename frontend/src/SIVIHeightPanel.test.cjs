@@ -58,7 +58,6 @@ test('SIVI safety feedback stays above fields and ordinary guidance below all fi
 });
 test('SIVI parent keeps the owner outside tabs and wires busy/dirty/safety gates before native acceptance', () => {
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(parent, /VITE_SIVI_HEIGHT_EDITING !== 'false'/);
   assert.match(parent, /const siviContextId = untrack\(\(\) => contextId\)/);
   assert.match(parent, /independentHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviBusy \|\| siviCombinedBusy \|\| siviCoverBusy \|\| siviCollectedBusy \|\| siviSpeciesBusy \|\| siviIdentityBusy \|\| siviCreationBusy \|\| siviLifecycleBusy\)/);
   assert.match(parent, /otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);

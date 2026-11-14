@@ -324,13 +324,13 @@ for(const [label,presentationWire,expected] of [
   assert.ok(!result.body.includes('joined sum / physical SU denominator'));
 });
 const buildSource = (source, enabled = false, strataEnabled = false, codeEnabled = false, selectedFieldEnabled = false) => source.replace(
-  "import.meta.env.VITE_LONG_VEGETATION_LIFEFORM !== 'false'", String(enabled)).replace(
-  "import.meta.env.VITE_LONG_VEGETATION_STRATA !== 'false'", String(strataEnabled)).replace(
-  "import.meta.env.VITE_LONG_VEGETATION_CODE !== 'false'", String(codeEnabled)).replace(
-  "import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD !== 'false'", String(selectedFieldEnabled)).replace(
-  "import.meta.env.VITE_LONG_VEGETATION_NONE_UNITS !== 'false'", 'false').replace(
-  "import.meta.env.VITE_LONG_VEGETATION_WORKBOOK !== 'false'", 'false').replace(
-  "import.meta.env.VITE_LONG_VEGETATION_PREFERENCES !== 'false'", 'false');
+  'const lifeformEnabled = true;', `const lifeformEnabled = ${enabled};`).replace(
+  'const strataEnabled = true;', `const strataEnabled = ${strataEnabled};`).replace(
+  'const codeEnabled = true;', `const codeEnabled = ${codeEnabled};`).replace(
+  'const selectedFieldEnabled = true;', `const selectedFieldEnabled = ${selectedFieldEnabled};`).replace(
+  'const noneUnitsEnabled = true;', 'const noneUnitsEnabled = false;').replace(
+  'const workbookEnabled = true;', 'const workbookEnabled = false;').replace(
+  'const preferencesEnabled = true;', 'const preferencesEnabled = false;');
 function options() {
   return {contextId:'owned',project:'Sample',projectPath:'C:\\project.db',su:'Selected',suPath:'C:\\external.db',settings:settings()};
 }
@@ -367,7 +367,6 @@ test('lifeform transport preserves nullable exact INTEGER groups without widenin
   assert.doesNotThrow(()=>report.requireLongVegetationGrouping(configured.settings,true));
   assert.doesNotThrow(()=>report.requireLongVegetationGrouping(settings(),false));
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
-  assert.match(source,/VITE_LONG_VEGETATION_LIFEFORM !== 'false'/);
   assert.equal((source.match(/requireLongVegetationGrouping\(candidate\.?(?:settings)?, lifeformEnabled, strataEnabled, codeEnabled, selectedFieldEnabled, noneUnitsEnabled, selectedUnitsEnabled\)/g)||[]).length,2);
   assert.match(source,/<th scope="col">\{groupLabel\}<\/th>/);
 });
@@ -393,7 +392,6 @@ test('Strata grouping preserves text NULL cells and independently refuses disabl
   malformed.report.units[0].rows[0].layer={storage:'integer',integer:'1',text:null,real:null,blobHex:null};
   assert.throws(()=>validate(malformed));
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
-  assert.match(source,/VITE_LONG_VEGETATION_STRATA !== 'false'/);
   assert.equal((source.match(/requireLongVegetationGrouping\(candidate\.?(?:settings)?, lifeformEnabled, strataEnabled, codeEnabled, selectedFieldEnabled, noneUnitsEnabled, selectedUnitsEnabled\)/g)||[]).length,2);
 });
 test('quality transport preserves physical IDs and recomputes denominators from complete distinct reference occurrences',()=>{
@@ -527,8 +525,8 @@ test('vegetation bindings are cancellable and report UI is independently default
   for (const file of ['App.svelte','Navigation.svelte','LongVegetationReport.svelte']) {
     assert.equal(compile(source(file),{filename:file,generate:'client'}).warnings.length,0);
   }
-  assert.match(source('Navigation.svelte'),/VITE_LONG_VEGETATION_REPORT !== 'false' \? 'long-vegetation' : undefined/);
-  assert.match(source('App.svelte'),/view === 'long-vegetation' && import\.meta\.env\.VITE_LONG_VEGETATION_REPORT !== 'false'/);
+  assert.match(source('Navigation.svelte'),/name: 'Long Vegetation', icon: TableProperties, view: 'long-vegetation'/);
+  assert.match(source('App.svelte'),/view === 'long-vegetation' && \$projectState/);
   assert.match(source('App.svelte'),/view === 'long-vegetation'[^\n]+\n\s*\{#if error\}<p class="error" role="alert">\{error\}/);
   assert.match(source('App.svelte'),/\{#key \$projectState\.contextId\}[\s\S]*<LongVegetationReport/);
   assert.match(source('App.svelte'),/closeDisposition\(state, busy \|\| editorBusy/);
@@ -579,7 +577,7 @@ test('vegetation report uses responsive labelled read-only settings, separate na
   assert.match(source,/value === null \? 'NULL' : String\(value\)/);
   assert.match(source,/Unassigned \(NULL\)/);
   assert.match(source,/role="region" aria-label=/);
-  assert.match(source,/Options are loaded from YAML; only title persistence has a separate reviewed default-off gate/);
+  assert.match(source,/Report options load from saved configuration/);
   assert.doesNotMatch(result.body,/id="long-vegetation-title"/);
 });
 test('quality presentation retains literal criteria, NULL ranks versus missing joins and physical versus qualified counts',()=>{

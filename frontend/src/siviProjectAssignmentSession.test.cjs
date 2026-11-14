@@ -366,7 +366,6 @@ test('unsupported new metadata remains distinguishable but disabled, and unavail
 
 test('FS882 candidate owns assignment across Save/Undo/Lock/close/remount/source and refreshes both clean peers', () => {
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(parent, /siviProjectAssignmentEnabled = siviParentEditingEnabled && import\.meta\.env\.VITE_SIVI_PROJECT_ASSIGNMENT !== 'false'/);
   for (const api of ['GetSIVIProjectAssignmentOriginal', 'SaveSIVIProjectAssignment', 'RestoreSIVIProjectAssignment']) {
     assert.ok(parent.includes(`ContextService.${api}`));
   }

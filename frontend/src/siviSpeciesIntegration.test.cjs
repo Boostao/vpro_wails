@@ -30,7 +30,6 @@ function host(overrides = {}) {
 }
 test('Species independently gates actual main registration and coordinates both tracked source/reference reads', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(parent, /VITE_SIVI_SPECIES_EDITING !== 'false'/);
   assert.match(main, /siviFeature\(siviSpeciesFeatureEnvironment, os.LookupEnv\)/);
   assert.match(main, /NewSIVISpeciesService\(contextService, os.LookupEnv\)/);
   assert.match(main, /siviSpecies:\s*siviSpecies/);

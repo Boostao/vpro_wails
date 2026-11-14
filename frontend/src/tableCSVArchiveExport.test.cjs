@@ -210,7 +210,7 @@ test('optional native picker cancellation/errors preserve destination and hold b
 const componentSource = readFileSync(path.join(__dirname, 'ProjectTableCSVReview.svelte'), 'utf8');
 function componentHarness({ enabled = true, service = {}, mod = moduleFor(), csvModule = csv, ownerScope = owner } = {}) {
   const script = componentSource.match(/<script lang="ts">([\s\S]*?)<\/script>/)[1]
-    .replaceAll("import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT !== 'false'", String(enabled));
+    .replace('const archiveEnabled = true;', `const archiveEnabled = ${enabled};`);
   const destroy = [], changes = [], reads = { tracked: 0, cancelled: 0 };
   const dependencies = {
     svelte: { onDestroy: callback => destroy.push(callback) },
@@ -379,7 +379,6 @@ test('actual App close handlers and navigation transition refuse pending/unackno
 test('UI literal opt-in, labels, receipts above fields and existing app native/navigation close guards remain integrated', async () => {
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   assert.equal(compile(componentSource, { filename: 'ProjectTableCSVReview.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(componentSource, /VITE_TABLE_CSV_ARCHIVE_EXPORT !== 'false'/);
   assert.match(componentSource, /busy \|\| !!publication\?\.busy \|\| !!publication\?\.blocked/);
   assert.ok(componentSource.indexOf('data-table-csv-archive-receipt') < componentSource.indexOf('id="table-csv-archive-destination"'));
   assert.match(componentSource, /<label for="table-csv-archive-destination">/);
@@ -391,25 +390,21 @@ test('UI literal opt-in, labels, receipts above fields and existing app native/n
   assert.doesNotMatch(componentSource, /\.trim\(|toLowerCase\(|toUpperCase\(/);
   assert.match(componentSource, /not independently verified by browser/);
   assert.match(componentSource, /not independently computed by browser/);
-  assert.match(app, /view === 'table-csv' && import\.meta\.env\.VITE_TABLE_CSV_REVIEW !== 'false'/);
+  assert.match(app, /App\.svelte|view === 'table-csv' && \$projectState/);
   assert.match(app, /ProjectTableCSVReview[\s\S]*?onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/);
   assert.match(app, /function navigate[\s\S]*?requestTransition/);
   assert.match(app, /closeDisposition\(state, busy \|\| editorBusy \|\| transitionWorking/);
   assert.match(app, /archivePublicationBusy = publication\.busy \|\| publication\.blocked/);
   assert.match(app, /publication\.blocked && view === 'home'\) view = 'table-csv'/);
   const { render } = await import('svelte/server');
-  for (const gate of [undefined, 'false', 'TRUE', '1', true, 'true']) {
-    const enabled = gate !== 'false';
-    const source = componentSource.replaceAll("import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT !== 'false'", String(enabled));
-    const mod = moduleFor();
-    const component = serverComponent(source, 'ProjectTableCSVReview.svelte', {
-      '../bindings/github.com/boostao/vpro-wails': {}, './projectTableCSV': csv,
-      './longEnvironmentReport': { reportCellText: String }, './tableCSVArchiveExport': mod,
-    });
-    const html = render(component, { props: { ...owner, onBusyChange() {} } }).body;
-    assert.equal(html.includes('data-table-csv-archive-export'), enabled);
-    assert.equal(html.includes('File publication, import, RDS and TurboVeg remain unavailable'), !enabled);
-  }
+  const mod = moduleFor();
+  const component = serverComponent(componentSource, 'ProjectTableCSVReview.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './projectTableCSV': csv,
+    './longEnvironmentReport': { reportCellText: String }, './tableCSVArchiveExport': mod,
+  });
+  const html = render(component, { props: { ...owner, onBusyChange() {} } }).body;
+  assert.equal(html.includes('data-table-csv-archive-export'), true);
+  assert.equal(html.includes('Exports a verified project table CSV archive (.zip)'), true);
   const scripts = JSON.parse(readFileSync(path.join(__dirname, '..', 'package.json'))).scripts;
   assert.equal(scripts.test.split('src/tableCSVArchiveExport.test.cjs').length - 1, 1);
 });

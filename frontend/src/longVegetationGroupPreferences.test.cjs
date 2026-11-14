@@ -140,9 +140,7 @@ test('actual parent module retains grouping validation across remount without re
     view() { return { busy: false, blocked: false, error: '', outcome: null, requestedDestination: '' }; }
     subscribe() { return () => {}; }
   }
-  const component = serverComponent(source('LongVegetationReport.svelte')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_GROUP_PREFERENCES !== 'false'/g, 'true')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false'),
+  const component = serverComponent(source('LongVegetationReport.svelte'),
     'LongVegetationReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': {},
       './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': { createLongVegetationGroupPreferencesRegistry() { created++; return registry; } },
@@ -157,7 +155,7 @@ test('actual parent module retains grouping validation across remount without re
       './longVegetationSwitchPreferences': {}, './LongVegetationSwitchPreferences.svelte': { default() {} },
       './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
       './longVegetationReport': {}, './longEnvironmentReport': {},
-      './vegetationWorkbook': { VegetationWorkbookPublicationSession: Publication },
+      './vegetationWorkbook': { vegetationWorkbookPublicationSession: () => new Publication(), VegetationWorkbookPublicationSession: Publication },
     });
   for (let mount = 0; mount < 2; mount++) {
     const result = render(component, { props: { ...scope, onBusyChange() {} } }).body;

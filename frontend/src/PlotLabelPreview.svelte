@@ -21,8 +21,8 @@
   let pdfReview = $state.raw<PlotLabelPDFExportReview | null>(null);
   let destination = $state('');
   const reads = new ReadRequests();
-  const regionalDateEnabled = import.meta.env.VITE_PLOT_LABEL_REGIONAL_DATE !== 'false';
-  const pdfEnabled = import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false';
+  const regionalDateEnabled = true;
+  const pdfEnabled = true;
   const pdfSession = untrack(() => pdfEnabled ? plotLabelPDFPublicationSession({ contextId, project, projectPath, su, suPath }) : null);
   let publication = $state.raw<PublicationView<PlotLabelPDFExportOutcome>>(pdfSession?.view() ??
     { busy: false, blocked: false, outcome: null, error: '', requestedDestination: '' });

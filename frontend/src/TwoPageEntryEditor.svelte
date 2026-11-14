@@ -40,10 +40,9 @@
     onExtendedShrubsChange?: (enabled: boolean) => void;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot }));
-  const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW !== 'false'
-    && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW !== 'false';
-  const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_EDITING !== 'false';
-  const metadataEditingEnabled = reviewEnabled && import.meta.env.VITE_PROJECT_METADATA_EDITING !== 'false';
+  const reviewEnabled = true;
+  const editingEnabled = true;
+  const metadataEditingEnabled = true;
   const metadataClient = untrack(() => projectMetadataClient);
   const metadataRestore = untrack(() => metadataRestorationAvailable);
   const sessions = untrack(() => {

@@ -13,7 +13,7 @@
     onvalidation: (axis: CoordinateAxis, message: string | null) => void;
     onbusy?: (busy: boolean) => void; children: Snippet<[Snippet<[PaperControl?]>]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_COORDINATE_EDITING !== 'false';
+  const editingEnabled = true;
   const axes = ['latitude', 'longitude'] as const;
   const serviceModes: Record<CoordinateDisplayMode, CoordinateMode> = {
     dd: CoordinateMode.CoordinateModeDD,
@@ -134,7 +134,6 @@
 </script>
 
 <div class="coordinate-toolbar" aria-label="Coordinate safety controls">
-  {#if !editingEnabled}<span>Coordinate editing is disabled by application configuration; values are read-only.</span>{/if}
   {#if view.mode !== 'dd'}
     <span>Safety addition: explicit numeric signs; no hemisphere assumptions.</span>
     {#each axes as axis}

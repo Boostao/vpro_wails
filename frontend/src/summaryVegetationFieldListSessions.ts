@@ -1,17 +1,10 @@
 import { fieldListOwner, SummaryVegetationFieldListSession, type FieldListOwner, type FieldListPort } from './summaryVegetationFieldList';
 
-export interface FieldListEnvironment {
-  VITE_SUMMARY_VEGETATION?: unknown;
-  VITE_SUMMARY_VEGETATION_FIELD_LIST?: unknown;
-}
-export function fieldListEnabled(environment: FieldListEnvironment): boolean {
-  return environment.VITE_SUMMARY_VEGETATION !== 'false' && environment.VITE_SUMMARY_VEGETATION_FIELD_LIST !== 'false';
-}
-export const summaryVegetationFieldListEnabled = fieldListEnabled(import.meta.env);
+export const summaryVegetationFieldListEnabled = true;
 export interface FieldListActivity { busy: boolean; blocked: boolean; owner: FieldListOwner | null }
 export function fieldListRegistry(createPort: (owner: FieldListOwner) => FieldListPort,
-  environment: FieldListEnvironment = import.meta.env, newRequestId?: () => string) {
-  const enabled = fieldListEnabled(environment);
+  newRequestId?: () => string) {
+  const enabled = true;
   const sessions = new Map<string, { owner: FieldListOwner; session: SummaryVegetationFieldListSession; unsubscribe: () => void }>();
   const listeners = new Set<(activity: FieldListActivity) => void>();
   const key = (owner: FieldListOwner) => JSON.stringify(fieldListOwner(owner));
@@ -32,7 +25,6 @@ export function fieldListRegistry(createPort: (owner: FieldListOwner) => FieldLi
       return () => { listeners.delete(listener); };
     },
     session(ownerValue: FieldListOwner) {
-      if (!enabled) throw new Error('Private Summary vegetation field-list flag/precondition disabled.');
       const owner = fieldListOwner(ownerValue), id = key(owner), existing = sessions.get(id);
       if (existing) return existing.session;
       if (sessions.size >= 16) throw new Error('Retained field-list context capacity reached; no state is evicted.');

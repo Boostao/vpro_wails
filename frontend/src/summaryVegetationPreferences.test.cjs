@@ -161,12 +161,12 @@ test('held saves, late reads and known unknown receipts remain separate across r
 });
 
 const component = readFileSync(path.join(__dirname, 'SummaryVegetationReport.svelte'), 'utf8');
-function panel(session, environment = { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_PREFERENCES: 'true' }) {
+function panel(session, preferencesEnabled = true) {
   return serverComponent(component, 'SummaryVegetationReport.svelte', {
     './summaryVegetation': summary,
-    './summaryVegetationPreferenceSessions': { summaryVegetationPreferenceSession: environment.VITE_SUMMARY_VEGETATION_PREFERENCES === 'true' ? () => session : null },
+    './summaryVegetationPreferenceSessions': { summaryVegetationPreferenceSession: preferencesEnabled ? () => session : null },
     '../bindings/github.com/boostao/vpro-wails': {},
-  }, environment);
+  });
 }
 test('compiled saved-option panel has one live source control per field and no render-time mutation', async () => {
   const owner = { ...scope, contextId: 'normal-panel', su: 'NormalSU' };
@@ -190,7 +190,7 @@ test('compiled saved-option panel has one live source control per field and no r
   await session.save(async () => ({ contextId: owner.contextId, changed: false, committed: false, errorMessage: '' })); session.acknowledge();
   body = render(panel(session), { props: { ...owner, onBusyChange() {} } }).body;
   assert.match(body, /data-summary-preference-receipt/);
-  const disabled = render(panel(session, { VITE_SUMMARY_VEGETATION: 'true' }), { props: { ...owner, onBusyChange() {} } }).body;
+  const disabled = render(panel(session, false), { props: { ...owner, onBusyChange() {} } }).body;
   assert.doesNotMatch(disabled, /data-summary-preferences/);
 });
 test('actual control handlers capture DOM values before preference validation and refuse duplicate field editors', () => {

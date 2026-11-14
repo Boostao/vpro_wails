@@ -29,7 +29,6 @@ test('Source-positioned BEC component compiles without warnings and retains prio
   assert.match(source, /value === '' \? null : value/);
   assert.match(source, /definition\.rowId/);
   assert.match(source, /rememberBECAcknowledgement\(draft, draft, accepted\)/);
-  assert.match(source, /VITE_BEC_EDITING !== 'false'/);
   assert.doesNotMatch(source, /draft\.(subZone|siteSeries)\s*=\s*null/);
 });
 test('Source code bounds preserve leading zeros, raw case and Access UTF-16 lengths', () => {

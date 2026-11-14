@@ -19,8 +19,8 @@
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
     operationHeld?: boolean; onBusyChange: (busy: boolean) => void;
   } = $props();
-  const enabled = import.meta.env.VITE_SUMMARY_VEGETATION !== 'false';
-  const groupedWorkbookEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK !== 'false';
+  const enabled = true;
+  const groupedWorkbookEnabled = true;
   const reads = new ReadRequests();
   function ownedContext() { return { contextId, project, projectPath, su, suPath }; }
   const session = summaryVegetationSession(ownedContext());
@@ -315,16 +315,14 @@
         presentationMutationHeld || presentationInvalid}
       onBusyChange={() => { environmentalHeld = summaryEnvironmentalDesktop.activity().busy; reportBusy(); }} />
   {/if}
-  {#if import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK !== 'false'}
-    <SummaryVegetationWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }}
-      calculation={{ average: viewState.average, display: workbookConstancy ? 1 : viewState.display, showClass: viewState.showClass,
-        ...(workbookConstancy ? { groupAndOrder: 13, constancy: true } :
-          groupedWorkbookEnabled && viewState.groupAndOrder !== 11 ? { groupAndOrder: viewState.groupAndOrder } : {}) }}
-      disabled={operationHeldProp || environmentalHeld || unavailableScope || viewState.groupAndOrder !== 11 && !groupedWorkbookEnabled ||
-        viewState.busy || fieldListHeld || preferenceHeld || preferenceInvalid || !!viewState.draftError ||
-        qualityMutationHeld || qualityUnavailable || presentationMutationHeld || presentationInvalid}
-      onBusyChange={(held) => { workbookHeld = held; reportBusy(); }} />
-  {/if}
+  <SummaryVegetationWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }}
+    calculation={{ average: viewState.average, display: workbookConstancy ? 1 : viewState.display, showClass: viewState.showClass,
+      ...(workbookConstancy ? { groupAndOrder: 13, constancy: true } :
+        groupedWorkbookEnabled && viewState.groupAndOrder !== 11 ? { groupAndOrder: viewState.groupAndOrder } : {}) }}
+    disabled={operationHeldProp || environmentalHeld || unavailableScope || viewState.groupAndOrder !== 11 && !groupedWorkbookEnabled ||
+      viewState.busy || fieldListHeld || preferenceHeld || preferenceInvalid || !!viewState.draftError ||
+      qualityMutationHeld || qualityUnavailable || presentationMutationHeld || presentationInvalid}
+    onBusyChange={(held) => { workbookHeld = held; reportBusy(); }} />
   <div class="actions">
     <button onclick={() => session.show(port)} disabled={!enabled || unavailableScope || viewState.busy || operationHeld || fieldListHeld || preferenceHeld || preferenceInvalid ||
       qualityMutationHeld || qualityUnavailable || presentationMutationHeld || presentationInvalid || !!viewState.draftError || !!preferences && !preferenceView?.initialized} data-summary-preview>

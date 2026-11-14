@@ -74,15 +74,15 @@ test('actual mode dispatch shares cancellation/owner checks and cannot change wo
   assert.equal(context.mode,'layer');
   assert.ok(cancellations>=3);
   const panel=readFileSync(path.join(__dirname,'SiteUnitSummary.svelte'),'utf8');
-  assert.match(panel,/VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false' && mode === 'layer'/);
+  assert.match(panel,/\{#if mode === 'layer' && !speciesView\?\.enabled\}/);
 });
-test('summary component is independently gated, cancellable and enters shared draft-safe navigation',()=>{
+test('summary component is cancellable and enters shared draft-safe navigation',()=>{
   const read=file=>readFileSync(path.join(__dirname,file),'utf8');
   for(const file of ['SiteUnitSummary.svelte','Navigation.svelte','App.svelte']) {
     assert.equal(compile(read(file),{filename:file,generate:'client'}).warnings.length,0);
   }
-  assert.match(read('Navigation.svelte'),/VITE_SITE_UNIT_SUMMARY !== 'false' \? 'summary-environment' : undefined/);
-  assert.match(read('App.svelte'),/view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false'/);
+  assert.match(read('Navigation.svelte'),/name: 'Summary Environment', icon: ChartColumn, view: 'summary-environment'/);
+  assert.match(read('App.svelte'),/view === 'summary-environment' && \$projectState/);
   const panel=read('SiteUnitSummary.svelte');
   assert.match(panel,/onDestroy\(\(\) => \{ unsubscribe\?\.\(\); unsubscribeSpecies\?\.\(\); cancel\(\); \}\)/);assert.match(panel,/request !== generation/);
   assert.match(panel,/onBusyChange\(busy \|\| preferenceBarrier \|\| workbookBusy \|\| speciesBarrier\)/);
@@ -91,7 +91,6 @@ test('summary component is independently gated, cancellable and enters shared dr
   assert.match(panel,/GetSiteUnitSummaryOptions/);
   assert.match(panel,/disabled=\{busy \|\| workbookBusy \|\| preferenceBarrier \|\| speciesBarrier \|\| !ready \|\| su === 'None'\}/);
   assert.match(panel,/ready = siteUnitType === 1/);
-  assert.match(panel,/VITE_SITE_UNIT_SUMMARY_PREFERENCES !== 'false'/);
   assert.doesNotMatch(panel,/<button[^>]*>Export|localStorage/);
 });
 test('saved summary options retain quartile initialization and unavailable source scopes',()=>{

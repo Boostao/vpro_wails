@@ -11,7 +11,7 @@
     onbusy: (busy: boolean) => void;
     children: Snippet<[{ columns: readonly string[]; input: Snippet<[PaperControl, string]> } | undefined]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_SOIL_DRAINAGE_EDITING !== 'false';
+  const editingEnabled = true;
   const lookup = new CatalogueLookup(async (force, requests) => {
     if (force) await requests.track(PlotEntryService.ReloadParentCodeCatalogue());
     const rows = await requests.track(PlotEntryService.ListParentCodeChoices('SoilDrainage'));

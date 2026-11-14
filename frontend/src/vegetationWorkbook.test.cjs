@@ -305,37 +305,32 @@ test('actual root transition and both native-close paths reject unresolved publi
   assert.equal(navigated, 1);
 });
 
-test('actual root workbook watcher and report share the immutable selected-unit consumer in both builds',()=>{
+test('actual root workbook watcher and report share the immutable selected-unit consumer',()=>{
   const ts=require('typescript');
   const app=readFileSync(path.join(__dirname,'App.svelte'),'utf8');
   const call=app.indexOf('    const session = vegetationWorkbookPublicationSession(');
   const effect=app.slice(app.lastIndexOf('  $effect(',call),app.indexOf('  $effect(',call));
-  for(const enabled of [false,true]) {
-    const scope={...owner,contextId:'root-consumer-'+enabled};
-    const callbacks=[];
-    const context=vm.createContext({
-      $projectState:{contextId:scope.contextId,activeProject:scope.project,projectPath:scope.projectPath,activeSU:scope.su,suPath:scope.suPath},
-      vegetationPublicationBusy:false,view:'home',$effect:fn=>callbacks.push(fn),
-      vegetationWorkbookPublicationSession:workbook.vegetationWorkbookPublicationSession,
-    });
-    vm.runInContext(ts.transpileModule(effect
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_SELECTED_UNITS !== 'false'/g,String(enabled))
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'false'/g,'false'),
-      {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,context);
-    assert.equal(callbacks.length,1);
-    const unsubscribe=callbacks[0]();
-    assert.equal(typeof unsubscribe,'function');
-    assert.equal(workbook.vegetationWorkbookPublicationSession(scope,enabled).view().busy,false);
-    assert.throws(()=>workbook.vegetationWorkbookPublicationSession(scope,!enabled));
-    unsubscribe();
-  }
+  const scope={...owner,contextId:'root-consumer-true'};
+  const callbacks=[];
+  const context=vm.createContext({
+    $projectState:{contextId:scope.contextId,activeProject:scope.project,projectPath:scope.projectPath,activeSU:scope.su,suPath:scope.suPath},
+    vegetationPublicationBusy:false,view:'home',$effect:fn=>callbacks.push(fn),
+    vegetationWorkbookPublicationSession:workbook.vegetationWorkbookPublicationSession,
+  });
+  vm.runInContext(ts.transpileModule(effect,
+    {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,context);
+  assert.equal(callbacks.length,1);
+  const unsubscribe=callbacks[0]();
+  assert.equal(typeof unsubscribe,'function');
+  assert.equal(workbook.vegetationWorkbookPublicationSession(scope,true).view().busy,false);
+  assert.throws(()=>workbook.vegetationWorkbookPublicationSession(scope,false));
+  unsubscribe();
 });
 test('route and root wiring keep held navigation/native close, no cancellable export, raw approval, labels and wrapped safety above guidance', () => {
   const panel = source(), app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   for (const [filename, value] of [['LongVegetationReport.svelte', panel], ['App.svelte', app]]) {
     assert.equal(compile(value, { filename, generate: 'client' }).warnings.length, 0);
   }
-  assert.match(panel, /VITE_LONG_VEGETATION_WORKBOOK !== 'false'/);
   assert.match(panel, /workbookReview = \$state\.raw<ValidatedVegetationWorkbookReview/);
   assert.match(panel, /reads\.track\(VegetationReportService\.GetVegetationWorkbookReview/);
   assert.doesNotMatch(panel, /reads\.track\(VegetationReportService\.ExportReviewedVegetationWorkbook/);
@@ -357,20 +352,8 @@ test('route and root wiring keep held navigation/native close, no cancellable ex
 
 test('SSR remount shows persistent unknown alert and explicit acknowledgement without recreating preparation', async () => {
   const owned = { ...owner, contextId: 'ssr-unknown' }, input = fixture(); input.preview.contextId = owned.contextId;
-  await workbook.vegetationWorkbookPublicationSession(owned).publish(input, destination, async () => null);
-  const component = serverComponent(source().replace("import.meta.env.VITE_LONG_VEGETATION_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_STATISTICS_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_SWITCH_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_THRESHOLD_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_GROUP_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_QUALITY_NULL_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_QUALITY_MINIMUM_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_NAMING_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_ENFORCEMENT_PREFERENCES !== 'false'", 'false')
-    .replace("import.meta.env.VITE_LONG_VEGETATION_UNIT_PREFERENCES !== 'false'", 'false')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_SELECTED_UNIT(?:S|_SELECTION) !== 'false'/g, 'false')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'true'),
+  await workbook.vegetationWorkbookPublicationSession(owned, true).publish(input, destination, async () => null);
+  const component = serverComponent(source(),
     'LongVegetationReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
       './longEnvironmentReport': environment, './longVegetationReport': report, './vegetationWorkbook': workbook, './longVegetationPreferences': {},

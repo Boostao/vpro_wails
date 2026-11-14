@@ -18,8 +18,8 @@
     masterAllowed?: boolean;
     onbusy?: (busy: boolean) => void; session: WorkingUnitSession; children: Snippet<[Snippet<[PaperControl?]>]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_WORKING_UNIT_EDITING !== 'false';
-  const masterEditingEnabled = import.meta.env.VITE_MASTER_BEC_EDITING !== 'false';
+  const editingEnabled = true;
+  const masterEditingEnabled = true;
   const componentId = $props.id();
   const listId = `${componentId}-working-unit`;
   function rows<T>(value: T[] | null): T[] {

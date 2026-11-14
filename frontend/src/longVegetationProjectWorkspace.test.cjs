@@ -332,16 +332,15 @@ test('default-off immutable per-context registry never borrows another owner or 
   assert.throws(()=>registry({...owner,suPath:'phantom'}),/physical paths/);
 });
 
-function sdkRegistry(environment,bindings) {
+function sdkRegistry(bindings) {
   class RuntimeError extends Error {}
   class CancelledRejectionError extends Error {}
   const reads=loadTypeScript('readRequests.ts',{'@wailsio/runtime':{Call:{RuntimeError},CancelledRejectionError}});
   const module={exports:{}};
-  const code=ts.transpileModule(readFileSync(path.join(__dirname,'longVegetationProjectWorkspaces.ts'),'utf8')
-    .replaceAll('import.meta.env','__environment'),{
+  const code=ts.transpileModule(readFileSync(path.join(__dirname,'longVegetationProjectWorkspaces.ts'),'utf8'),{
     compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
   }).outputText;
-  vm.runInNewContext(code,{module,exports:module.exports,__environment:environment,require(name) {
+  vm.runInNewContext(code,{module,exports:module.exports,require(name) {
     if(name==='../bindings/github.com/boostao/vpro-wails') return bindings;
     if(name==='./readRequests') return reads;
     if(name==='./longVegetationProjectWorkspace.svelte') return workspaceModule;
@@ -351,9 +350,6 @@ function sdkRegistry(environment,bindings) {
 }
 
 test('public SDK registry routes only distinct project APIs using production-Go full requests and one immutable client capability',async()=>{
-  for(const flag of ['false']) {
-    assert.equal(sdkRegistry({VITE_LONG_VEGETATION_PROJECT_SCOPE:flag},{}),null);
-  }
   const input=structuredClone(wire[0]),owner=physicalOwner(input.review.scope),calls=[],cancelled=[];
   let saved=1;
   const cancellable=(operation,value)=>{
@@ -387,15 +383,13 @@ test('public SDK registry routes only distinct project APIs using production-Go 
     GetReview:(context,request)=>{calls.push(['review',context,JSON.parse(request)]);return cancellable('review',input.review);},
     ExportReviewed:(context,request)=>{calls.push(['publish',context,JSON.parse(request)]);return cancellable('publish',input.outcome);},
   };
-  const environment={VITE_LONG_VEGETATION_PROJECT_SCOPE:'true',VITE_LONG_VEGETATION_WORKBOOK:'true'};
-  const registry=sdkRegistry(environment,{
+  const registry=sdkRegistry({
     VegetationReportService:{
       ...scopeService,
       GetLongVegetationProjectWorkbookReview:workbookService.GetReview,
       ExportReviewedLongVegetationProjectWorkbook:workbookService.ExportReviewed,
     }
   });
-  environment.VITE_LONG_VEGETATION_PROJECT_SCOPE='false';environment.VITE_LONG_VEGETATION_WORKBOOK='false';
   const workspace=registry(owner);
   await workspace.selection.load();await workspace.units.load(workspace.fetchUnitPreferences,async()=>{});
   workspace.units.editUnitGroups('2');
@@ -427,7 +421,7 @@ test('actual public SDK read ownership cancels getter requests but never an issu
       return cancellable('switch',mutation.promise);
     },
   };
-  const registry=sdkRegistry({VITE_LONG_VEGETATION_PROJECT_SCOPE:'true'},{
+  const registry=sdkRegistry({
     VegetationReportService:service
   });
   const workspace=registry(owner);

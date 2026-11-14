@@ -14,7 +14,7 @@ test('actual top-level Summary authority effect subscribes and reopens a retaine
     ts.isCallExpression(node.expression) && node.expression.expression.getText(ast) === '$effect');
   const effect = effects.filter(node => node.getText(ast).includes('siteUnitSummaryWorkbookPublicationSession'));
   assert.equal(effect.length, 1, 'Summary subscription must be an independently reachable top-level effect');
-  for (const enabled of [true, false]) for (const blocked of [true, false]) {
+  for (const blocked of [true, false]) {
     let subscribed = 0, unsubscribed = 0, owner;
     const context = vm.createContext({
       summaryEnvironmentPublicationBusy: false, view: 'home',
@@ -27,20 +27,20 @@ test('actual top-level Summary authority effect subscribes and reopens a retaine
           subscribed++; listener(); return () => { unsubscribed++; };
         } };
       },
+      extendedSummaryWorkbookPublicationSession() {
+        return { view: () => ({ busy: false, blocked: false }), subscribe(listener) {
+          listener(); return () => {};
+        } };
+      },
     });
     context.$effect = run => { context.cleanup = run(); };
-    const code = effect[0].getText(ast).replaceAll("import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK",
-      JSON.stringify(enabled ? 'true' : 'false'))
-      .replaceAll("import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK", "'false'")
-      .replaceAll("import.meta.env.VITE_SITE_UNIT_SUMMARY", "'true'");
+    const code = effect[0].getText(ast);
     vm.runInContext(ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, context);
-    assert.equal(subscribed, enabled ? 1 : 0);
-    assert.equal(context.summaryEnvironmentPublicationBusy, enabled);
-    assert.equal(context.view, enabled && blocked ? 'summary-environment' : 'home');
-    if (enabled) {
-      assert.equal(owner.contextId, 'owned'); assert.equal(owner.suPath, 'C:\\external.db');
-      context.cleanup(); assert.equal(unsubscribed, 1);
-    }
+    assert.equal(subscribed, 1);
+    assert.equal(context.summaryEnvironmentPublicationBusy, true);
+    assert.equal(context.view, blocked ? 'summary-environment' : 'home');
+    assert.equal(owner.contextId, 'owned'); assert.equal(owner.suPath, 'C:\\external.db');
+    context.cleanup(); assert.equal(unsubscribed, 1);
   }
 });
 
@@ -108,14 +108,12 @@ test('actual Summary parent prevents method, preview and preference changes whil
   assert.deepEqual(held, [true, true, false]);
 });
 
-test('Summary root and parent wire independent default-off gates and persistent publication authority', () => {
+test('Summary root and parent wire persistent publication authority', () => {
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const parent = readFileSync(path.join(__dirname, 'SiteUnitSummary.svelte'), 'utf8');
-  assert.match(app, /VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'false' && import\.meta\.env\.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK === 'false'/);
   assert.match(app, /summaryEnvironmentPublicationBusy = publication.busy \|\| publication.blocked/);
   assert.match(app, /summaryPublicationBusy = \$derived\(summaryEnvironmentPublicationBusy \|\| summaryVegetationPublicationBusy\)/);
   assert.match(app, /publication.blocked && view === 'home'\) view = 'summary-environment'/);
-  assert.match(parent, /VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false'/);
   assert.match(parent, /<SiteUnitSummaryWorkbookPanel owner=\{\{ contextId, project, projectPath, su, suPath \}\} \{method\}/);
   assert.match(parent, /onBusyChange=\{\(held\) => \{ workbookBusy = held; reportBusy\(\); \}\}/);
   for (const selector of ['undo', 'normal', 'acknowledge']) {

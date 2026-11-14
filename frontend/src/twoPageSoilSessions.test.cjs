@@ -6,7 +6,7 @@ const ts = require('typescript');
 const vm = require('node:vm');
 const { loadTypeScript } = require('./svelteTestHelpers.cjs');
 const { TwoPageSoilSession, fixture, original, wire, outcome } = require('./twoPageSoilTestHelpers.cjs');
-function registry(environment = {}, overrides = {}) {
+function registry(_environment = {}, overrides = {}) {
   const calls = [];
   const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
   const dependencies = {
@@ -20,16 +20,16 @@ function registry(environment = {}, overrides = {}) {
     './twoPageSoilActivity': loadTypeScript('twoPageSoilActivity.ts', { './qualityEditor': quality }),
   };
   const module = { exports: {} };
-  const source = readFileSync(path.join(__dirname, 'twoPageSoilSessions.ts'), 'utf8').replaceAll('import.meta.env', '__environment');
+  const source = readFileSync(path.join(__dirname, 'twoPageSoilSessions.ts'), 'utf8');
   vm.runInNewContext(ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-  }).outputText, { module, exports: module.exports, __environment: environment, require: name => {
+  }).outputText, { module, exports: module.exports, require: name => {
     if (!(name in dependencies)) throw new Error(`Unexpected registry dependency ${name}`);
     return dependencies[name];
   } });
   return { ...module.exports, calls };
 }
-const enabled = { VITE_TWO_PAGE_SOIL_REVIEW: 'true', VITE_TWO_PAGE_SOIL_WRITING: 'true' };
+const enabled = {};
 const owner = fixture.owner;
 function stage(session) {
   session.stage('-7', 'Horizon', 'LF', false);
@@ -37,38 +37,24 @@ function stage(session) {
   session.stage('-7', 'Comment', '', true);
 }
 
-test('default and writing-only cannot grant review; read-only cannot stage or dispatch mutation', async () => {
-  for (const environment of [{ VITE_TWO_PAGE_SOIL_REVIEW: 'false' }, { VITE_TWO_PAGE_SOIL_REVIEW: 'false', VITE_TWO_PAGE_SOIL_WRITING: 'true' }]) {
-    const api = registry(environment);
-    assert.equal(api.twoPageSoilReviewEnabled, false);
-    assert.equal(api.twoPageSoilWritingEnabled, false);
-    assert.throws(() => api.twoPageSoilSession(owner), /disabled/);
-    assert.equal(api.calls.length, 0);
-  }
-  const api = registry({ VITE_TWO_PAGE_SOIL_REVIEW: 'true', VITE_TWO_PAGE_SOIL_WRITING: 'false' });
+test('two-page soil review, writing and creation are enabled by default and load/release cleanly', async () => {
+  const api = registry();
+  assert.equal(api.twoPageSoilReviewEnabled, true);
+  assert.equal(api.twoPageSoilWritingEnabled, true);
+  assert.equal(api.twoPageSoilCreationEnabled, true);
   const session = api.twoPageSoilSession(owner);
   assert.equal(await session.load(), true);
-  assert.throws(() => session.stage('-7', 'Horizon', 'LF', false), /disabled/);
-  await assert.rejects(session.save(fixture.request.requestId), /disabled/);
   assert.equal(session.view().blocked, false);
   assert.equal(api.calls.length, 1);
   assert.equal(api.releaseTwoPageSoilSession(owner), true);
 });
 
-test('independent creation profile retains drafts and dispatches only its exact owner/action across remounts', async () => {
+test('creation profile retains drafts and dispatches only its exact owner/action across remounts', async () => {
   const entry = structuredClone(require('./twoPageSoilCreationWire.json')[0]);
   const { contextId, project, plot, form } = entry.request.original;
   const creationOwner = { contextId, project, plot, form };
-  for (const environment of [
-    { ...enabled, VITE_TWO_PAGE_SOIL_CREATION: 'false' },
-    { VITE_TWO_PAGE_SOIL_REVIEW: 'false', VITE_TWO_PAGE_SOIL_WRITING: 'false', VITE_TWO_PAGE_SOIL_CREATION: 'true' },
-    { VITE_TWO_PAGE_SOIL_REVIEW: 'true', VITE_TWO_PAGE_SOIL_WRITING: 'false', VITE_TWO_PAGE_SOIL_CREATION: 'true' },
-    { VITE_TWO_PAGE_SOIL_REVIEW: 'false', VITE_TWO_PAGE_SOIL_WRITING: 'true', VITE_TWO_PAGE_SOIL_CREATION: 'true' },
-  ]) {
-    assert.equal(registry(environment).twoPageSoilCreationEnabled, false);
-  }
   const creates = [];
-  const api = registry({ ...enabled, VITE_TWO_PAGE_SOIL_CREATION: 'true' }, {
+  const api = registry(enabled, {
     GetOriginal: () => Promise.resolve(entry.request.original),
     CreateHorizon: (...args) => { creates.push(args); return Promise.resolve(entry.receipt); },
   });

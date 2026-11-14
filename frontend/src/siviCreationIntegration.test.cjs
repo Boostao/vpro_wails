@@ -91,7 +91,6 @@ test('actual client subscription settles, notifies once and detaches when its ow
 
 test('creation independently gates actual root/main registration and binds only owned refs/Create/readonly lookup', async () => {
   const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
-  assert.match(root, /VITE_SIVI_CREATION_WRITING !== 'false'/);
   assert.match(main, /NewSIVICreationService\(contextService, os.LookupEnv\)/);
   assert.match(main, /siviCreation:\s*siviCreation/);
   assert.match(main, /application\.NewService\(plotEntryService\)/);

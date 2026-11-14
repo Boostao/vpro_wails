@@ -12,7 +12,7 @@
   let { owner, disabled, onBusyChange }: {
     owner: LifeformSummaryOwner; disabled: boolean; onBusyChange: (held: boolean) => void;
   } = $props();
-  const enabled = import.meta.env.VITE_LIFEFORM_WORKBOOK !== 'false';
+  const enabled = true;
   const owned = untrack(() => structuredClone(owner));
   const session = lifeformWorkbookPublicationSession(owned);
   const reads = new ReadRequests();
@@ -93,9 +93,6 @@
   {/if}
   {#if publication.blocked && !publication.busy}
     <button data-lifeform-workbook-acknowledge onclick={acknowledge}>Acknowledge workbook outcome</button>
-  {/if}
-  {#if !enabled}
-    <p>Workbook publication is unavailable. The independent Lifeform workbook feature is disabled.</p>
   {/if}
   <fieldset disabled={!enabled || held}>
     <legend>Optional detail tables (all six count summaries are always included)</legend>

@@ -213,42 +213,38 @@ test('actual panel preserves labels, one unrestricted control per field and dist
     }
   }
 });
-test('actual report retains minimum validation on remount and independently gates root and sibling actions', () => {
+test('actual report retains minimum validation on remount and gates root and sibling actions', () => {
   const reportSource = source('LongVegetationReport.svelte');
-  for (const enabled of [false, true]) {
-    const owner = { ...scope, contextId: `quality-minimum-composition-${enabled}` };
-    const session = prefs.longVegetationQualityMinimumPreferencesSession(owner);
-    session.apply(review(undefined, owner)); session.editMinimum('vegMinimum', '\ud800');
-    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
-      .replace('const qualityMinimaEnabled = false;', `const qualityMinimaEnabled = ${enabled};`), 'LongVegetationReport.svelte', {
-        '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
-        './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},
-        './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
-        './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
-        './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} },
-        './longVegetationQualityMinimumPreferences': prefs, './LongVegetationQualityMinimumPreferences.svelte': { default: child() },
-        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
-        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
-      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
-      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
-      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-        './LongVegetationSwitchPreferences.svelte': { default() {} }, './longEnvironmentReport': {}, './longVegetationReport': {},
-        './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
-          view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
-        } },
-      });
-    for (let mount = 0; mount < 2; mount++) {
-      const barriers = [];
-      const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
-      assert.equal(barriers.at(-1), enabled);
-      if (enabled) {
-        assert.match(body, /data-long-vegetation-quality-minima/);
-        assert.match(body, /data-long-vegetation-quality-minimum-save[^>]*disabled/);
-        assert.doesNotMatch(body, /data-long-vegetation-quality-minimum-undo[^>]*disabled/);
-      } else assert.doesNotMatch(body, /data-long-vegetation-quality-minima/);
-    }
-    session.undo();
+  const owner = { ...scope, contextId: 'quality-minimum-composition-true' };
+  const session = prefs.longVegetationQualityMinimumPreferencesSession(owner);
+  session.apply(review(undefined, owner)); session.editMinimum('vegMinimum', '\ud800');
+  const component = serverComponent(reportSource, 'LongVegetationReport.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
+    './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},
+    './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
+    './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} },
+    './longVegetationQualityMinimumPreferences': prefs, './LongVegetationQualityMinimumPreferences.svelte': { default: child() },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+    './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    './LongVegetationSwitchPreferences.svelte': { default() {} }, './longEnvironmentReport': {}, './longVegetationReport': {},
+    './vegetationWorkbook': {
+      vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+      VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+    },
+  });
+  for (let mount = 0; mount < 2; mount++) {
+    const barriers = [];
+    const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
+    assert.equal(barriers.at(-1), true);
+    assert.match(body, /data-long-vegetation-quality-minima/);
+    assert.match(body, /data-long-vegetation-quality-minimum-save[^>]*disabled/);
+    assert.doesNotMatch(body, /data-long-vegetation-quality-minimum-undo[^>]*disabled/);
   }
+  session.undo();
   assert.match(reportSource, /qualityMinimumView = qualityMinima.view\(\); invalidateReports\(\)/);
   assert.match(reportSource, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);
   assert.match(reportSource, /qualityNullBarrier \|\| qualityMinimumBarrier/);

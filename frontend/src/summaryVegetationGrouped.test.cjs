@@ -100,7 +100,7 @@ test('compiled grouped panel uses source captions, numeric Order and explicitly 
   const component = readFileSync(path.join(__dirname, 'SummaryVegetationReport.svelte'), 'utf8');
   const panel = serverComponent(component, 'SummaryVegetationReport.svelte', {
     './summaryVegetation': report, '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
-  }, { VITE_SUMMARY_VEGETATION: 'true' });
+  });
   const session = report.summaryVegetationSession(owner);
   for (const value of wire.filter(value => value.average === 1)) {
     session.edit(1, 6, 1, value.groupAndOrder);
@@ -113,9 +113,4 @@ test('compiled grouped panel uses source captions, numeric Order and explicitly 
     assert.doesNotMatch(body.match(/<option value="4"[^>]*>/)[0], /\bdisabled\b/);
     assert.equal(/\bdisabled\b/.test(body.match(/<option value="2"[^>]*>/)[0]), value.groupAndOrder !== 14);
   }
-  const disabled = serverComponent(component, 'SummaryVegetationReport.svelte', {
-    './summaryVegetation': report, '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
-  }, { VITE_SUMMARY_VEGETATION: 'false' });
-  const body = render(disabled, { props: { ...owner, onBusyChange() {} } }).body;
-  assert.match(body.match(/<select[^>]*data-summary-group[^>]*>/)[0], /\bdisabled\b/);
 });

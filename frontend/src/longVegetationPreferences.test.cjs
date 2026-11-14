@@ -135,46 +135,39 @@ test('actual title handlers cancel reads and refuse stale publication without ca
   assert.equal(cancellations, 1); assert.equal(session.view().draft.title, 'newer');
   await context.actions.saveTitle(); assert.equal(saves, 1);
 });
-test('enabled title presentation has one visible labelled control and retained safety; default has no new editor', () => {
+test('title presentation has one visible labelled control and retained safety', () => {
   const source = readFileSync(path.join(__dirname, 'LongVegetationReport.svelte'), 'utf8');
-  for (const enabled of [false, true]) {
-    const owner = { ...scope, contextId: `render-title-${enabled}` };
-    const session = prefs.longVegetationPreferencesSession(owner);
-    session.apply(review('First\r\nSecond', owner)); session.edit('invalid\0draft');
-    const component = serverComponent(source.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
-      .replace('const preferencesEnabled = false;', `const preferencesEnabled = ${enabled};`),
-      'LongVegetationReport.svelte', {
-        '../bindings/github.com/boostao/vpro-wails': {},
-        './longVegetationPreferences': prefs,
-        './longVegetationStatisticsPreferences': {},
-        './longVegetationSwitchPreferences': {},
-        './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
-        './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
-        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
-        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
-        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+  const owner = { ...scope, contextId: 'render-title-true' };
+  const session = prefs.longVegetationPreferencesSession(owner);
+  session.apply(review('First\r\nSecond', owner)); session.edit('invalid\0draft');
+  const component = serverComponent(source,
+    'LongVegetationReport.svelte', {
+      '../bindings/github.com/boostao/vpro-wails': {},
+      './longVegetationPreferences': prefs,
+      './longVegetationStatisticsPreferences': {},
+      './longVegetationSwitchPreferences': {},
+      './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
+      './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+      './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+      './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+      './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
       './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
       './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
       './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-        './LongVegetationSwitchPreferences.svelte': { default() {} },
-        './longEnvironmentReport': {},
-        './longVegetationReport': {},
-        './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
-          view() { return { busy: false, blocked: false }; }
-          subscribe() { return () => {}; }
-        } },
-      });
-    const barriers = [];
-    const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
-    if (enabled) {
-      assert.equal((body.match(/id="long-vegetation-title"/g) ?? []).length, 1);
-      assert.match(body, /for="long-vegetation-title">Report Title/);
-      assert.match(body, /aria-invalid="true"/);
-      assert.match(body, /correct it or Undo/); assert.equal(barriers.at(-1), true);
-    } else {
-      assert.doesNotMatch(body, /id="long-vegetation-title"/); assert.equal(barriers.at(-1), false);
-    }
-  }
+      './LongVegetationSwitchPreferences.svelte': { default() {} },
+      './longEnvironmentReport': {},
+      './longVegetationReport': {},
+      './vegetationWorkbook': {
+        vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+        VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+      },
+    });
+  const barriers = [];
+  const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
+  assert.equal((body.match(/id="long-vegetation-title"/g) ?? []).length, 1);
+  assert.match(body, /for="long-vegetation-title">Report Title/);
+  assert.match(body, /aria-invalid="true"/);
+  assert.match(body, /correct it or Undo/); assert.equal(barriers.at(-1), true);
   assert.match(source, /const value = event.currentTarget.value; editTitle\(value\)/);
   assert.doesNotMatch(source, /reads\.track\(VegetationReportService\.Save/);
   assert.match(source, /workbookBarrier \|\| preferenceBarrier \|\| !workbookReview/);

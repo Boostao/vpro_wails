@@ -183,16 +183,14 @@ test('actual compiled SSR consumes default Current, four populated column captio
   assert.doesNotMatch(source, /\b(?:Save|Delete|LogIn|LogOut)\s*\(/);
 });
 
-for (const flag of [undefined, false, true, 'false', 'TRUE', '1', 'true']) {
-  test(`compiled normal User log menu requires the exact independent frontend literal ${String(flag)}`, async () => {
-    const source = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
-    const component = serverComponent(source, 'Navigation.svelte', {
-      '@lucide/svelte': new Proxy({}, { get: () => () => {} }),
-    }, { VITE_USER_LOG_REVIEW: flag });
-    const { render } = await import(pathToFileURL(require.resolve('svelte/server')).href);
-    const body = render(component, { props: { view: 'home', onnavigate: () => {} } }).body;
-    const button = [...body.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].find(match => match[2].includes('User log'));
-    assert.ok(button, 'planned selector must resolve');
-    assert.equal(/\bdisabled(?:=|\s|$)/.test(button[1]), flag === 'false');
+test('compiled normal User log menu is unconditionally enabled in Navigation', async () => {
+  const source = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
+  const component = serverComponent(source, 'Navigation.svelte', {
+    '@lucide/svelte': new Proxy({}, { get: () => () => {} }),
   });
-}
+  const { render } = await import(pathToFileURL(require.resolve('svelte/server')).href);
+  const body = render(component, { props: { view: 'home', onnavigate: () => {} } }).body;
+  const button = [...body.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].find(match => match[2].includes('User log'));
+  assert.ok(button, 'planned selector must resolve');
+  assert.equal(/\bdisabled(?:=|\s|$)/.test(button[1]), false);
+});

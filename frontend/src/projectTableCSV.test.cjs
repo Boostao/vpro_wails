@@ -103,8 +103,8 @@ test('CSV UI is independently default-off and shares existing draft, context and
   const app=readFileSync(path.join(__dirname,'App.svelte'),'utf8');
   const navigation=readFileSync(path.join(__dirname,'Navigation.svelte'),'utf8');
   assert.equal(compile(component,{filename:'ProjectTableCSVReview.svelte',generate:'client'}).warnings.length,0);
-  assert.match(navigation,/VITE_TABLE_CSV_REVIEW !== 'false' \? 'table-csv' : undefined/);
-  assert.match(app,/view === 'table-csv' && import\.meta\.env\.VITE_TABLE_CSV_REVIEW !== 'false'/);
+  assert.match(navigation,/name: 'Project Table CSV Archive', icon: Table, view: 'table-csv'/);
+  assert.match(app,/view === 'table-csv' && \$projectState/);
   assert.match(app,/function navigate[\s\S]*?requestTransition/);
   assert.match(app,/busy \|\| editorBusy \|\| transitionWorking/);
   assert.match(component,/reads\.track\(ImportExportService\.GetProjectTableCSVReview\(contextId, table\)\)/);
@@ -112,6 +112,6 @@ test('CSV UI is independently default-off and shares existing draft, context and
   assert.match(component,/onDestroy\(cancel\)/);
   assert.match(component,/reads\.cancelAll\(\)/);
   assert.match(component,/<textarea id="csv-value-preview" readonly/);
-  assert.match(component,/File publication, import, RDS and TurboVeg remain unavailable/);
+  assert.match(component,/JSON-escaped text and typed storage metadata/);
   assert.doesNotMatch(component,/Save|download=|CreateBlank|SaveProject/);
 });

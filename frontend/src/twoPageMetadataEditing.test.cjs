@@ -30,7 +30,7 @@ async function mountEntry(flags = {}, options = {}) {
     assert.equal(compiled.warnings.length, 0);
     const ast = ts.createSourceFile('two-page-metadata-client.js', compiled.js.code, ts.ScriptTarget.Latest, true);
     compiledScript = ast.statements.filter(node => !ts.isImportDeclaration(node)).map(node => node.getText(ast))
-      .join('\n').replace('export default function', 'function').replaceAll('import.meta.env', '__testEnvironment');
+      .join('\n').replace('export default function', 'function');
   }
   let props, actions;
   const calls = [];
@@ -61,30 +61,19 @@ async function mountEntry(flags = {}, options = {}) {
     onchange: () => props.revision++, onbusy: value => calls.push(['busy', value]),
     onclosed: () => calls.push('close'), oncommitted: async () => calls.push('root'),
     embedded() {}, inspect: value => actions = value, ...options });
-  const mount = new Function('$', 'onDestroy', 'untrack', 'twoPageEntryCell', '__testEnvironment',
+  const mount = new Function('$', 'onDestroy', 'untrack', 'twoPageEntryCell',
     compiledScript + '\nreturn _unknown_;')(runtime, onDestroy, runtime.untrack,
-    (original, column) => { assert.equal(column, 'ProjectID'); return original.projectId; }, {
-      VITE_TWO_PAGE_PARENT_REVIEW: 'true', VITE_TWO_PAGE_PARENT_ENTRY_REVIEW: 'true',
-      VITE_PROJECT_METADATA_EDITING: 'true', ...flags,
-    });
+    (original, column) => { assert.equal(column, 'ProjectID'); return original.projectId; });
   const dispose = runtime.effect_root(() => mount(null, props));
   runtime.flush();
   return { actions: () => actions, props, sessions, cache, calls, dispose, flush: runtime.flush };
 }
 
-test('actual complete-entry client requires all literal metadata prerequisites, independent of parent editing', async () => {
-  const names = ['VITE_TWO_PAGE_PARENT_REVIEW', 'VITE_TWO_PAGE_PARENT_ENTRY_REVIEW', 'VITE_PROJECT_METADATA_EDITING'];
-  for (const name of names) for (const value of [undefined, false, 'false', 'TRUE', '1', 'true']) {
-    const panel = await mountEntry({ [name]: value, VITE_TWO_PAGE_PARENT_ENTRY_EDITING: 'false' });
-    try {
-      const expected = value !== 'false';
-      assert.equal(panel.actions().canOpenMetadataEditor(), expected, `${name}=${value}`);
-      if (!expected) {
-        panel.actions().openMetadataEditor(); panel.flush();
-        assert.equal(panel.actions().mode, null); assert.match(panel.actions().error, /Resolve/);
-      }
-    } finally { panel.dispose(); }
-  }
+test('actual complete-entry client enables metadata editing by default', async () => {
+  const panel = await mountEntry();
+  try {
+    assert.equal(panel.actions().canOpenMetadataEditor(), true);
+  } finally { panel.dispose(); }
 });
 
 test('actual client retains literal saved identity and all peer/root/child barriers', async () => {

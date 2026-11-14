@@ -14,7 +14,7 @@
     onbusy?: (busy: boolean) => void;
     children: Snippet<[{ columns: readonly string[]; input: Snippet<[PaperControl, string]> } | undefined]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_PARENT_CODES_EDITING !== 'false';
+  const editingEnabled = true;
   const editor = createParentCodeEditor(untrack(() => scope));
   const validationKey = `parentCodes-${untrack(() => scope)}`;
   let views = $state<ParentCodeViews>({});

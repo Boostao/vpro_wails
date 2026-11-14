@@ -17,7 +17,7 @@
     disabled: boolean; onchange: () => void; onvalidation: (key: 'regionCodes', message: string | null) => void;
     onbusy?: (busy: boolean) => void; children: Snippet<[Snippet<[PaperControl?]>]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_REGION_CODES_EDITING !== 'false';
+  const editingEnabled = true;
   const listId = $props.id();
   const regionLookup = new CatalogueLookup(async (force, requests) => {
     if (force) await requests.track(PlotEntryService.ReloadRegionCodeCatalogue());

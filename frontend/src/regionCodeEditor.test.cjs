@@ -34,7 +34,6 @@ const ready = () => ({
 test('Native-verified source controls compile with explicit opt-out, shared gates and no direct writes', () => {
   const source = readFileSync(path.join(__dirname, 'RegionCodeFields.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'RegionCodeFields.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_REGION_CODES_EDITING !== 'false'/);
   assert.match(source, /style=\{position\(control\)\}/);
   assert.match(source, /data-source-control=\{control.controlName\}/);
   assert.match(source, /ListRegionChoices/);

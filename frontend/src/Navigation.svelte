@@ -39,8 +39,8 @@
       { label: 'Others', items: [
         { name: 'Metadata', icon: Table, action: 'metadata' },
         { name: 'Combine Species', icon: Link, view: 'lump-editor' },
-        { name: 'Plot Pictures', icon: FileText, view: import.meta.env.VITE_PICTURE_MANAGER !== 'false' ? 'picture-manager' : undefined },
-        { name: 'User log', icon: History, view: import.meta.env.VITE_USER_LOG_REVIEW !== 'false' ? 'user-log' : undefined },
+        { name: 'Plot Pictures', icon: FileText, view: 'picture-manager' },
+        { name: 'User log', icon: History, view: 'user-log' },
         ...(showDeferredPhase2 ? [
           { name: 'Herbarium (Phase 2 Deferred)', icon: Leaf, deferredPhase2: true },
           { name: 'Colour-theme (Phase 2 Deferred)', icon: Palette, deferredPhase2: true },
@@ -50,13 +50,13 @@
     ] },
     { label: 'Reports', icon: ChartColumn, groups: [
       { label: 'Vegetation', items: [
-        { name: 'Long Vegetation', icon: TableProperties, view: import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'false' ? 'long-vegetation' : undefined },
-        { name: 'Lifeform Summary', icon: Leaf, view: import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false' ? 'lifeform-summary' : undefined },
-        { name: 'Summary Vegetation', icon: ChartColumn, view: import.meta.env.VITE_SUMMARY_VEGETATION !== 'false' ? 'summary-vegetation' : undefined }
+        { name: 'Long Vegetation', icon: TableProperties, view: 'long-vegetation' },
+        { name: 'Lifeform Summary', icon: Leaf, view: 'lifeform-summary' },
+        { name: 'Summary Vegetation', icon: ChartColumn, view: 'summary-vegetation' }
       ] },
       { label: 'Environment', items: [
-        { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT !== 'false' ? 'long-environment' : undefined },
-        { name: 'Summary Environment', icon: ChartColumn, view: import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' ? 'summary-environment' : undefined }
+        { name: 'Long Environment', icon: TableProperties, view: 'long-environment' },
+        { name: 'Summary Environment', icon: ChartColumn, view: 'summary-environment' }
       ] },
       { label: 'Spatial & Synthesis', items: [
         { name: '3D Geospatial Workbench (BGC, QA & AOI)', icon: Globe, view: 'geospatial-map' },
@@ -64,12 +64,11 @@
         { name: 'R Analytics, climr aSMR & Quarto Guides', icon: Network, view: 'r-sidecar' }
       ] },
       { label: 'Others', items: [
-        { name: 'Subzone Matrix of Units', icon: Table, view: import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'false' ? 'subzone-matrix' : undefined },
+        { name: 'Subzone Matrix of Units', icon: Table, view: 'subzone-matrix' },
         { name: 'Hierarchy table', icon: Network, view: 'hierarchy' },
-        { name: 'Plot Label PDF', icon: Tag,
-          view: (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'false' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false') ? 'plot-label-preview' : undefined },
-        { name: 'Plot Locations', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW !== 'false' ? 'plot-locations' : undefined },
-        { name: 'Google Earth (KML)', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW !== 'false' ? 'google-earth-review' : undefined },
+        { name: 'Plot Label PDF', icon: Tag, view: 'plot-label-preview' },
+        { name: 'Plot Locations', icon: FileText, view: 'plot-locations' },
+        { name: 'Google Earth (KML)', icon: Globe, view: 'google-earth-review' },
         ...(showDeferredPhase2 ? [
           { name: 'Hierarchy Diagram (Phase 2 Deferred)', icon: Network, deferredPhase2: true },
         ] : []),
@@ -79,7 +78,7 @@
       { label: 'Import & Export', items: [
         { name: 'Interchange Hub (VENUS 5, TurboVeg, RDS, GeoPackage)', icon: Globe, view: 'interchange-hub' },
         { name: 'Cloud BECMaster Sync', icon: Globe, action: 'cloud-sync' },
-        { name: 'Project Table CSV Archive', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' ? 'table-csv' : undefined }
+        { name: 'Project Table CSV Archive', icon: Table, view: 'table-csv' }
       ] }
     ] },
     { label: 'Help', icon: HelpCircle, groups: [

@@ -12,8 +12,8 @@ const row = (listName, note) => ({
   fieldUsedIn: null, validateLoops: null, validate: false, note, flag: true,
   selectable: false, diagnostic: 'Empty Item is not selectable'
 });
-function component(enabled) {
-  return serverComponent(source.replace("import.meta.env.VITE_SOIL_CODES_REFERENCE !== 'false'", String(enabled)),
+function component() {
+  return serverComponent(source,
     'SoilCodeReference.svelte', {
       '../bindings/github.com/boostao/vpro-wails': {
         SoilCodeService: {
@@ -35,14 +35,12 @@ function component(enabled) {
     });
 }
 
-test('Soil reference compiles, remains opt-in and cannot mutate a draft or source record', () => {
+test('Soil reference compiles and cannot mutate a draft or source record', () => {
   assert.equal(compile(source, { filename: 'SoilCodeReference.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_SOIL_CODES_REFERENCE !== 'false'/);
   assert.match(source, /ListGreatGroupChoices/);
   assert.match(source, /ListSubgroupChoices/);
   assert.match(source, /Retry \{label\} reference/);
   assert.doesNotMatch(source, /<input|bind:|PlotService|UpdatePlot|CreatePlot|onchange=|oninput=/);
-  assert.doesNotMatch(render(component(false)).body, /soil-code-reference|data-reference-row=/);
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(form, /<SoilCodeReference disabled=\{busy \|\| headerWorkflowBusy\}/);
 });

@@ -73,7 +73,6 @@ test('Bedrock review is draft-bound, exact-value-bound and retained across remou
 test('Bedrock defaults on with opt-out and wires source slots, hidden validation and explicit Retry', () => {
   const source = read('GeologyCodeFields.svelte'), form = read('FS882Form.svelte');
   assert.equal(compile(source, { filename: 'GeologyCodeFields.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_GEOLOGY_CODES_EDITING !== 'false'/);
   assert.match(source, /onDestroy[\s\S]*onvalidation\('geologyCodes'/);
   assert.match(source, /Retry bedrock choices/);
   assert.match(form, /soilCodeBusy \|\| geologyCodeBusy/);
@@ -91,10 +90,8 @@ test('Actual Bedrock component renders only its three source slots with default 
     './paperLayout': { paperPage: () => ({ contentWidth: 600, height: 200, controls }), accessCaption: value => value },
     './formPresentation': presentation
   });
-  function renderEditor(enabled) {
-    const Component = serverComponent(read('GeologyCodeFields.svelte')
-      .replace("import.meta.env.VITE_GEOLOGY_CODES_EDITING",
-        enabled === undefined ? 'undefined' : JSON.stringify(enabled ? 'true' : 'false')),
+  function renderEditor() {
+    const Component = serverComponent(read('GeologyCodeFields.svelte'),
       'GeologyCodeFields.svelte', {
         '../bindings/github.com/boostao/vpro-wails': { GeologyCodeService: {
           ListBedrockChoices() { throw new Error('SSR must not call native bindings'); }
@@ -122,9 +119,7 @@ test('Actual Bedrock component renders only its three source slots with default 
     return render(Fixture, { props: { draft: codes({ bedrockGeology2: "q'X " }),
       capabilities: { bedrockGeology1: true, bedrockGeology2: true, bedrockGeology3: true } } }).body;
   }
-  assert.ok(renderEditor(false).match(/<input\b[^>]*>/g).every(input => /\bdisabled\b/.test(input)));
-  assert.equal((renderEditor().match(/class="geology-code-control/g) ?? []).length, 3);
-  const html = renderEditor(true);
+  const html = renderEditor();
   for (let index = 0; index < 3; index++) {
     assert.match(html, new RegExp(`id="header-bedrockGeology${index + 1}"`));
     assert.match(html, /min-height:40px;font:inherit/);

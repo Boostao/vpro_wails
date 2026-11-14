@@ -187,9 +187,7 @@ test('actual report module retains selector draft safety across remount with ind
     class Publication {view(){return {busy:false,blocked:false,error:'',outcome:null,requestedDestination:''}} subscribe(){return ()=>{}}}
     let created=0;
     const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
-    const component=serverComponent(source
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_SELECTED_UNIT_SELECTION !== 'false'/g,'true')
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g,'false'),'LongVegetationReport.svelte',{
+    const component=serverComponent(source,'LongVegetationReport.svelte',{
       '../bindings/github.com/boostao/vpro-wails':{},
       './longVegetationSelectedUnitSelection':{createSelectedUnitSelectionRegistry(){created++;return registry}},
       './LongVegetationSelectedUnitSelection.svelte':{default:child},
@@ -204,7 +202,7 @@ test('actual report module retains selector draft safety across remount with ind
       './longVegetationSwitchPreferences':{},'./LongVegetationSwitchPreferences.svelte':{default(){}},
       './longVegetationThresholdPreferences':{},'./LongVegetationThresholdPreferences.svelte':{default(){}},
       './longVegetationReport':{},'./longEnvironmentReport':{},
-      './vegetationWorkbook':{VegetationWorkbookPublicationSession:Publication}
+      './vegetationWorkbook':{vegetationWorkbookPublicationSession:()=>new Publication(),VegetationWorkbookPublicationSession:Publication}
     });
     for(let mount=0;mount<2;mount++) {
       const body=render(component,{props:{...owner,onBusyChange(){}}}).body;

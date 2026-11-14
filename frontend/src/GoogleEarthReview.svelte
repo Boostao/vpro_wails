@@ -17,9 +17,9 @@
   let review = $state<ValidatedGoogleEarthReview | null>(null);
   let busy = $state(false);
   let error = $state('');
-  const kmlEnabled = import.meta.env.VITE_GOOGLE_EARTH_KML_PREVIEW !== 'false';
-  const kmlExportEnabled = import.meta.env.VITE_GOOGLE_EARTH_KML_EXPORT !== 'false';
-  const preferencesEnabled = import.meta.env.VITE_GOOGLE_EARTH_PREFERENCES !== 'false';
+  const kmlEnabled = true;
+  const kmlExportEnabled = true;
+  const preferencesEnabled = true;
   let title = $state('VPro Plot Locations');
   let kml = $state<GoogleEarthKMLReview | null>(null);
   let approval = $state<GoogleEarthKMLExportReview | null>(null);

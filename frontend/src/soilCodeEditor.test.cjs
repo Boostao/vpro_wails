@@ -213,9 +213,8 @@ test('Shared QualityLookup failed retry, stale success and disposal preserve saf
 });
 
 const source = read('SoilCodeFields.svelte');
-function component(enabled, views = ready()) {
-  return serverComponent(source.replace("import.meta.env.VITE_SOIL_CODES_EDITING",
-    enabled === undefined ? 'undefined' : JSON.stringify(enabled ? 'true' : 'false')),
+function component(_enabled, views = ready()) {
+  return serverComponent(source,
     'SoilCodeFields.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { SoilCodeService: {
         ListGreatGroupChoices() { throw new Error('SSR must not call bindings'); },
@@ -265,12 +264,8 @@ function renderEditor(enabled, options = {}) {
   return render(Fixture, { props: { draft: codes({ soilClassGroup: 'BG', soilClassSubGroup: 'BGL' }),
     original: codes(), capabilities: { soilClassGroup: true, soilClassSubGroup: true }, disabled: false, ...options } }).body;
 }
-test('Actual SSR editor defaults on with readonly opt-out, responsive labels and preserved children', () => {
+test('Actual SSR editor renders responsive labels and preserved children', () => {
   assert.equal(compile(source, { filename: 'SoilCodeFields.svelte', generate: 'client' }).warnings.length, 0);
-  const off = renderEditor(false);
-  assert.doesNotMatch(off, /soil-code-toolbar|soil-code-control|data-reference-row/);
-  assert.ok(off.match(/<input\b[^>]*>/g).every(input => /\bdisabled\b/.test(input)));
-  assert.equal((renderEditor().match(/class="soil-code-control/g) ?? []).length, 2);
   const html = renderEditor(true);
   for (const [column, x] of [['SoilClassGroup', 231], ['SoilClassSubGroup', 105]]) {
     const input = html.match(/<input\b[^>]*>/g).find(input => input.includes(`data-column="${column}"`));
@@ -317,7 +312,6 @@ test('Actual SSR errors and capability gates are explicit without disabling inpu
 test('Parent integrates hidden validation, lifecycle/reset gates and default-on/no-double-fetch adaptation', () => {
   const form = read('FS882Form.svelte');
   assert.equal(compile(form, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(form, /VITE_SOIL_CODES_EDITING !== 'false'/);
   assert.match(form, /regionCodeBusy \|\| soilCodeBusy/);
   assert.match(form, /if !soilCodeEditingEnabled.*SoilCodeReference/);
   assert.match(form, /onvalidation=\{validateHeader\} onbusy=\{\(pending\) => soilCodeBusy = pending\}/);

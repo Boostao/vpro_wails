@@ -87,7 +87,6 @@ test('real Go nullable ordinary wire stays readable but explicitly unavailable t
 });
 test('form gates restoration and refreshes both header and child revision after all outcomes', () => {
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(form, /VITE_AUDIT_RESTORE !== 'false'/);
   assert.match(form, /auditBlocked = \$derived\(childEditingDisabled \|\| Object\.keys\(headerValidation\)\.length > 0\)/);
   assert.match(form, /await PlotService\.SetAuditRestoreSelection\(plot, \[\]\)/);
   assert.match(form, /await refreshAfterRestore\(plot, request\)/);

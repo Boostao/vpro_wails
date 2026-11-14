@@ -66,8 +66,7 @@ function renderReport(value,environment={},overrides={}) {
     './vegetationWorkbook':{VegetationWorkbookPublicationSession:Publication,vegetationWorkbookPublicationSession:()=>new Publication()},
     ...overrides,
   };
-  const component=serverComponent(source('LongVegetationReport.svelte'),'LongVegetationReport.svelte',dependencies,
-    {VITE_LONG_VEGETATION_PROJECT_SCOPE:'true',VITE_LONG_VEGETATION_WORKBOOK:'true',...environment});
+  const component=serverComponent(source('LongVegetationReport.svelte'),'LongVegetationReport.svelte',dependencies);
   const busy=[];
   const body=render(component,{props:{...value.physicalOwner,onBusyChange:value=>busy.push(value)}}).body;
   return {body,busy};
@@ -186,7 +185,7 @@ test('actual root owner watcher keeps unmounted None-context project work in agg
     LifecycleService:{GetPendingCloseRequest:async()=>'close',CancelClose:async()=>{cancelled++;},ConfirmClose:async()=>{confirmed++;}},
   });
   Object.defineProperty(context,'editorBusy',{get:()=>context.projectReportBusy});
-  vm.runInContext(ts.transpileModule(effect.replaceAll("import.meta.env.VITE_LONG_VEGETATION_REPORT === 'false'",'false')+
+  vm.runInContext(ts.transpileModule(effect+
     close+transition+'\nthis.actions={handleCloseRequest,respondToClose,requestTransition};',
     {compilerOptions:{target:ts.ScriptTarget.ES2022, editorInitializing: false}}).outputText,Object.assign(context,{editorInitializing:false}));
   assert.equal(effects.length,1);const unsubscribe=effects[0]();
@@ -243,8 +242,7 @@ test('ordinary Unit and selected-field controls inherit pending project scope ho
       'LongVegetationUnitPreferences.svelte',{'../bindings/github.com/boostao/vpro-wails':{},...dependencies})};
     dependencies['./LongVegetationSelectedUnitSelection.svelte']={default:serverComponent(selectionSource,
       'LongVegetationSelectedUnitSelection.svelte',{'../bindings/github.com/boostao/vpro-wails':{}})};
-    const {body}=renderReport(value,{VITE_LONG_VEGETATION_UNIT_PREFERENCES:'true',
-      VITE_LONG_VEGETATION_SELECTED_UNIT_SELECTION:'true'},dependencies);
+    const {body}=renderReport(value,{},dependencies);
     const button=attribute=>{
       const matches=body.match(new RegExp(`<button\\b[^>]*${attribute}[^>]*>`,'g'))??[];
       assert.equal(matches.length,1,attribute);return matches[0];

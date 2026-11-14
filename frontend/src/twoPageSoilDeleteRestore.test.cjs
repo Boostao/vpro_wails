@@ -96,7 +96,7 @@ test('TwoPageSoilPanel SSR renders guarded Delete and Deleted horizons actions w
     const html = render(Component, { props: { ...owner, parentBlocked: false } }).body;
     assert.match(html, /data-soil-delete-trigger/);
     assert.match(html, /data-soil-deleted-history-trigger/);
-    assert.match(html, /guarded horizon deletion and restoration preserve permanent child IDs/);
+    assert.match(html, /LMH25 pedon horizon editor/);
   }
 });
 

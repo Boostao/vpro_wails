@@ -20,13 +20,13 @@
   let workbookBusy = $state(false);
   let error = $state('');
   let preview = $state<ValidatedSiteUnitSummary | null>(null);
-  const extendedWorkbookEnabled = import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'false';
+  const extendedWorkbookEnabled = true;
   const extendedAuthority = untrack(() => extendedWorkbookEnabled
     ? extendedSummaryWorkbookPublicationSession({ contextId, project, projectPath, su, suPath }) : null);
   const retainedOptions = extendedAuthority?.view().blocked ? extendedAuthority.requestedOptions() : null;
   let mode = $state<SiteUnitSummaryMode>(retainedOptions?.orderBy === 2 ? 'lifeform' : 'layer');
-  const lifeformsEnabled = import.meta.env.VITE_SITE_UNIT_SUMMARY_LIFEFORMS !== 'false';
-  const speciesEnabled = import.meta.env.VITE_SITE_UNIT_SUMMARY_SPECIES !== 'false';
+  const lifeformsEnabled = true;
+  const speciesEnabled = true;
   const ownedCriteria = () => summarySpeciesCriteria({ contextId, project, projectPath, su, suPath });
   const criteria = speciesEnabled ? ownedCriteria() : null;
   let speciesView = $state(criteria?.view() ?? null);
@@ -40,7 +40,7 @@
   });
   const reads = new ReadRequests();
   let generation = 0;
-  const preferencesEnabled = import.meta.env.VITE_SITE_UNIT_SUMMARY_PREFERENCES !== 'false';
+  const preferencesEnabled = true;
   const ownedPreferences = () => siteUnitSummaryPreferencesSession({ contextId, project, projectPath, su, suPath });
   const preferences = preferencesEnabled ? ownedPreferences() : null;
   let preferenceView = $state(preferences?.view() ?? null);
@@ -229,7 +229,7 @@
     {/if}
     {#if busy}<button data-summary-cancel onclick={cancel}>Cancel report read</button><p role="status">Reading owned summary options or snapshots...</p>{/if}
   </div>
-  {#if import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false' && mode === 'layer' && !speciesView?.enabled}
+  {#if mode === 'layer' && !speciesView?.enabled}
     <SiteUnitSummaryWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }} {method}
       disabled={busy || preferenceBarrier || speciesBarrier || !ready || su === 'None'}
       onBusyChange={(held) => { workbookBusy = held; reportBusy(); }} />

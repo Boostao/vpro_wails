@@ -12,7 +12,7 @@
     disabled: boolean; onchange: () => void; onvalidation: (key: 'bec', message: string | null) => void;
     children: Snippet<[Snippet<[PaperControl?]>]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_BEC_EDITING !== 'false';
+  const editingEnabled = true;
   const listPrefix = $props.id();
   function catalogueRows<T>(rows: T[] | null): T[] {
     if (rows === null) throw new Error('The BEC service did not return catalogue rows.');

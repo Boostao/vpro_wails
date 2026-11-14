@@ -9,13 +9,13 @@ const req = createRequire(path.join(__dirname, '..', 'package.json'));
 const ts = req('typescript');
 const { proxy } = req('svelte/internal/client');
 const clone = value => structuredClone(value);
-function load(name, dependencies = {}, environment = {}) {
-  const source = fs.readFileSync(path.join(__dirname, name), 'utf8').replaceAll('import.meta.env', '__environment');
+function load(name, dependencies = {}) {
+  const source = fs.readFileSync(path.join(__dirname, name), 'utf8');
   const code = ts.transpileModule(source, { compilerOptions: {
     target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS,
   } }).outputText;
   const module = { exports: {} };
-  vm.runInNewContext(code, { module, exports: module.exports, __environment: environment,
+  vm.runInNewContext(code, { module, exports: module.exports,
     crypto: { randomUUID }, require: id => {
       if (!(id in dependencies)) throw new Error(`Uninjected dependency ${id}`);
       return dependencies[id];
@@ -316,8 +316,7 @@ test('fresh lowercase UUIDv4 belongs to actual Save attempts; used identities ca
 test('read errors and draft errors survive Undo and registry remount; correction never repairs silently', async () => {
   let failRead = false;
   const reg = registries.fieldListRegistry(() => ({ read: () => failRead
-    ? Promise.reject(new Error('read fault')) : Promise.resolve(clone(wire.review)), save: () => Promise.reject('unused') }),
-    { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'true' });
+    ? Promise.reject(new Error('read fault')) : Promise.resolve(clone(wire.review)), save: () => Promise.reject('unused') }));
   const session = reg.session(owner);
   await session.load();
   assert.equal(session.stageRow('5', true), false);
@@ -422,20 +421,12 @@ test('foreign/malformed reconciliation preserves previous authority and receipt,
   assert.equal(session.view().receipts[0].kind, 'unknown');
 });
 
-test('registry literal flags, exact owner isolation, retained receipts and aggregate lifecycle holds', async () => {
-  for (const environment of [
-    { VITE_SUMMARY_VEGETATION: 'false', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'false' },
-    { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'false' },
-    { VITE_SUMMARY_VEGETATION: 'false', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'true' },
-  ]) {
-    const reg = registries.fieldListRegistry(() => { throw new Error('must not create port'); }, environment);
-    assert.equal(reg.enabled, false); assert.throws(() => reg.session(owner), /disabled/);
-  }
+test('registry exact owner isolation, retained receipts and aggregate lifecycle holds', async () => {
   assert.equal(registries.summaryVegetationFieldListEnabled, true);
   const reg = registries.fieldListRegistry(scope => ({
     read: () => Promise.resolve({ ...clone(wire.review), ...scope }),
     save: json => Promise.resolve(commitFor(JSON.parse(json))),
-  }), { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'true' });
+  }));
   const activities = [];
   const unsubscribe = reg.subscribe(value => activities.push(value));
   const first = reg.session(owner), alternateOwner = { ...owner, contextId: owner.contextId + '2' };
@@ -454,8 +445,7 @@ test('registry literal flags, exact owner isolation, retained receipts and aggre
 });
 
 test('bounded contexts/actions/rows refuse without eviction, request or evidence reduction', async () => {
-  const reg = registries.fieldListRegistry(() => ({ read: () => Promise.resolve(wire.review), save: () => Promise.resolve(null) }),
-    { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'true' });
+  const reg = registries.fieldListRegistry(() => ({ read: () => Promise.resolve(wire.review), save: () => Promise.resolve(null) }));
   for (let i = 0; i < 16; i++) reg.session({ ...owner, contextId: String(i) });
   assert.throws(() => reg.session({ ...owner, contextId: '17' }), /capacity/);
   assert.equal(reg.session({ ...owner, contextId: '0' }), reg.session({ ...owner, contextId: '0' }));

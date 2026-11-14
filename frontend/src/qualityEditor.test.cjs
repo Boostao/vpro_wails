@@ -30,7 +30,6 @@ const deferred = () => { let resolve, reject; const promise = new Promise((yes, 
 test('Native-verified quality source renderer compiles, preserves lexical input, and retains explicit opt-out', () => {
   const source = readFileSync(path.join(__dirname, 'QualityFields.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'QualityFields.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_QUALITY_EDITING !== 'false'/);
   assert.match(source, /style=\{position\(control\)\}/);
   assert.match(source, /data-column=\{control.column\}/);
   assert.match(source, /oninput=\{event => setCode/);

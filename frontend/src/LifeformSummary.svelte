@@ -10,8 +10,8 @@
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
     onBusyChange: (busy: boolean) => void;
   } = $props();
-  const enabled = import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false';
-  const attributesEnabled = import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY !== 'false';
+  const enabled = true;
+  const attributesEnabled = true;
   const reads = new ReadRequests();
   let generation = 0;
   let busy = $state(false);
@@ -49,17 +49,14 @@
   <h1>Lifeform Summary</h1>
   {#if error}<p role="alert" class="error">{error}</p>{/if}
   <p>Project {project}; selected normal SU {su}. Profile navigation does not filter this report.</p>
-  {#if !enabled}<p>Lifeform Summary preview is currently unavailable.</p>{/if}
   {#if su === 'None' || su === 'USysSuTableDynamic'}<p>A selected normal SU is required. Hierarchy and dynamic breaks are unavailable.</p>{/if}
   <div class="actions">
     <button onclick={() => show('lifeform')} disabled={!enabled || busy || workbookBusy || su === 'None' || su === 'USysSuTableDynamic'}>Preview Lifeform Summary</button>
     <button onclick={() => show('attributes')} disabled={!enabled || !attributesEnabled || busy || workbookBusy || su === 'None' || su === 'USysSuTableDynamic'}>Preview species attribute summaries</button>
     {#if busy}<button onclick={cancel}>Cancel preview</button><p role="status">Reading owned project and SU…</p>{/if}
   </div>
-  {#if import.meta.env.VITE_LIFEFORM_WORKBOOK !== 'false'}
-    <LifeformWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }} disabled={busy}
-      onBusyChange={(held) => { workbookBusy = held; reportBusy(); }} />
-  {/if}
+  <LifeformWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }} disabled={busy}
+    onBusyChange={(held) => { workbookBusy = held; reportBusy(); }} />
   {#if currentPreview}
     {#each currentPreview.report.units as unit}
       <article>

@@ -3,12 +3,11 @@ import { TwoPageSoilSession } from './twoPageSoilSession';
 import type { TwoPageSoilOwner } from './twoPageSoilEditor';
 import { notifyTwoPageSoilActivity, subscribeTwoPageSoilActivity, twoPageSoilActivity, twoPageSoilEntries, twoPageSoilOwnerKey, type TwoPageSoilActivity } from './twoPageSoilActivity';
 
-export const twoPageSoilReviewEnabled = import.meta.env.VITE_TWO_PAGE_SOIL_REVIEW !== 'false';
-export const twoPageSoilWritingEnabled = twoPageSoilReviewEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_WRITING !== 'false';
-export const twoPageSoilCreationEnabled = twoPageSoilWritingEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_CREATION !== 'false';
+export const twoPageSoilReviewEnabled = true;
+export const twoPageSoilWritingEnabled = true;
+export const twoPageSoilCreationEnabled = true;
 export { subscribeTwoPageSoilActivity, twoPageSoilActivity, type TwoPageSoilActivity };
 export function twoPageSoilSession(owner: TwoPageSoilOwner): TwoPageSoilSession {
-  if (!twoPageSoilReviewEnabled) throw new Error('Two-page soil review is disabled.');
   const key = twoPageSoilOwnerKey(owner);
   const existing = twoPageSoilEntries.get(key);
   if (existing) return existing.session;

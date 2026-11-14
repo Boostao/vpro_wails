@@ -157,9 +157,7 @@ test('actual parent unit registry retains invalid drafts across remount and reac
     view(){return {busy:false,blocked:false,error:'',outcome:null,requestedDestination:''}}
     subscribe(){return ()=>{}}
   }
-  const component=serverComponent(source('LongVegetationReport.svelte')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_UNIT_PREFERENCES !== 'false'/g,'true')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g,'false'),
+  const component=serverComponent(source('LongVegetationReport.svelte'),
     'LongVegetationReport.svelte',{
       '../bindings/github.com/boostao/vpro-wails':{},
       './longVegetationUnitPreferences':{createLongVegetationUnitPreferencesRegistry(){created++;return registry}},
@@ -175,7 +173,7 @@ test('actual parent unit registry retains invalid drafts across remount and reac
       './longVegetationSwitchPreferences':{},'./LongVegetationSwitchPreferences.svelte':{default(){}},
       './longVegetationThresholdPreferences':{},'./LongVegetationThresholdPreferences.svelte':{default(){}},
       './longVegetationReport':{},'./longEnvironmentReport':{},
-      './vegetationWorkbook':{VegetationWorkbookPublicationSession:Publication},
+      './vegetationWorkbook':{vegetationWorkbookPublicationSession:()=>new Publication(),VegetationWorkbookPublicationSession:Publication},
     });
   for(let mount=0;mount<2;mount++){
     const body=render(component,{props:{...scope,onBusyChange(){}}}).body;

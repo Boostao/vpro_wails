@@ -933,21 +933,18 @@ test('read cancellation rejects late originals; active commits cannot be cancell
   save.resolve({ ChangedCells: 1, HistoryID: '' });
   assert.equal(await pending, true);
 });
-const component = serverComponent(readFileSync(path.join(__dirname, 'SIVIParentSharedFields.svelte'), 'utf8')
-  .replace('import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING', "'false'"),
-  'SIVIParentSharedFields.svelte', { './siviParentSharedSession': shared, './projectMetadataEditor': metadata });
-  const enabledReferenceComponent = serverComponent(
-    readFileSync(path.join(__dirname, 'SIVIParentSharedFields.svelte'), 'utf8')
-      .replace('import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING', "'true'"),
-    'SIVIParentSharedFields.svelte',
-    { './projectMetadataEditor': metadata, './siviParentSharedSession': shared },
-  );
-  test('default build renders 32; enabled suggestions render exactly 60 live controls and duplicate options', async () => {
+const component = serverComponent(
+  readFileSync(path.join(__dirname, 'SIVIParentSharedFields.svelte'), 'utf8'),
+  'SIVIParentSharedFields.svelte',
+  { './projectMetadataEditor': metadata, './siviParentSharedSession': shared },
+);
+const enabledReferenceComponent = component;
+  test('view.referencesEnabled=false renders 32; enabled suggestions render exactly 60 live controls and duplicate options', async () => {
     const { session } = referenceFixture();
     await session.load();
     const props = { view: session.view(), disabled: false, canSave: true,
       onstage() {}, onoperation() {}, oncancel() {}, onreferences() {} };
-    const hidden = render(component, { props }).body;
+    const hidden = render(enabledReferenceComponent, { props: { ...props, view: { ...props.view, referencesEnabled: false } } }).body;
     assert.equal((hidden.match(/data-sivi-shared-field="/g) ?? []).length, 32);
     assert.equal(hidden.includes('sivi-shared-Exposure1'), false);
     const html = render(enabledReferenceComponent, { props }).body;

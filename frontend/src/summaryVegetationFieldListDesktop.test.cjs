@@ -8,14 +8,13 @@ const req = createRequire(path.join(__dirname, '..', 'package.json'));
 const ts = req('typescript'), compiler = req('svelte/compiler'), runtime = req('svelte/internal/client');
 const wire = JSON.parse(fs.readFileSync(path.join(__dirname, 'summaryVegetationFieldListWire.json'), 'utf8'));
 const { physical, source, sourcePath, ...context } = wire.review;
-const env = { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'true' };
 const plain = value => JSON.parse(JSON.stringify(value));
 function execute(code, dependencies = {}, globals = {}) {
   const module = { exports: {} };
-  const js = ts.transpileModule(code.replaceAll('import.meta.env', '__env'), { compilerOptions: {
+  const js = ts.transpileModule(code, { compilerOptions: {
     target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS,
   } }).outputText;
-  vm.runInNewContext(js, { ...globals, __env: env, module, exports: module.exports, setTimeout,
+  vm.runInNewContext(js, { ...globals, module, exports: module.exports, setTimeout,
     crypto: { randomUUID: () => wire.request.requestId },
     require(id) { assert.ok(id in dependencies, `Uninjected import ${id}`); return dependencies[id]; } });
   return module.exports;
@@ -42,14 +41,14 @@ function desktop(options = {}) {
     read: id => { assert.equal(id, context.contextId); gets++; return options.read?.() ?? Promise.resolve(runtime.proxy(structuredClone(wire.review))); },
     save: (id, json) => { assert.equal(id, context.contextId); saves++; return options.save?.(json) ?? Promise.resolve(wire.outcome); },
     validationYield: options.validationYield,
-  }, env, () => wire.request.requestId);
+  }, () => wire.request.requestId);
   return { value, gets: () => gets, saves: () => saves };
 }
 function scriptHandlers(filename, appended, dependencies, props) {
   let destroy;
   let script = fs.readFileSync(path.join(__dirname, filename), 'utf8').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
   script = script.replace('$props()', '__props') + appended;
-  const stripped = ts.transpileModule(script.replaceAll('import.meta.env', '__env'), { compilerOptions: {
+  const stripped = ts.transpileModule(script, { compilerOptions: {
     target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext,
   } }).outputText;
   const compiled = compiler.compileModule(stripped, { filename: filename + '.js', generate: 'client' });

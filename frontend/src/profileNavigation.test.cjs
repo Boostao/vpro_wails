@@ -56,7 +56,6 @@ test('Zero and over200 previews stay unavailable without clearing an existing fi
 
 test('Apply/Clear/Previous/Next reuse transition ownership and revalidation before publishing, with context retirement and a fresh plot mount',()=>{
   const app=read('App.svelte'),panel=read('ProjectPlotProfileReview.svelte'),form=read('FS882Form.svelte');
-  assert.match(form,/VITE_PROJECT_PLOT_PROFILE_FILTERING !== 'false'/);
   assert.match(panel,/allowFiltering = false/);
   assert.match(panel,/disabled=\{busy \|\| blocked \|\| profileFilterUnavailable\(result\) !== null\}/);
   assert.match(panel,/runInput = \$state\.snapshot\(input\)/);
@@ -80,7 +79,6 @@ test('Apply/Clear/Previous/Next reuse transition ownership and revalidation befo
 
 test('Independent profile write authorization is default-off and shared-transition owned, not inferred from selection',()=>{
   const app=read('App.svelte');
-  assert.match(app,/VITE_PLOT_PROFILE_WRITE_OWNERSHIP !== 'false'/);
   assert.match(app,/aria-label="Reviewed profile write ownership"/);
   assert.match(app,/Context changes or restart clear it/);
   assert.match(app,/profileWriteContext !== \$projectState.contextId/);
@@ -144,7 +142,6 @@ test('Blank profile-file creation preserves the exact original template and reje
 
 test('New profile-file publication is separately default-off, shared-transition owned and never an implicit attach or grant',()=>{
   const app=read('App.svelte');
-  assert.match(app,/VITE_PLOT_PROFILE_FILE_CREATION !== 'false'/);
   assert.match(app,/aria-label="Reviewed blank profile file creation"/);
   assert.match(app,/<label for="profile-file-name"/);
   assert.match(app,/<label for="profile-file-path"/);
@@ -182,7 +179,6 @@ test('Existing-file profile creation requires exact original template and curren
 
 test('Existing-file creation is separately gated inside profile selection, shares draft transitions and never switches or grants',()=>{
   const app=read('App.svelte');
-  assert.match(app,/VITE_PLOT_PROFILE_TABLE_CREATION !== 'false'/);
   assert.match(app,/\{#if profileTableCreationEnabled && \$projectState.plotProfile.writable\}/);
   const panel=app.indexOf('aria-label="Reviewed existing-file profile creation"');
   assert.ok(panel>app.indexOf('aria-label="Stored plot profile selection"'));

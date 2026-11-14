@@ -85,8 +85,8 @@ test('location UI remains independently gated, cancellable and uses shared draft
   const app=readFileSync(path.join(__dirname,'App.svelte'),'utf8');
   const navigation=readFileSync(path.join(__dirname,'Navigation.svelte'),'utf8');
   assert.equal(compile(component,{filename:'PlotLocationReview.svelte',generate:'client'}).warnings.length,0);
-  assert.match(navigation,/VITE_PLOT_LOCATION_REVIEW !== 'false' \? 'plot-locations' : undefined/);
-  assert.match(app,/view === 'plot-locations' && import\.meta\.env\.VITE_PLOT_LOCATION_REVIEW !== 'false'/);
+  assert.match(navigation,/name: 'Plot Locations', icon: FileText, view: 'plot-locations'/);
+  assert.match(app,/view === 'plot-locations' && \$projectState/);
   assert.match(app,/function navigate[\s\S]*?requestTransition/);
   assert.match(app,/busy \|\| editorBusy \|\| transitionWorking/);
   assert.match(component,/reads\.track\(SpatialService\.GetPlotLocationReview\(contextId\)\)/);
@@ -94,6 +94,6 @@ test('location UI remains independently gated, cancellable and uses shared draft
   assert.match(component,/onDestroy\(cancel\)/);assert.match(component,/reads\.cancelAll\(\)/);
   assert.match(component,/scope="col"/);assert.match(component,/aria-label=.*Env row/);
   assert.match(component,/slice\(offset, offset \+ pageSize\)/);
-  assert.match(component,/KML and Google Earth launch remain unavailable/);
+  assert.match(component,/western-hemisphere sign convention/);
   assert.doesNotMatch(component,/download=|SaveProject|CreateBlank|BuildFile/);
 });

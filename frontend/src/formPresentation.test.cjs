@@ -33,7 +33,7 @@ const native = {
 const dependencies = { ...modules, '../bindings/github.com/boostao/vpro-wails': native };
 for (const name of ['BECFields', 'CoordinateFields', 'WorkingUnitFields', 'QualityFields', 'SubstrateFields', 'SiteCodeFields', 'RegionCodeFields']) {
   dependencies[`./${name}.svelte`] = { default: serverComponent(
-    read(`${name}.svelte`).replace(/import\.meta\.env\.VITE_[A-Z_]+/g, 'undefined'), `${name}.svelte`, dependencies) };
+    read(`${name}.svelte`), `${name}.svelte`, dependencies) };
 }
 const HeaderEditor = serverComponent(read('HeaderEditor.svelte'), 'HeaderEditor.svelte', dependencies);
 test('Exact source captions and binding aliases take precedence only for explicitly supplied source pages', () => {

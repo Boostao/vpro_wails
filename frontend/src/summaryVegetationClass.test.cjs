@@ -95,7 +95,7 @@ test('compiled class panel retains Show labels and source-enabled but ignored Sh
   const component = readFileSync(path.join(__dirname, 'SummaryVegetationReport.svelte'), 'utf8');
   const panel = serverComponent(component, 'SummaryVegetationReport.svelte', {
     './summaryVegetation': report, '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
-  }, { VITE_SUMMARY_VEGETATION: 'true' });
+  });
   const session = report.summaryVegetationSession(owner);
   session.edit(1, 4, 20);
   await session.show({ preview() {}, previewClass: async () => structuredClone(wire[4]), cancel() {} });
