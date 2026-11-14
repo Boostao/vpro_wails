@@ -6,7 +6,8 @@ const { compile } = require('svelte/compiler');
 const { componentFunctions, srcPath } = require('./svelteTestHelpers.cjs');
 
 const parent = readFileSync(srcPath('FS882Form.svelte'), 'utf8');
-const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
+const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8') + '\n' +
+  readFileSync(path.join(__dirname, '..', '..', 'domainservices_plotentry.go'), 'utf8');
 const peers = ['siviSession', 'siviCoverSession', 'siviCombinedSession', 'siviCollectedSession', 'siviSpeciesSession', 'siviIdentitySession'];
 const guards = ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'siviCombinedUnsaved', 'siviSpeciesUnsaved', 'siviIdentityUnsaved',
   'heightUnsaved', 'otherUnsaved', 'soilUnsaved', 'attributeUnsaved', 'collectedUnsaved', 'speciesUnsaved',
@@ -34,7 +35,7 @@ function host(overrides = {}) {
 
 test('Collected has unconditional actual native registration without granting other columns', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(main, /NewSIVICollectedService\(contextService\)/);
+  assert.match(main, /NewSIVICollectedService\((?:contextService|core)\)/);
   assert.match(main, /siviCollected:\s*siviCollected/);
   assert.match(main, /application\.NewService\(plotEntryService\)/);
   for (const method of ['GetSIVICollectedOriginal', 'SaveSIVICollectedReviewed', 'RestoreSIVICollectedReviewed']) assert.ok(parent.includes(`PlotEntryService.${method}(`));

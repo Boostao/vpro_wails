@@ -29,8 +29,9 @@ function derived(name, state) {
   return vm.runInNewContext(expression[1], state);
 }
 test('actual main and root unconditionally register historical creation Undo without granting Create or Delete', () => {
-  const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
-  assert.match(main, /NewSIVICreationUndoService\(contextService\)/);
+  const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8') + '\n' +
+    readFileSync(path.join(__dirname, '..', '..', 'domainservices_plotentry.go'), 'utf8');
+  assert.match(main, /NewSIVICreationUndoService\((?:contextService|core)\)/);
   assert.match(main, /siviCreationUndo:\s*siviCreationUndo/);
   assert.match(main, /application\.NewService\(plotEntryService\)/);
   assert.match(root, /ownedSIVICreationUndoSession\(\{ contextId: siviContextId, project: \$projectState.activeProject, plot: original.plotNumber \}\)/);

@@ -68,7 +68,8 @@ function parseTapCounts(output) {
   };
 }
 
-const filters = process.argv.slice(2).filter(Boolean);
+const verbose = process.argv.includes('--verbose');
+const filters = process.argv.slice(2).filter(arg => Boolean(arg) && arg !== '--verbose');
 const allDiscovered = discoverTestFiles(testsRoot);
 
 const runnable = allDiscovered.filter(rel => {
@@ -119,8 +120,18 @@ const [standardResult, browserResult] = await Promise.all([
 ]);
 
 for (const res of [standardResult, browserResult]) {
-  if (res.stdout) process.stdout.write(res.stdout);
-  if (res.stderr) process.stderr.write(res.stderr);
+  if (verbose || res.code !== 0) {
+    const failedLines = (res.stdout + '\n' + res.stderr)
+      .split('\n')
+      .filter(line => verbose || /^not ok\b|^\s*Error:|^\s*AssertionError/i.test(line));
+    if (failedLines.length > 0) {
+      console.error(`[run-tests:${res.label}]`);
+      console.error(failedLines.join('\n'));
+    }
+  }
+  if (!verbose && res.stderr) {
+    process.stderr.write(res.stderr);
+  }
 }
 
 const stdCounts = parseTapCounts(standardResult.stdout + '\n' + standardResult.stderr);
@@ -137,5 +148,5 @@ console.log(
 );
 
 if (standardResult.code !== 0 || browserResult.code !== 0 || totalFail > 0) {
-  process.exit(1);
+  process.exitCode = 1;
 }

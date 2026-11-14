@@ -90,8 +90,9 @@ test('actual client subscription settles, notifies once and detaches when its ow
 });
 
 test('creation unconditionally registers in actual root/main and binds only owned refs/Create/readonly lookup', async () => {
-  const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
-  assert.match(main, /NewSIVICreationService\(contextService\)/);
+  const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8') + '\n' +
+    readFileSync(path.join(__dirname, '..', '..', 'domainservices_plotentry.go'), 'utf8');
+  assert.match(main, /NewSIVICreationService\((?:contextService|core)\)/);
   assert.match(main, /siviCreation:\s*siviCreation/);
   assert.match(main, /application\.NewService\(plotEntryService\)/);
   const calls = [];

@@ -5,7 +5,8 @@ const path = require('node:path');
 const { compile } = require('svelte/compiler');
 const { componentFunctions, srcPath } = require('./svelteTestHelpers.cjs');
 const parent = readFileSync(srcPath('FS882Form.svelte'), 'utf8');
-const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
+const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8') + '\n' +
+  readFileSync(path.join(__dirname, '..', '..', 'domainservices_plotentry.go'), 'utf8');
 const peers = ['siviSession', 'siviCoverSession', 'siviCombinedSession', 'siviCollectedSession', 'siviSpeciesSession', 'siviIdentitySession'];
 const guards = ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'siviCombinedUnsaved', 'siviCollectedUnsaved',
   'siviSpeciesUnsaved', 'heightUnsaved', 'otherUnsaved', 'soilUnsaved', 'attributeUnsaved', 'collectedUnsaved',
@@ -28,7 +29,7 @@ function host(overrides = {}) {
 }
 test('identity is unconditionally registered in actual main and uses tracked owned reads without requiring audited peers', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(main, /NewSIVIIdentityService\(contextService\)/);
+  assert.match(main, /NewSIVIIdentityService\((?:contextService|core)\)/);
   assert.match(main, /siviIdentity:\s*siviIdentity/);
   assert.match(main, /application\.NewService\(plotEntryService\)/);
   for (const method of ['GetSIVIIdentityOriginal', 'SaveSIVIIdentityReviewed', 'RestoreSIVIIdentityReviewed']) assert.ok(parent.includes(`PlotEntryService.${method}(`));
