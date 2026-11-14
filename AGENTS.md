@@ -2,8 +2,8 @@
 
 ## 1. Authoritative Specification & Product Direction
 
-- **Single Source of Truth:** Read `~/Work/VPRO_ACCESS/okf/00_index.md` first, together with:
-  - `okf/02_present_state/capability_matrix.md` & `data_dictionary.md`
+- **Single Source of Truth (In-Tree `./okf/`):** Read `okf/00_index.md` first, together with:
+  - `okf/02_present_state/capability_matrix.md` & `okf/02_present_state/data_dictionary.md`
   - `okf/03_future_architecture/transition_and_adoption.md`
   - `okf/03_future_architecture/target_stack_recommendation.md`
   - `okf/03_future_architecture/analytics_and_governance.md` (In-App MapLibre v6 + WebGPU + `PMTiles`, GeoPackage, TurboVeg 3 + XML, R `.rds`)
@@ -22,7 +22,7 @@
 
 **IMPORTANT DISCOVERY RULE:** Workspace `glob` and `grep` tools default solely to `~/Work/vpro_wails`. Always pass explicit absolute `paths` (expand `~` to `/home/$USER`) when inspecting the sibling directories below, and **always include relevant sibling paths in subagent prompts**. Never mutate legacy `.accdb`/`.mdb`/`.zip` source archives (inspect read-only or copy to a temporary directory first):
 
-1. **Authoritative Knowledge Repository (`okf/`):** `~/Work/VPRO_ACCESS/okf/` (start at `00_index.md`; 17 Markdown files across `01_history_and_evolution/`, `02_present_state/`, `03_future_architecture/`, `04_evidence_and_sources/`).
+1. **Authoritative Knowledge Framework (`./okf/` — In-Tree):** `~/Work/vpro_wails/okf/` (kept in-tree with the app; start at `okf/00_index.md`; 17 cross-linked Markdown specs across `01_history_and_evolution/`, `02_present_state/`, `03_future_architecture/`, `04_evidence_and_sources/`).
 2. **Legacy Manuals, Triage, Emails & `VPro64` Exports:** `~/Work/VPRO_ACCESS/`
    - Field Manuals: `LMH25_2023_web.pdf` (2023 ed.) & `Lmh25_2015.pdf` (2015 ed.), `VProXP_Userguide.pdf`
    - Client Scope & Triage: `VPro2.0_Functions to remove-retain-modify.pdf` (`.docx`), `_BEC_data_system_fs1a_schedule_of_services_v2 (13).md`, `VproMailExchange/` (106 emails incl. executed contract `RE26OCF433` in `0072`), `SCREENCAPS/` (21 VPro 64 PNGs)
